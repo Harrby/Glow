@@ -3,10 +3,15 @@ import sys
 
 
 class MainWindow(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, app: QtWidgets.QApplication):
         super().__init__()
 
+        self.app = app
+        app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
+        app.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
+
         self.load_fonts()
+
 
         self.setWindowTitle("Glow")
         self.setMinimumSize(600, 400)
@@ -20,6 +25,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    window = MainWindow()
+    window = MainWindow(app)
     window.show()
     sys.exit(app.exec())
