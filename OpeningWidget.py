@@ -9,6 +9,29 @@ class OpeningWidget(QtWidgets.QWidget):
         self.setMinimumSize(800, 600)
         self.setBaseSize(1920, 1080)
 
+        quicksand_medium = QtGui.QFont("Quicksand Medium", 16)
+
+        excited_label = QtWidgets.QLabel("excited")
+        excited_label.setFont(quicksand_medium)
+        happy_label = QtWidgets.QLabel("happy")
+        happy_label.setFont(quicksand_medium)
+        proud_label = QtWidgets.QLabel("proud")
+        proud_label.setFont(quicksand_medium)
+        content_label = QtWidgets.QLabel("content")
+        content_label.setFont(quicksand_medium)
+        unsure_label = QtWidgets.QLabel("unsure")
+        unsure_label.setFont(quicksand_medium)
+        sick_label = QtWidgets.QLabel("sick")
+        sick_label.setFont(quicksand_medium)
+        stressed_label = QtWidgets.QLabel("stressed")
+        stressed_label.setFont(quicksand_medium)
+        angry_label = QtWidgets.QLabel("angry")
+        angry_label.setFont(quicksand_medium)
+        sad_label = QtWidgets.QLabel("sad")
+        sad_label.setFont(quicksand_medium)
+        tired_label = QtWidgets.QLabel("tired")
+        tired_label.setFont(quicksand_medium)
+
         excited_button = ImageButton(330, 290,  "resources/images/excited.png")
         happy_button = ImageButton(330, 290, "resources/images/happy.png")
         proud_button = ImageButton(330, 290, "resources/images/proud.png")
@@ -43,7 +66,9 @@ class OpeningWidget(QtWidgets.QWidget):
 
 
 if __name__ == "__main__":
+
     app = QtWidgets.QApplication(sys.argv)
+    font_id = QtGui.QFontDatabase.addApplicationFont("resources/fonts/quicksand/Quicksand-Medium.ttf")
     window = OpeningWidget()
     window.show()
     sys.exit(app.exec())
