@@ -7,8 +7,6 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
 
         self.app = app
-        app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
-        app.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
 
         self.load_fonts()
 

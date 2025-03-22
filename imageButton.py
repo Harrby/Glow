@@ -13,7 +13,7 @@ class ImageButton(QtWidgets.QPushButton):
             }
         """)
 
-        self.setFixedSize(width, height)
+        self.setMaximumSize(width, height)
 
         # setting icon
         self.img_icon_default = QtGui.QIcon(img_file_path)
@@ -33,6 +33,10 @@ class ImageButton(QtWidgets.QPushButton):
         # CONNECTIONS
         self.pressed.connect(self.on_button_pressed)
         self.released.connect(self.on_button_released)
+
+    def resizeEvent(self, event: QtGui.QResizeEvent, /) -> None:
+        self.setIconSize(QtCore.QSize(self.width(), self.height()))
+        super().resizeEvent(event)
 
     def enterEvent(self, event: QtCore.QEvent) -> None:
         self.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
