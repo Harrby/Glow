@@ -9,24 +9,24 @@ class OpeningWidget(QtWidgets.QWidget):
         self.setMinimumSize(800, 600)
         self.setBaseSize(1920, 1080)
 
-        quicksand_medium = QtGui.QFont("Quicksand Medium", 48)
+        quicksand_medium = QtGui.QFont("Quicksand Medium", 42)
         quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
 
         main_label = QtWidgets.QLabel("How are you feeling today?")
         main_label.setFont(quicksand_medium)
 
-        excited_label = QtWidgets.QLabel("excited")
-        happy_label = QtWidgets.QLabel("happy")
-        proud_label = QtWidgets.QLabel("proud")
-        content_label = QtWidgets.QLabel("content")
-        unsure_label = QtWidgets.QLabel("unsure")
-        sick_label = QtWidgets.QLabel("sick")
-        stressed_label = QtWidgets.QLabel("stressed")
-        angry_label = QtWidgets.QLabel("angry")
-        sad_label = QtWidgets.QLabel("sad")
-        tired_label = QtWidgets.QLabel("tired")
+        excited_label = ResizableLabel("excited", font=quicksand_medium)
+        happy_label = ResizableLabel("happy", font=quicksand_medium)
+        proud_label = ResizableLabel("proud", font=quicksand_medium)
+        content_label = ResizableLabel("content", font=quicksand_medium)
+        unsure_label = ResizableLabel("unsure", font=quicksand_medium)
+        sick_label = ResizableLabel("sick", font=quicksand_medium)
+        stressed_label = ResizableLabel("stressed", font=quicksand_medium)
+        angry_label = ResizableLabel("angry", font=quicksand_medium)
+        sad_label = ResizableLabel("sad", font=quicksand_medium)
+        tired_label = ResizableLabel("tired", font=quicksand_medium)
 
-        excited_button = ImageButton(330, 290,  "resources/images/excited.png")
+        excited_button = ImageButton(330, 290, "resources/images/excited.png")
         happy_button = ImageButton(330, 290, "resources/images/happy.png")
         proud_button = ImageButton(330, 290, "resources/images/proud.png")
         content_button = ImageButton(330, 290, "resources/images/content.png")
@@ -62,6 +62,11 @@ class OpeningWidget(QtWidgets.QWidget):
         button_grid_layout.addWidget(tired_frame, 1, 4)
         button_grid_layout.setContentsMargins(10, 10, 10, 10)
 
+        button_grid_hor_layout = QtWidgets.QHBoxLayout()
+        button_grid_hor_layout.addStretch(1)
+        button_grid_hor_layout.addLayout(button_grid_layout)
+        button_grid_hor_layout.addStretch(1)
+
         v_layout = QtWidgets.QVBoxLayout()
 
         label_hor_layout = QtWidgets.QHBoxLayout()
@@ -71,7 +76,7 @@ class OpeningWidget(QtWidgets.QWidget):
 
         v_layout.addLayout(label_hor_layout)
         v_layout.addStretch(1)
-        v_layout.addLayout(button_grid_layout)
+        v_layout.addLayout(button_grid_hor_layout)
         v_layout.addStretch(1)
         v_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -81,11 +86,6 @@ class OpeningWidget(QtWidgets.QWidget):
 class LabelAndMoodButtonContainer(QtWidgets.QWidget):
     def __init__(self, label, mood_button):
         super(LabelAndMoodButtonContainer, self).__init__()
-
-        quicksand_medium = QtGui.QFont("Quicksand Medium", 36)
-        quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
-
-        label.setFont(quicksand_medium)
 
         label_hor_layout = QtWidgets.QHBoxLayout()
         label_hor_layout.addStretch(1)
@@ -99,8 +99,16 @@ class LabelAndMoodButtonContainer(QtWidgets.QWidget):
         self.setLayout(v_layout)
 
 
+class ResizableLabel(QtWidgets.QLabel):
+    def __init__(self, *args, font: QtGui.QFont, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.base_font = font
 
-
+    def resizeEvent(self, event):
+        print("label resized")
+        new_font = QtGui.QFont(self.base_font)
+        self.setFont(new_font)
+        super().resizeEvent(event)
 
 
 if __name__ == "__main__":
