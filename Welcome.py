@@ -17,7 +17,7 @@ class Welcome(QtWidgets.QWidget):
 
         # Load image to display next to "Hey James!"
         self.image_label = QtWidgets.QLabel(self)
-        self.original_pixmap = QtGui.QPixmap("windowCreating/glowlogo.png")  
+        self.original_pixmap = QtGui.QPixmap("Glow/resources/images/glowlogo.png")  
         self.image_label.setPixmap(self.original_pixmap)
         self.image_label.setAlignment(QtCore.Qt.AlignCenter)
 
@@ -70,7 +70,7 @@ class Welcome(QtWidgets.QWidget):
         layout.addStretch(6)
 
         self.setLayout(layout)
-        self.pixmap = QtGui.QPixmap("windowCreating/welcomeImage.png")
+        self.pixmap = QtGui.QPixmap("Glow/resources/images/welcomeImage.png")
 
         # Start animations
         QtCore.QTimer.singleShot(0, self.fade_animation_hey.start)
