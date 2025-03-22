@@ -17,7 +17,7 @@ class Welcome(QtWidgets.QWidget):
 
         # Load image to display next to "Hey James!"
         self.image_label = QtWidgets.QLabel(self)
-        self.original_pixmap = QtGui.QPixmap("windowCreating/glowlogo.png")  # Store the original pixmap
+        self.original_pixmap = QtGui.QPixmap("windowCreating/glowlogo.png")  
         self.image_label.setPixmap(self.original_pixmap)
         self.image_label.setAlignment(QtCore.Qt.AlignCenter)
 
@@ -37,31 +37,31 @@ class Welcome(QtWidgets.QWidget):
 
         # Create the fade-in animation for both labels
         self.fade_animation_hey = QtCore.QPropertyAnimation(self.opacity_effect_hey, b"opacity")
-        self.fade_animation_hey.setDuration(3000)  # 3 seconds for the fade
+        self.fade_animation_hey.setDuration(3000)  
         self.fade_animation_hey.setStartValue(0.0)
         self.fade_animation_hey.setEndValue(1.0)
-        self.fade_animation_hey.setEasingCurve(QtCore.QEasingCurve.InOutQuad)  # Smooth easing
+        self.fade_animation_hey.setEasingCurve(QtCore.QEasingCurve.InOutQuad)  
 
         self.fade_animation_welcome = QtCore.QPropertyAnimation(self.opacity_effect_welcome, b"opacity")
-        self.fade_animation_welcome.setDuration(3000)  # 3 seconds for the fade
+        self.fade_animation_welcome.setDuration(3000)  
         self.fade_animation_welcome.setStartValue(0.0)
         self.fade_animation_welcome.setEndValue(1.0)
-        self.fade_animation_welcome.setEasingCurve(QtCore.QEasingCurve.InOutQuad)  # Smooth easing
+        self.fade_animation_welcome.setEasingCurve(QtCore.QEasingCurve.InOutQuad)  
 
         # Create fade-in animation for the image
         self.fade_animation_image = QtCore.QPropertyAnimation(self.opacity_effect_image, b"opacity")
-        self.fade_animation_image.setDuration(3000)  # 3 seconds for the fade
+        self.fade_animation_image.setDuration(3000)  
         self.fade_animation_image.setStartValue(0.0)
         self.fade_animation_image.setEndValue(1.0)
-        self.fade_animation_image.setEasingCurve(QtCore.QEasingCurve.InOutQuad)  # Smooth easing
+        self.fade_animation_image.setEasingCurve(QtCore.QEasingCurve.InOutQuad)  
 
         # Layout to arrange labels one above the other
         sub_layout = QtWidgets.QHBoxLayout()
-        sub_layout.addStretch(22)  # Adds flexible space on the left of the text
+        sub_layout.addStretch(22) 
         sub_layout.addWidget(self.main_label_hey) 
         sub_layout.addStretch(1)
         sub_layout.addWidget(self.image_label)
-        sub_layout.addStretch(20)  # Adds flexible space after the image to center everything
+        sub_layout.addStretch(20)  
 
         layout = QtWidgets.QVBoxLayout(self)
         layout.addStretch(1)
@@ -74,8 +74,8 @@ class Welcome(QtWidgets.QWidget):
 
         # Start animations
         QtCore.QTimer.singleShot(0, self.fade_animation_hey.start)
-        QtCore.QTimer.singleShot(500, self.fade_animation_welcome.start)  # Slight delay for the second label's fade-in
-        QtCore.QTimer.singleShot(1000, self.fade_animation_image.start)  # Delay for the image fade-in
+        QtCore.QTimer.singleShot(500, self.fade_animation_welcome.start)  
+        QtCore.QTimer.singleShot(500, self.fade_animation_image.start)  
 
         self.setWindowState(QtCore.Qt.WindowMaximized)
 
