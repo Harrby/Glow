@@ -1,6 +1,7 @@
-from PySide6 import QtGui, QtCore, QtWidgets
+from PySide6 import QtGui, QtWidgets
 import sys
-
+from PySide6.QtWidgets import QApplication
+from Welcome import Welcome
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, app: QtWidgets.QApplication):
@@ -22,7 +23,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    window = MainWindow(app)
-    window.show()
+    app = QApplication(sys.argv)
+    welcome_window = Welcome()
+    welcome_window.show()
     sys.exit(app.exec())
