@@ -4,16 +4,26 @@ from imageButton import ImageButton
 
 
 class OpeningWidget(QtWidgets.QWidget):
+    """
+        widget for the opening screen of the application. Displays the 10 mood options (ImageButtons) of how the user
+        is feeling.
+
+
+        Author: Harry
+        Created: 2025-03-23
+        """
+
     def __init__(self):
         super().__init__()
-        self.setMinimumSize(800, 600)
-        self.setBaseSize(1920, 1080)
+        #self.setMinimumSize(1200, 600)
+        #self.setBaseSize(1920, 1080)
 
         quicksand_medium = QtGui.QFont("Quicksand Medium", 42)
         quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
 
         main_label = QtWidgets.QLabel("How are you feeling today?")
         main_label.setFont(quicksand_medium)
+        main_label.setAlignment(QtCore.Qt.AlignCenter)
 
         excited_label = ResizableLabel("excited", font=quicksand_medium)
         happy_label = ResizableLabel("happy", font=quicksand_medium)
@@ -61,22 +71,23 @@ class OpeningWidget(QtWidgets.QWidget):
         button_grid_layout.addWidget(sad_frame, 1, 3)
         button_grid_layout.addWidget(tired_frame, 1, 4)
         button_grid_layout.setContentsMargins(10, 10, 10, 10)
+        button_grid_layout.setSpacing(10)
 
         button_grid_hor_layout = QtWidgets.QHBoxLayout()
-        button_grid_hor_layout.addStretch(1)
-        button_grid_hor_layout.addLayout(button_grid_layout)
-        button_grid_hor_layout.addStretch(1)
+        button_grid_hor_layout.addSpacing(1)
+        button_grid_hor_layout.addLayout(button_grid_layout,12)
+        button_grid_hor_layout.addSpacing(1)
 
         v_layout = QtWidgets.QVBoxLayout()
 
         label_hor_layout = QtWidgets.QHBoxLayout()
-        label_hor_layout.addStretch(1)
+
         label_hor_layout.addWidget(main_label)
-        label_hor_layout.addStretch(1)
+
 
         v_layout.addLayout(label_hor_layout)
-        v_layout.addStretch(1)
-        v_layout.addLayout(button_grid_hor_layout)
+        v_layout.addStretch(2)
+        v_layout.addLayout(button_grid_hor_layout,12)
         v_layout.addStretch(1)
         v_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -84,17 +95,34 @@ class OpeningWidget(QtWidgets.QWidget):
 
 
 class LabelAndMoodButtonContainer(QtWidgets.QWidget):
+    """
+    A container that holds a ResizableLabel and an ImageButton, arranged in a layout.
+
+    :param label: The ResizableLabel to be displayed in the container.
+    :type label: QtWidgets.QLabel (or subclass)
+    :param mood_button: The image-based button widget.
+    :type mood_button: QtWidgets.QPushButton (or subclass)
+
+    :author: Harry
+    :created: 2025-03-23
+
+    :contributors:
+        - Add your name here when you edit or maintain this class.
+
+    """
     def __init__(self, label, mood_button):
         super(LabelAndMoodButtonContainer, self).__init__()
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.setMinimumSize(100, 100)
 
         label_hor_layout = QtWidgets.QHBoxLayout()
-        label_hor_layout.addStretch(1)
+
         label_hor_layout.addWidget(label)
-        label_hor_layout.addStretch(1)
 
         v_layout = QtWidgets.QVBoxLayout()
         v_layout.addLayout(label_hor_layout)
-        v_layout.addWidget(mood_button)
+        v_layout.addWidget(mood_button, 1)
+        v_layout.setContentsMargins(6, 6, 6, 6)
 
         self.setLayout(v_layout)
 
@@ -103,18 +131,31 @@ class ResizableLabel(QtWidgets.QLabel):
     def __init__(self, *args, font: QtGui.QFont, **kwargs):
         super().__init__(*args, **kwargs)
         self.base_font = font
+        new_font = QtGui.QFont(self.base_font)
+        self.setFixedWidth(250)
+        self.setFixedHeight(100)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        self.setFont(new_font)
+        self.setAlignment(QtCore.Qt.AlignCenter)
 
     def resizeEvent(self, event):
-        print("label resized")
-        new_font = QtGui.QFont(self.base_font)
-        self.setFont(new_font)
         super().resizeEvent(event)
+
+    def change_to_new_font_size(self, new_font_size: int) -> None:
+        self.base_font.setPointSize(new_font_size)
+        self.setFont(self.base_font)
 
 
 if __name__ == "__main__":
 
     app = QtWidgets.QApplication(sys.argv)
     font_id = QtGui.QFontDatabase.addApplicationFont("resources/fonts/quicksand/Quicksand-Medium.ttf")
-    window = OpeningWidget()
+
+    quicksand_medium = QtGui.QFont("Quicksand Medium", 42)
+    quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
+    excited_button = ImageButton(330, 290, "resources/images/excited.png")
+    excited_label = ResizableLabel("excited", font=quicksand_medium)
+
+    window = LabelAndMoodButtonContainer(excited_label, excited_button)
     window.show()
     sys.exit(app.exec())

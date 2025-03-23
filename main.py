@@ -11,7 +11,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.load_fonts()
 
-
         self.setWindowTitle("Glow")
         self.setMinimumSize(600, 400)
 

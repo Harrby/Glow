@@ -14,11 +14,16 @@ class ImageButton(QtWidgets.QPushButton):
         """)
 
         self.setMaximumSize(width, height)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         # setting icon
-        self.img_icon_default = QtGui.QIcon(img_file_path)
-        self.img_icon_hovered = self.generate_new_opacity_image(img_file_path, 0.8)
-        self.img_icon_pressed = self.generate_new_opacity_image(img_file_path, 0.5)
+        self._original_pixmap = QtGui.QPixmap(img_file_path)
+        self._pixmap_hovered = self.generate_new_opacity_image(img_file_path, 0.8)
+        self._pixmap_pressed = self.generate_new_opacity_image(img_file_path, 0.5)
+
+        self.img_icon_default = QtGui.QIcon(self._original_pixmap)
+        self.img_icon_hovered = QtGui.QIcon(self._pixmap_hovered)
+        self.img_icon_pressed = QtGui.QIcon(self._pixmap_pressed)
 
         self.setIcon(self.img_icon_default)
         self.setIconSize(QtCore.QSize(width, height))
@@ -35,7 +40,19 @@ class ImageButton(QtWidgets.QPushButton):
         self.released.connect(self.on_button_released)
 
     def resizeEvent(self, event: QtGui.QResizeEvent, /) -> None:
-        self.setIconSize(QtCore.QSize(self.width(), self.height()))
+        new_size = QtCore.QSize(self.width(), self.height())
+        self.setIconSize(new_size)
+
+        # make new pixmap of new size then convert back to Qicon
+        self.img_icon_default = QtGui.QIcon(self._original_pixmap.scaled(
+            new_size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+
+        self.img_icon_hovered = QtGui.QIcon(self._pixmap_hovered.scaled(
+            new_size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+
+        self.img_icon_pressed = QtGui.QIcon(self._pixmap_pressed.scaled(
+            new_size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+
         super().resizeEvent(event)
 
     def enterEvent(self, event: QtCore.QEvent) -> None:
