@@ -3,7 +3,9 @@ import os
 from PySide6 import QtGui, QtCore, QtWidgets
 from OpeningWidget import OpeningWidget
 
+
 class Welcome(QtWidgets.QWidget):
+    UserClicked = QtCore.Signal()       # define a signal to send to main when user clicks
 
     def __init__(self, name="James"):
         super().__init__()
@@ -92,17 +94,7 @@ class Welcome(QtWidgets.QWidget):
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
-            self.open_opening_widget()
-
-    def open_opening_widget(self):
-        self.opening_window = OpeningWidget()
-        if self.isFullScreen():
-            self.opening_window.showFullScreen()
-        elif self.isMaximized():
-            self.opening_window.showMaximized()
-        else:
-            self.opening_window.show()
-        self.close()
+            self.UserClicked.emit()
 
     def paintEvent(self, event):
         if not self.background_pixmap.isNull():
