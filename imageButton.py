@@ -3,6 +3,21 @@ import sys
 
 
 class ImageButton(QtWidgets.QPushButton):
+    """A Subclass of PushButton, that create an interactive button based on the parameters.
+
+    :param width: The width of the button (starting width).
+    :type width: int
+    :param height: height of button
+    :type height: int
+    :param img_file_path: path to img that the button displays
+    :type img_file_path: str
+
+    :author: Harry
+    :created: 22-03-25
+
+    :contributors:
+        - Add your name here when you edit or maintain this class.
+    """
     def __init__(self, width: int, height: int, img_file_path: str):
         super().__init__()
 
@@ -13,14 +28,15 @@ class ImageButton(QtWidgets.QPushButton):
             }
         """)
 
-        self.setMaximumSize(width, height)
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         # setting icon
+        # pixmaps are stored as they scale very well (lossless)
         self._original_pixmap = QtGui.QPixmap(img_file_path)
         self._pixmap_hovered = self.generate_new_opacity_image(img_file_path, 0.8)
         self._pixmap_pressed = self.generate_new_opacity_image(img_file_path, 0.5)
 
+        # icons are used directly onto the pushbutton (using set icon)
         self.img_icon_default = QtGui.QIcon(self._original_pixmap)
         self.img_icon_hovered = QtGui.QIcon(self._pixmap_hovered)
         self.img_icon_pressed = QtGui.QIcon(self._pixmap_pressed)
@@ -56,6 +72,7 @@ class ImageButton(QtWidgets.QPushButton):
         super().resizeEvent(event)
 
     def enterEvent(self, event: QtCore.QEvent) -> None:
+        # adjusts look of button and changes cursor when hovering over this widget.
         self.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.setIcon(self.img_icon_hovered)
         self.drop_shadow.setColor(QtGui.QColor(0, 0, 0, 180))
@@ -77,6 +94,7 @@ class ImageButton(QtWidgets.QPushButton):
 
     @staticmethod
     def generate_new_opacity_image(path: str, opacity: float) -> QtGui.QPixmap:
+        # creates a new image at a different opacity
         original = QtGui.QPixmap(path)
         result = QtGui.QPixmap(original.size())
         result.fill(QtCore.Qt.transparent)
