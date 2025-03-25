@@ -13,7 +13,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.setWindowTitle("Glow")
         self.setMinimumSize(600, 400)
-
+   
     @staticmethod
     def load_fonts():
         font_id = QtGui.QFontDatabase.addApplicationFont("resources/fonts/quicksand/Quicksand-Medium.ttf")
