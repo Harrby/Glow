@@ -1,6 +1,6 @@
 from PySide6 import QtGui, QtCore, QtWidgets
 import sys
-
+from imageButton import ImageButton
 
 class CalenderContainer(QtWidgets.QWidget):
     def __init__(self):
@@ -9,35 +9,52 @@ class CalenderContainer(QtWidgets.QWidget):
         self.current_month_index = 2
         self.current_year = 2025
 
-        self.setStyleSheet("""
-        .CalenderContainer{
-        background-color: #4B4A63;
-        }
-        """)
 
-        title_layout = QtWidgets.QHBoxLayout()
 
-        generic_background_img = QtGui.QPixmap("resources/images/calenderBackgroundImg.png")
+
+        generic_background_img = QtGui.QPixmap("resources/images/calender_background.png")
+        self.pixmap = generic_background_img
+
 
         background_img_label1 = QtWidgets.QLabel(pixmap=generic_background_img)
         background_img_label2 = QtWidgets.QLabel(pixmap=generic_background_img)
 
-        quicksand_medium = QtGui.QFont("Quicksand Medium", 32)
-        quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        quicksand_medium_title = QtGui.QFont("Quicksand Medium", 120)
+        quicksand_medium_content = QtGui.QFont("Quicksand Medium", 48)
+        quicksand_medium_title.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        quicksand_medium_content.setStyleStrategy(QtGui.QFont.PreferAntialias)
 
         self.year_label = QtWidgets.QLabel(alignment=QtCore.Qt.AlignCenter)
-        self.year_label.setFont(quicksand_medium)
+        self.year_label.setFont(quicksand_medium_title)
         self.month_label = QtWidgets.QLabel(alignment=QtCore.Qt.AlignCenter)
-        self.month_label.setFont(quicksand_medium)
+        self.month_label.setFont(quicksand_medium_content)
 
         month_year_v_layout = QtWidgets.QVBoxLayout()
         month_year_v_layout.addWidget(self.year_label)
         month_year_v_layout.addWidget(self.month_label)
 
         h_title_layout = QtWidgets.QHBoxLayout()
-        h_title_layout.addWidget(background_img_label1)
+        h_title_layout.addStretch(1)
         h_title_layout.addLayout(month_year_v_layout)
-        h_title_layout.addWidget(background_img_label2)
+        h_title_layout.addStretch(1)
+
+        right_button = ImageButton(48, 104,  "resources/images/right_arrow.png")
+        right_button.setFixedSize(QtCore.QSize(48, 104))
+        right_button.clicked.connect(self.right_button_clicked)
+        left_button = ImageButton(48, 104,  "resources/images/left_arrow.png")
+        left_button.setFixedSize(QtCore.QSize(48, 104))
+        left_button.clicked.connect(self.left_button_clicked)
+
+        right_v_layout = QtWidgets.QVBoxLayout()
+        right_v_layout.addStretch(2)
+        right_v_layout.addWidget(right_button)
+        right_v_layout.addStretch(1)
+        right_v_layout.setContentsMargins(40, 0, 40, 0)
+        left_v_layout = QtWidgets.QVBoxLayout()
+        left_v_layout.addStretch(2)
+        left_v_layout.addWidget(left_button)
+        left_v_layout.addStretch(1)
+        left_v_layout.setContentsMargins(40, 0, 40, 0)
 
 
         # jan to may
@@ -63,9 +80,18 @@ class CalenderContainer(QtWidgets.QWidget):
         main_layout.addLayout(h_title_layout)
         main_layout.addLayout(self.v_layout, 2)
 
+        main_h_layout = QtWidgets.QHBoxLayout()
+        main_h_layout.addLayout(left_v_layout)
+        main_h_layout.addLayout(main_layout)
+        main_h_layout.addLayout(right_v_layout)
+
         self.set_month_and_year(2, 2025)
 
-        self.setLayout(main_layout)
+        self.setLayout(main_h_layout)
+
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
+        painter.drawPixmap(self.rect(), self.pixmap)
 
     def show_calender_frame_at_index(self, index: int):
         self.hide_all_calender_frame_widget()
@@ -81,7 +107,18 @@ class CalenderContainer(QtWidgets.QWidget):
         self.month_label.setText(self.months[month][0])
         self.year_label.setText(str(year))
 
+    def right_button_clicked(self):
+        if self.current_month_index < 11:
+            self.current_month_index +=1
+            self.show_calender_frame_at_index(self.current_month_index)
+            self.set_month_and_year(self.current_month_index, 2025)
 
+
+    def left_button_clicked(self):
+        if self.current_month_index >0:
+            self.current_month_index -= 1
+            self.show_calender_frame_at_index(self.current_month_index)
+            self.set_month_and_year(self.current_month_index, 2025)
 
 
 class CalenderFrame(QtWidgets.QFrame):
@@ -122,6 +159,8 @@ class CalenderFrame(QtWidgets.QFrame):
 class CalenderEntry(QtWidgets.QFrame):
     def __init__(self, number: int):
         super().__init__()
+
+        self.setMinimumHeight(50)
 
         quicksand_medium = QtGui.QFont("Quicksand Medium", 18)
         quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
