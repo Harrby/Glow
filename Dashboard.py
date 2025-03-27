@@ -1,7 +1,9 @@
 import sys
-from PySide6 import QtWidgets, QtGui, QtCore
-from PySide6.QtWidgets import QPushButton, QSizePolicy, QGraphicsOpacityEffect
+from PySide6 import QtWidgets, QtCore
+from PySide6.QtWidgets import QSizePolicy
 from PySide6.QtGui import QFont, QIcon
+from HoverButton import HoverButton
+
 
 class MyWindow(QtWidgets.QWidget):
     def __init__(self):
@@ -9,10 +11,11 @@ class MyWindow(QtWidgets.QWidget):
         self.setMinimumSize(800, 600)
         self.setStyleSheet("background-color: #4B4A63;")
 
-        self.screenTimeButton = QPushButton("Screen Time", self)
-        self.alcoholLogButton = QPushButton("Alcohol log", self)
-        self.exerciseButton = QPushButton("Exercise", self)
-        self.sleepButton = QPushButton("Sleep", self)
+        # Replace QPushButton with HoverButton for the main buttons
+        self.screenTimeButton = HoverButton("Screen Time", self)
+        self.alcoholLogButton = HoverButton("Alcohol log", self)
+        self.exerciseButton = HoverButton("Exercise", self)
+        self.sleepButton = HoverButton("Sleep", self)
 
         self.main_button_features(self.screenTimeButton, "#ACB0FF")
         self.main_button_features(self.alcoholLogButton, "#EB9573")
@@ -23,31 +26,23 @@ class MyWindow(QtWidgets.QWidget):
         for button in [self.screenTimeButton, self.alcoholLogButton, self.exerciseButton, self.sleepButton]:
             button.setSizePolicy(size_policy)
 
-
-        self.exitButton = QPushButton()
+        # For icon buttons, you can also use HoverButton
+        self.exitButton = HoverButton("", self)
         self.exitButton.setIcon(QIcon("Glow/resources/images/exit.png"))
 
-        self.calenderButton = QPushButton()
+        self.calenderButton = HoverButton("", self)
         self.calenderButton.setIcon(QIcon("Glow/resources/images/calender.png"))
 
-        self.logoButton = QPushButton()
+        self.logoButton = HoverButton("", self)
         self.logoButton.setIcon(QIcon("Glow/resources/images/glowlogo.png"))
 
-        self.editMood = QPushButton()
+        self.editMood = HoverButton("", self)
         self.editMood.setIcon(QIcon("Glow/resources/images/miniLogos.png"))
 
         for button in [self.exitButton, self.calenderButton, self.logoButton, self.editMood]:
             button.setFixedSize(140, 140)  
-            button.setStyleSheet(f"border-radius: 40px; background-color: #B9B9B9;")
+            button.setStyleSheet("border-radius: 40px; background-color: #B9B9B9;")
             button.setIconSize(QtCore.QSize(100, 100))  
-
-        for button in [self.exitButton, self.calenderButton, self.logoButton, self.editMood, self.screenTimeButton, self.alcoholLogButton, self.exerciseButton, self.sleepButton]:
-            effect = QGraphicsOpacityEffect()
-            button.setGraphicsEffect(effect)
-            button.setProperty("opacityEffect", effect)
-
-            button.enterEvent = lambda event: effect.setOpacity(0.7)  # Reduce opacity on hover
-            button.leaveEvent = lambda event: effect.setOpacity(1.0)  # Restore opacity on leave
 
         main_layout = QtWidgets.QHBoxLayout(self)
         grid_layout = QtWidgets.QGridLayout()
@@ -78,27 +73,23 @@ class MyWindow(QtWidgets.QWidget):
         grid_layout.setSpacing(10)
         grid_layout.setContentsMargins(20, 20, 20, 20)
 
-        # Create a widget to hold grid_layout
         grid_widget = QtWidgets.QWidget()
         grid_widget.setLayout(grid_layout)
 
-        # Add both layouts to main_layout (sidebar on the right)
         main_layout.addWidget(grid_widget)  # Main buttons first
-        main_layout.addLayout(side_layout)  # Sidebar second (right side)
+        main_layout.addLayout(side_layout)    # Sidebar second (right side)
 
-        # Set final layout
         self.setLayout(main_layout)
 
     def main_button_features(self, button, color):
         border_radius = '20%'  
         button.setStyleSheet(f"background-color: {color}; color: #4B4A63; border-radius: {border_radius};")
 
-    
     def resizeEvent(self, event):
         font_size = max(30, min(int(self.width() * 0.035), 60))
         font = QFont("Quicksand Medium", font_size)
         font.setStyleStrategy(QFont.PreferAntialias)
-        for button in [self.screenTimeButton, self.alcoholLogButton, self.sleepButton, self.exerciseButton]:
+        for button in [self.screenTimeButton, self.alcoholLogButton, self.exerciseButton, self.sleepButton]:
             button.setFont(font)
         super().resizeEvent(event)
 
