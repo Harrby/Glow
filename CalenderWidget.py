@@ -1,6 +1,7 @@
 from PySide6 import QtGui, QtCore, QtWidgets
 import sys
 from imageButton import ImageButton
+from pymongo import MongoClient
 
 class CalenderContainer(QtWidgets.QWidget):
     def __init__(self):
@@ -9,8 +10,7 @@ class CalenderContainer(QtWidgets.QWidget):
         self.current_month_index = 2
         self.current_year = 2025
 
-
-
+        self.mood_db = MoodDataBase()
 
         generic_background_img = QtGui.QPixmap("resources/images/calender_background.png")
         self.pixmap = generic_background_img
@@ -59,17 +59,28 @@ class CalenderContainer(QtWidgets.QWidget):
 
         # jan to may
         self.months = [
-            ["January", [-1] * 2 + list(range(1, 32)) + [-1] * 2],
-            ["February", [-1] * 5 +list(range(1, 29)) + [-1]*2],
-            ["March", [-1]*5 + list(range(1, 32)) + [-1]*6],
-            ["April", [-1]*1 + list(range(1, 31)) + [-1]*4],
-            ["May", [-1]*3 + list(range(1, 32)) + [-1]*1]
+            ["January",   1, [-1] * 2 + list(range(1, 32)) + [-1] * 2],
+            ["February",  2, [-1] * 5 + list(range(1, 29)) + [-1] * 2],
+            ["March",     3, [-1] * 5 + list(range(1, 32)) + [-1] * 6],
+            ["April",     4, [-1] * 1 + list(range(1, 31)) + [-1] * 4],
+            ["May",       5, [-1] * 3 + list(range(1, 32)) + [-1] * 1],
+            ["June",      6, [-1] * 6 + list(range(1, 31)) + [-1] * 6],
+            ["July",      7, [-1] * 1 + list(range(1, 32)) + [-1] * 3],
+            ["August",    8, [-1] * 4 + list(range(1, 32)) + [-1] * 0],
+            ["September", 9, [-1] * 0 + list(range(1, 31)) + [-1] * 5],
+            ["October",  10, [-1] * 2 + list(range(1, 32)) + [-1] * 2],
+            ["November", 11, [-1] * 5 + list(range(1, 31)) + [-1] * 0],
+            ["December", 12, [-1] * 0 + list(range(1, 32)) + [-1] * 4]
         ]
+
+
+        self.calender_frame_widgets = [CalenderFrame(self.current_year, month[1], month[2], self.mood_db) for month in self.months]
 
         # pre load all cal frames, for speed (high mem consumption but low cpu consumption)
         # i feel like since this will be single core we should optimize for cpu
 
-        self.calender_frame_widgets = [CalenderFrame(month[1]) for month in self.months]
+        # self.calender_frame_widgets = [CalenderFrame(month[1]) for month in self.months]
+
 
         self.v_layout = QtWidgets.QVBoxLayout()
         for calender_frame_widget in self.calender_frame_widgets:
@@ -111,18 +122,30 @@ class CalenderContainer(QtWidgets.QWidget):
         if self.current_month_index < 11:
             self.current_month_index +=1
             self.show_calender_frame_at_index(self.current_month_index)
-            self.set_month_and_year(self.current_month_index, 2025)
+            self.set_month_and_year(self.current_month_index, self.current_year)
 
 
     def left_button_clicked(self):
         if self.current_month_index >0:
             self.current_month_index -= 1
             self.show_calender_frame_at_index(self.current_month_index)
-            self.set_month_and_year(self.current_month_index, 2025)
+            self.set_month_and_year(self.current_month_index, self.current_year)
+
+
+class MoodDataBase:
+    def __init__(self):
+        self.client = MongoClient("mongodb+srv://sam_user:9ireiEodVKBb3Owt@glowcluster.36bwm.mongodb.net/?retryWrites=true&w=majority&appName=GlowCluster")
+        self.db = self.client["mood_tracker"]
+        self.collection = self.db["moods"]
+
+    def get_mood_for_date(self, year, month, day):
+        date_str = f"{year}-{month:02d}-{day:02d}"
+        result = self.collection.find_one({"date": date_str})
+        return result["mood"] if result else None
 
 
 class CalenderFrame(QtWidgets.QFrame):
-    def __init__(self, month: list):
+    def __init__(self, year: int, month: int, days: list, mood_db: MoodDataBase):
         super().__init__()
 
         self.setStyleSheet("""
@@ -134,33 +157,40 @@ class CalenderFrame(QtWidgets.QFrame):
         """)
 
         grid_layout = QtWidgets.QGridLayout()
-
-        calender_entries = []
         grid_layout.setSpacing(0)
         grid_layout.setContentsMargins(0, 0, 0, 0)
 
-        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-        day_calender_widgets = [CalenderWeekdayTitleEntry(day) for day in days]
+        days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        for i, day in enumerate(days_of_week):
+            grid_layout.addWidget(CalenderWeekdayTitleEntry(day), 0, i)
 
-        for i, widget in enumerate(day_calender_widgets):
-            grid_layout.addWidget(widget, 0, i)
-
-        for i, day in enumerate(month):
-            new_calender_entry = CalenderEntry(day)
-            calender_entries.append(new_calender_entry)
+        for i, day in enumerate(days):
+            entry = CalenderEntry(day, year, month, mood_db)
             row = 1 + (i // 7)
             col = i % 7
-            grid_layout.addWidget(new_calender_entry, row, col)
+            grid_layout.addWidget(entry, row, col)
+        
+        # day_calender_widgets = [CalenderWeekdayTitleEntry(day) for day in days]
 
+        # for i, widget in enumerate(day_calender_widgets):
+        #     grid_layout.addWidget(widget, 0, i)
+
+        # for i, day in enumerate(month):
+        #     new_calender_entry = CalenderEntry(day)
+        #     calender_entries.append(new_calender_entry)
+        #     row = 1 + (i // 7)
+        #     col = i % 7
+        #     grid_layout.addWidget(new_calender_entry, row, col)
 
         self.setLayout(grid_layout)
 
 
 class CalenderEntry(QtWidgets.QFrame):
-    def __init__(self, number: int):
+    def __init__(self, number: int, year: int, month: int, mood_db: MoodDataBase):
         super().__init__()
 
         self.setMinimumHeight(50)
+        self.mood_db = mood_db
 
         quicksand_medium = QtGui.QFont("Quicksand Medium", 18)
         quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
@@ -168,9 +198,16 @@ class CalenderEntry(QtWidgets.QFrame):
         number_label = QtWidgets.QLabel(self)
         number_label.setFont(quicksand_medium)
         number_label.setGeometry(8, 5, 40, 40)
-        number_label.setStyleSheet("""color:white;""")
+        number_label.setStyleSheet("color:white;")
+
         if number != -1:
             number_label.setText(str(number))
+            mood = self.mood_db.get_mood_for_date(year, month, number)
+            if mood:
+                mood_pixmap = QtGui.QPixmap(f"resources/images/{mood}.png")
+                mood_label = QtWidgets.QLabel(self)
+                mood_label.setPixmap(mood_pixmap.scaled(40, 40, QtCore.Qt.KeepAspectRatio))
+                mood_label.setGeometry(50, 5, 40, 40)
         else:
             number_label.hide()
 
