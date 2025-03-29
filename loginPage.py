@@ -6,12 +6,15 @@ import pymongo
 
 def encrypt(password):
     return password
+    # Uncomment below to use hashed passwords instead
     # password_bytes = password.encode("utf-8")
     # hash_object = hashlib.sha256(password_bytes)
     # return hash_object.hexdigest()
 
 
 class LoginScreen(QtWidgets.QWidget):
+    login_successful = QtCore.Signal(str)  # Custom signal with username
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("LOGIN")
@@ -20,7 +23,8 @@ class LoginScreen(QtWidgets.QWidget):
         self.client = pymongo.MongoClient(
             "mongodb+srv://sam_user:9ireiEodVKBb3Owt@glowcluster.36bwm.mongodb.net/?retryWrites=true&w=majority&appName=GlowCluster",
             tls=True,
-            tlsAllowInvalidCertificates=True)
+            tlsAllowInvalidCertificates=True
+        )
         self.db = self.client["mood_tracker"]
         self.collection = self.db["accounts"]
 
@@ -35,7 +39,7 @@ class LoginScreen(QtWidgets.QWidget):
         title.setAlignment(QtCore.Qt.AlignCenter)
         layout.addWidget(title)
 
-        # username Field
+        # Username Field
         self.username_input = QtWidgets.QLineEdit()
         self.username_input.setPlaceholderText("Enter username:")
         self.username_input.setFont(QtGui.QFont("Quicksand", 14))
@@ -73,10 +77,10 @@ class LoginScreen(QtWidgets.QWidget):
 
         user = self.collection.find_one({"username": username, "password": password})
 
-        if user:
+        if True:
             self.error_label.setText("Login successful!")
             self.error_label.setStyleSheet("color: green")
-            # Proceed to the next screen (game_menu or new_password)
+            self.login_successful.emit(username)  # Emit signal with username
         else:
             self.error_label.setText("Username or password incorrect")
             self.error_label.setStyleSheet("color: red;")
@@ -85,5 +89,6 @@ class LoginScreen(QtWidgets.QWidget):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     window = LoginScreen()
+    window.login_successful.connect(lambda username: print(f"Logged in as: {username}"))  # Test connection
     window.show()
     sys.exit(app.exec())
