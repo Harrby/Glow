@@ -2,22 +2,23 @@ from PySide6 import QtGui, QtCore, QtWidgets
 import sys
 from imageButton import ImageButton
 
-
 class OpeningWidget(QtWidgets.QWidget):
     """
-        widget for the opening screen of the application. Displays the 10 mood options (ImageButtons) of how the user
-        is feeling.
+    Widget for the opening screen of the application. Displays the 10 mood options (ImageButtons)
+    of how the user is feeling.
 
+    Author: Harry
+    Created: 2025-03-23
+    """
+    # Define a signal that emits a title, subtitle, and a boolean for showing the date.
+    start_quiz = QtCore.Signal(str, str, bool)
 
-        Author: Harry
-        Created: 2025-03-23
-        """
     COMMON_PT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72]
 
     def __init__(self):
         super().__init__()
-        #self.setMinimumSize(1200, 600)
-        #self.setBaseSize(1920, 1080)
+        # self.setMinimumSize(1200, 600)
+        # self.setBaseSize(1920, 1080)
 
         quicksand_medium = QtGui.QFont("Quicksand Medium", 42)
         quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
@@ -26,6 +27,7 @@ class OpeningWidget(QtWidgets.QWidget):
         main_label.setFont(quicksand_medium)
         main_label.setAlignment(QtCore.Qt.AlignCenter)
 
+        # Create labels for each mood
         self.excited_label = ResizableLabel("excited", font=quicksand_medium)
         self.happy_label = ResizableLabel("happy", font=quicksand_medium)
         self.proud_label = ResizableLabel("proud", font=quicksand_medium)
@@ -36,9 +38,11 @@ class OpeningWidget(QtWidgets.QWidget):
         self.angry_label = ResizableLabel("angry", font=quicksand_medium)
         self.sad_label = ResizableLabel("sad", font=quicksand_medium)
         self.tired_label = ResizableLabel("tired", font=quicksand_medium)
-        self.labels: set = {self.excited_label, self.happy_label, self.proud_label, self.content_label, self.unsure_label,
-                  self.sick_label, self.stressed_label, self.angry_label, self.sad_label, self.tired_label}
+        self.labels: set = {self.excited_label, self.happy_label, self.proud_label, self.content_label,
+                            self.unsure_label, self.sick_label, self.stressed_label,
+                            self.angry_label, self.sad_label, self.tired_label}
 
+        # Create mood buttons
         self.excited_button = ImageButton(330, 290, "resources/images/excited.png")
         self.happy_button = ImageButton(330, 290, "resources/images/happy.png")
         self.proud_button = ImageButton(330, 290, "resources/images/proud.png")
@@ -49,11 +53,31 @@ class OpeningWidget(QtWidgets.QWidget):
         self.angry_button = ImageButton(330, 290, "resources/images/angry.png")
         self.sad_button = ImageButton(330, 290, "resources/images/sad.png")
         self.tired_button = ImageButton(330, 290, "resources/images/tired.png")
-        self.buttons: set = {self.excited_button, self.happy_button, self.proud_button, self.content_button,
-                             self.unsure_button, self.sick_button, self.stressed_button, self.angry_button,
-                             self.sad_button, self.tired_button}
+        self.buttons: set = {self.excited_button, self.happy_button, self.proud_button,
+                             self.content_button, self.unsure_button, self.sick_button,
+                             self.stressed_button, self.angry_button, self.sad_button,
+                             self.tired_button}
 
-        self.excited_frame = LabelAndMoodButtonContainer(self.excited_label, self.excited_button)  # these are pass by ref
+        # Define a payload for each button as (button, title, subtitle, show_date)
+        buttons_payloads = [
+            (self.excited_button, "Exciting Stuff", "What are you looking forward to?", True),
+            (self.happy_button,   "Brilliant","Everything feels great!", False),
+            (self.proud_button,   "Woo-hoo!","I am so proud!", False),
+            (self.content_button, "Nothing special?","How about trying [database activity from original sign-up section] to really boost your mood today?", False),
+            (self.unsure_button,  "Not sure?","Try taking this short quiz", False),
+            (self.sick_button,    "I'm sorry you aren't feeling well.", "What's up?", False),
+            (self.stressed_button,"Breath, you've got this.","Tell me what is going on here", False),
+            (self.angry_button,   "It's okay to feel angry, take a deep breath", "Tell me some more about what you're feeling below", False),
+            (self.sad_button,     "Hey, I'm here for you","It’s normal to feel down. Don’t forget, you’ve got [excited database] (if logged) coming up in [n] days! ", False),
+            (self.tired_button,   "ZZZzzzzz....","Blah! Blah! Blah!", False)
+        ]
+
+        # Connect each button's clicked signal to emit its unique payload.
+        for btn, title, subtitle, show_date in buttons_payloads:
+            btn.clicked.connect(lambda _, t=title, s=subtitle, d=show_date: self.emit_start_quiz(t, s, d))
+
+        # Create containers for each label-button pair
+        self.excited_frame = LabelAndMoodButtonContainer(self.excited_label, self.excited_button)
         self.happy_frame = LabelAndMoodButtonContainer(self.happy_label, self.happy_button)
         self.proud_frame = LabelAndMoodButtonContainer(self.proud_label, self.proud_button)
         self.content_frame = LabelAndMoodButtonContainer(self.content_label, self.content_button)
@@ -64,6 +88,7 @@ class OpeningWidget(QtWidgets.QWidget):
         self.sad_frame = LabelAndMoodButtonContainer(self.sad_label, self.sad_button)
         self.tired_frame = LabelAndMoodButtonContainer(self.tired_label, self.tired_button)
 
+        # Arrange the containers in a grid layout.
         button_grid_layout = QtWidgets.QGridLayout()
         button_grid_layout.addWidget(self.excited_frame, 0, 0)
         button_grid_layout.addWidget(self.happy_frame, 0, 1)
@@ -81,15 +106,12 @@ class OpeningWidget(QtWidgets.QWidget):
 
         button_grid_hor_layout = QtWidgets.QHBoxLayout()
         button_grid_hor_layout.addSpacing(1)
-        button_grid_hor_layout.addLayout(button_grid_layout,12)
+        button_grid_hor_layout.addLayout(button_grid_layout, 12)
         button_grid_hor_layout.addSpacing(1)
 
         v_layout = QtWidgets.QVBoxLayout()
-
         label_hor_layout = QtWidgets.QHBoxLayout()
-
         label_hor_layout.addWidget(main_label)
-
         v_layout.addLayout(label_hor_layout)
         v_layout.addStretch(2)
         v_layout.addLayout(button_grid_hor_layout, 12)
@@ -98,13 +120,17 @@ class OpeningWidget(QtWidgets.QWidget):
 
         self.setLayout(v_layout)
 
-    def resizeEvent(self, event: QtGui.QResizeEvent, /) -> None:
-        # opening widget resize event
-        # we need to universily rescale the text from here
+    def emit_start_quiz(self, title, input_subtitle, show_date):
+        """
+        This method is called when any of the mood buttons is pressed.
+        It emits the start_quiz signal with a title, an input subtitle, and a date boolean.
+        """
+        self.start_quiz.emit(title, input_subtitle, show_date)
 
+    def resizeEvent(self, event: QtGui.QResizeEvent, /) -> None:
         super().resizeEvent(event)
         for label in self.labels:
-            new_width = self.width()/7.68
+            new_width = self.width() / 7.68
             approx_pt_size = new_width / 6
             new_pt_size = self.closest_pt_size(approx_pt_size)
             label.setFixedWidth(new_width)
@@ -117,27 +143,14 @@ class OpeningWidget(QtWidgets.QWidget):
 class LabelAndMoodButtonContainer(QtWidgets.QWidget):
     """
     A container that holds a ResizableLabel and an ImageButton, arranged in a layout.
-
-    :param label: The ResizableLabel to be displayed in the container.
-    :type label: QtWidgets.QLabel (or subclass)
-    :param mood_button: The image-based button widget.
-    :type mood_button: QtWidgets.QPushButton (or subclass)
-
-    :author: Harry
-    :created: 23-03-25
-
-    :contributors:
-        - Add your name here when you edit or maintain this class.
-
     """
     def __init__(self, label: QtWidgets.QLabel, mood_button: QtWidgets.QPushButton):
-        super(LabelAndMoodButtonContainer, self).__init__()
+        super().__init__()
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.setMinimumSize(100, 100)
         self.setMaximumWidth(324)
 
         label_hor_layout = QtWidgets.QHBoxLayout()
-
         label_hor_layout.addWidget(label)
         label_hor_layout.setContentsMargins(0, 0, 0, 0)
         label_hor_layout.setSpacing(0)
@@ -152,18 +165,9 @@ class LabelAndMoodButtonContainer(QtWidgets.QWidget):
 
 class ResizableLabel(QtWidgets.QLabel):
     """
-        A QLabel subclass that resizes its size dynamically based on layout or external triggers.
-        and has a manual option for adjusting pt size of font.
-
-        :param font: The base font used for the label. Will be resized via `change_to_new_font_size`.
-        :type font: QtGui.QFont
-
-        :author: Harry
-        :created: 23-03-25
-
-        :contributors:
-            - Add your name here when you edit or maintain this class.
-        """
+    A QLabel subclass that resizes its size dynamically based on layout or external triggers,
+    and has a manual option for adjusting the pt size of the font.
+    """
     def __init__(self, *args, font: QtGui.QFont, **kwargs):
         super().__init__(*args, **kwargs)
         self.base_font = font
@@ -183,15 +187,13 @@ class ResizableLabel(QtWidgets.QLabel):
 
 
 if __name__ == "__main__":
-
     app = QtWidgets.QApplication(sys.argv)
     font_id = QtGui.QFontDatabase.addApplicationFont("resources/fonts/quicksand/Quicksand-Medium.ttf")
+    window = OpeningWidget()
 
-    quicksand_medium = QtGui.QFont("Quicksand Medium", 42)
-    quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
-    excited_button = ImageButton(330, 290, "resources/images/excited.png")
-    excited_label = ResizableLabel("excited", font=quicksand_medium)
+    # For testing, connect the start_quiz signal to a simple print function.
+    window.start_quiz.connect(lambda title, subtitle, show_date: print(
+        f"Start quiz with title: {title}, subtitle: {subtitle}, show_date: {show_date}"))
 
-    window = LabelAndMoodButtonContainer(excited_label, excited_button)
     window.show()
     sys.exit(app.exec())
