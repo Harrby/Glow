@@ -2,6 +2,7 @@ from PySide6 import QtGui, QtCore, QtWidgets
 import sys
 from imageButton import ImageButton
 
+
 class OpeningWidget(QtWidgets.QWidget):
     """
     Widget for the opening screen of the application. Displays the 10 mood options (ImageButtons)
@@ -124,10 +125,19 @@ class OpeningWidget(QtWidgets.QWidget):
         """
         This method is called when any of the mood buttons is pressed.
         It emits the start_quiz signal with a title, an input subtitle, and a date boolean.
+
+
         """
         self.start_quiz.emit(title, input_subtitle, show_date)
 
     def resizeEvent(self, event: QtGui.QResizeEvent, /) -> None:
+        """
+        every time widget is resized. This is called.
+        it will adjust the label sizes dynamically.
+
+        :param event:
+        :return:
+        """
         super().resizeEvent(event)
         for label in self.labels:
             new_width = self.width() / 7.68
@@ -143,6 +153,10 @@ class OpeningWidget(QtWidgets.QWidget):
 class LabelAndMoodButtonContainer(QtWidgets.QWidget):
     """
     A container that holds a ResizableLabel and an ImageButton, arranged in a layout.
+
+    Author: Harry
+    Created: 2025-03-23
+
     """
     def __init__(self, label: QtWidgets.QLabel, mood_button: QtWidgets.QPushButton):
         super().__init__()
@@ -167,6 +181,9 @@ class ResizableLabel(QtWidgets.QLabel):
     """
     A QLabel subclass that resizes its size dynamically based on layout or external triggers,
     and has a manual option for adjusting the pt size of the font.
+
+    Author: Harry
+    Created: 2025-03-23
     """
     def __init__(self, *args, font: QtGui.QFont, **kwargs):
         super().__init__(*args, **kwargs)
@@ -182,6 +199,11 @@ class ResizableLabel(QtWidgets.QLabel):
         super().resizeEvent(event)
 
     def change_to_new_font_size(self, new_font_size: int) -> None:
+        """
+        sets the labels font size, works best with normal font sizes defined prev as COMMON_PT_SIZES.
+        :param new_font_size: (int) pt size of text.
+        :return:
+        """
         self.base_font.setPointSize(new_font_size)
         self.setFont(self.base_font)
 

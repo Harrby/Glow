@@ -12,7 +12,7 @@ def encrypt(password):
     # return hash_object.hexdigest()
 
 
-class LoginScreen(QtWidgets.QWidget):
+class LoginScreenWidget(QtWidgets.QWidget):
     login_successful = QtCore.Signal(str)  # Custom signal with username
 
     def __init__(self):

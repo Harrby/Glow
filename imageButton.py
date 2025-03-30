@@ -55,8 +55,6 @@ class ImageButton(QtWidgets.QPushButton):
         self.pressed.connect(self.on_button_pressed)
         self.released.connect(self.on_button_released)
 
-        self.show()
-
     def resizeEvent(self, event: QtGui.QResizeEvent, /) -> None:
         new_size = QtCore.QSize(self.width(), self.height())
         self.setIconSize(new_size)

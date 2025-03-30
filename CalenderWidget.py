@@ -1,23 +1,35 @@
 from PySide6 import QtGui, QtCore, QtWidgets
 import sys
 from imageButton import ImageButton
-from pymongo import MongoClient
+
 
 class CalenderContainer(QtWidgets.QWidget):
+    """
+        A QWidget-based container that displays a calendar interface with month and year navigation.
+
+        This widget shows a background image, the current year and month, and a calendar grid for each month.
+        It includes left and right arrow buttons for navigating between months. The calendar frames are
+        preloaded for performance, prioritizing low CPU usage at the cost of higher memory consumption.
+
+        Attributes:
+            current_month_index (int): Index of the currently displayed month (0–11).
+            current_year (int): The year currently displayed in the header.
+            months (list): A list of month data, where each month contains its name and a list of day values.
+            calender_frame_widgets (list): Pre-initialized CalenderFrame widgets for each month.
+
+        Author: Harry
+        Created: 2025-03-23
+        """
     def __init__(self):
         super().__init__()
 
         self.current_month_index = 2
         self.current_year = 2025
 
-        self.mood_db = MoodDataBase()
+        self.setStyleSheet("""QLabel{color: white;}""")
 
         generic_background_img = QtGui.QPixmap("resources/images/calender_background.png")
         self.pixmap = generic_background_img
-
-
-        background_img_label1 = QtWidgets.QLabel(pixmap=generic_background_img)
-        background_img_label2 = QtWidgets.QLabel(pixmap=generic_background_img)
 
         quicksand_medium_title = QtGui.QFont("Quicksand Medium", 120)
         quicksand_medium_content = QtGui.QFont("Quicksand Medium", 48)
@@ -38,10 +50,10 @@ class CalenderContainer(QtWidgets.QWidget):
         h_title_layout.addLayout(month_year_v_layout)
         h_title_layout.addStretch(1)
 
-        right_button = ImageButton(48, 104,  "resources/images/right_arrow.png")
+        right_button = ImageButton(48, 104, "resources/images/right_arrow.png")
         right_button.setFixedSize(QtCore.QSize(48, 104))
         right_button.clicked.connect(self.right_button_clicked)
-        left_button = ImageButton(48, 104,  "resources/images/left_arrow.png")
+        left_button = ImageButton(48, 104, "resources/images/left_arrow.png")
         left_button.setFixedSize(QtCore.QSize(48, 104))
         left_button.clicked.connect(self.left_button_clicked)
 
@@ -56,31 +68,26 @@ class CalenderContainer(QtWidgets.QWidget):
         left_v_layout.addStretch(1)
         left_v_layout.setContentsMargins(40, 0, 40, 0)
 
-
         # jan to may
         self.months = [
-            ["January",   1, [-1] * 2 + list(range(1, 32)) + [-1] * 2],
-            ["February",  2, [-1] * 5 + list(range(1, 29)) + [-1] * 2],
-            ["March",     3, [-1] * 5 + list(range(1, 32)) + [-1] * 6],
-            ["April",     4, [-1] * 1 + list(range(1, 31)) + [-1] * 4],
-            ["May",       5, [-1] * 3 + list(range(1, 32)) + [-1] * 1],
-            ["June",      6, [-1] * 6 + list(range(1, 31)) + [-1] * 6],
-            ["July",      7, [-1] * 1 + list(range(1, 32)) + [-1] * 3],
-            ["August",    8, [-1] * 4 + list(range(1, 32)) + [-1] * 0],
-            ["September", 9, [-1] * 0 + list(range(1, 31)) + [-1] * 5],
-            ["October",  10, [-1] * 2 + list(range(1, 32)) + [-1] * 2],
-            ["November", 11, [-1] * 5 + list(range(1, 31)) + [-1] * 0],
-            ["December", 12, [-1] * 0 + list(range(1, 32)) + [-1] * 4]
+            ["January",  [-1] * 2 + list(range(1, 32)) + [-1] * 2],
+            ["February",  [-1] * 5 + list(range(1, 29)) + [-1] * 2],
+            ["March",  [-1] * 5 + list(range(1, 32)) + [-1] * 6],
+            ["April",  [-1] * 1 + list(range(1, 31)) + [-1] * 4],
+            ["May",  [-1] * 3 + list(range(1, 32)) + [-1] * 1],
+            ["June",  [-1] * 6 + list(range(1, 31)) + [-1] * 6],
+            ["July",  [-1] * 1 + list(range(1, 32)) + [-1] * 3],
+            ["August",  [-1] * 4 + list(range(1, 32)) + [-1] * 0],
+            ["September",  [-1] * 0 + list(range(1, 31)) + [-1] * 5],
+            ["October",  [-1] * 2 + list(range(1, 32)) + [-1] * 2],
+            ["November",  [-1] * 5 + list(range(1, 31)) + [-1] * 0],
+            ["December",  [-1] * 0 + list(range(1, 32)) + [-1] * 4]
         ]
-
-
-        self.calender_frame_widgets = [CalenderFrame(self.current_year, month[1], month[2], self.mood_db) for month in self.months]
 
         # pre load all cal frames, for speed (high mem consumption but low cpu consumption)
         # i feel like since this will be single core we should optimize for cpu
 
-        # self.calender_frame_widgets = [CalenderFrame(month[1]) for month in self.months]
-
+        self.calender_frame_widgets = [CalenderFrame(month[1]) for month in self.months]
 
         self.v_layout = QtWidgets.QVBoxLayout()
         for calender_frame_widget in self.calender_frame_widgets:
@@ -100,52 +107,81 @@ class CalenderContainer(QtWidgets.QWidget):
 
         self.setLayout(main_h_layout)
 
-    def paintEvent(self, event):
+    def paintEvent(self, event) -> None:
+        """
+        Draws the background image to the correct size on resize.
+        :param event:
+        """
         painter = QtGui.QPainter(self)
         painter.drawPixmap(self.rect(), self.pixmap)
 
-    def show_calender_frame_at_index(self, index: int):
+    def show_calender_frame_at_index(self, index: int)-> None:
+        """
+        Displays the calendar frame for the given month index.
+        :param index: (int) 0-11
+        """
         self.hide_all_calender_frame_widget()
         self.calender_frame_widgets[index].show()
 
-    def hide_all_calender_frame_widget(self):
+    def hide_all_calender_frame_widget(self)-> None:
+        """
+        Hides all calendar frames.
+        """
         for widget in self.calender_frame_widgets:
             widget.hide()
 
-    def set_month_and_year(self, month: int, year: int):
+    def set_month_and_year(self, month: int, year: int)-> None:
+        """
+        Updates the labels and internal state to reflect the given month and year.
+        :param month: (int) 0-11
+        :param year:  (int) e.g. 2025
+        """
         self.current_month_index = month
         self.current_year = year
         self.month_label.setText(self.months[month][0])
         self.year_label.setText(str(year))
 
-    def right_button_clicked(self):
+    def right_button_clicked(self) -> None:
+        """
+        Advances to the next month (if not at December).
+        """
         if self.current_month_index < 11:
-            self.current_month_index +=1
+            self.current_month_index += 1
             self.show_calender_frame_at_index(self.current_month_index)
-            self.set_month_and_year(self.current_month_index, self.current_year)
+            self.set_month_and_year(self.current_month_index, 2025)
 
-
-    def left_button_clicked(self):
-        if self.current_month_index >0:
+    def left_button_clicked(self) -> None:
+        """
+        Goes back to the previous month (if not at January).
+        """
+        if self.current_month_index > 0:
             self.current_month_index -= 1
             self.show_calender_frame_at_index(self.current_month_index)
-            self.set_month_and_year(self.current_month_index, self.current_year)
-
-
-class MoodDataBase:
-    def __init__(self):
-        self.client = MongoClient("mongodb+srv://sam_user:9ireiEodVKBb3Owt@glowcluster.36bwm.mongodb.net/?retryWrites=true&w=majority&appName=GlowCluster")
-        self.db = self.client["mood_tracker"]
-        self.collection = self.db["moods"]
-
-    def get_mood_for_date(self, year, month, day):
-        date_str = f"{year}-{month:02d}-{day:02d}"
-        result = self.collection.find_one({"date": date_str})
-        return result["mood"] if result else None
+            self.set_month_and_year(self.current_month_index, 2025)
 
 
 class CalenderFrame(QtWidgets.QFrame):
-    def __init__(self, year: int, month: int, days: list, mood_db: MoodDataBase):
+    """
+        A QFrame subclass that displays a grid-based layout for a single month's calendar.
+
+        This frame includes weekday headers and individual calendar entries for each day of the month,
+        laid out in a 7-column grid (Monday to Sunday). It is styled with a border and background color
+        and is meant to be used within a calendar view like `CalenderContainer`.
+
+        Attributes:
+            calender_entries (list): A list of `CalenderEntry` widgets representing each day cell.
+
+        Parameters:
+            month (list): A list of integers representing the days in a month, where `-1` represents an
+                          empty cell (used to offset the start of the month or fill trailing space).
+
+        Example:
+            frame = CalenderFrame([ -1, -1, 1, 2, 3, ..., 31, -1, -1 ])
+
+        Author: Harry
+        Created: 2025-03-23
+    """
+    def __init__(self, month: list):
         super().__init__()
 
         self.setStyleSheet("""
@@ -153,44 +189,61 @@ class CalenderFrame(QtWidgets.QFrame):
             border: 1px solid rgb(156, 156, 169);
             background-color: #B9B9B9;
             }
-        
+
         """)
 
         grid_layout = QtWidgets.QGridLayout()
+
+        calender_entries = []
         grid_layout.setSpacing(0)
         grid_layout.setContentsMargins(0, 0, 0, 0)
 
-        days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-        for i, day in enumerate(days_of_week):
-            grid_layout.addWidget(CalenderWeekdayTitleEntry(day), 0, i)
+        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        day_calender_widgets = [CalenderWeekdayTitleEntry(day) for day in days]
 
-        for i, day in enumerate(days):
-            entry = CalenderEntry(day, year, month, mood_db)
+        for i, widget in enumerate(day_calender_widgets):
+            grid_layout.addWidget(widget, 0, i)
+
+        for i, day in enumerate(month):
+            new_calender_entry = CalenderEntry(day)
+            calender_entries.append(new_calender_entry)
             row = 1 + (i // 7)
             col = i % 7
-            grid_layout.addWidget(entry, row, col)
-        
-        # day_calender_widgets = [CalenderWeekdayTitleEntry(day) for day in days]
-
-        # for i, widget in enumerate(day_calender_widgets):
-        #     grid_layout.addWidget(widget, 0, i)
-
-        # for i, day in enumerate(month):
-        #     new_calender_entry = CalenderEntry(day)
-        #     calender_entries.append(new_calender_entry)
-        #     row = 1 + (i // 7)
-        #     col = i % 7
-        #     grid_layout.addWidget(new_calender_entry, row, col)
+            grid_layout.addWidget(new_calender_entry, row, col)
 
         self.setLayout(grid_layout)
 
 
 class CalenderEntry(QtWidgets.QFrame):
-    def __init__(self, number: int, year: int, month: int, mood_db: MoodDataBase):
+    """
+        A single day cell in the calendar grid, optionally displaying a mood icon and the day number.
+
+        This widget is designed to be used within a `CalenderFrame` and represents either a valid day
+        of the month or a placeholder (when the day number is -1). It includes space for a mood icon
+        and displays the day number if applicable.
+
+        Attributes:
+            mood_pixmap (QPixmap or None): The current mood image set for this day.
+            mood_label (QLabel): Label used to display the mood image.
+
+        Parameters:
+            number (int): The day number to display, or -1 for an empty/inactive cell.
+
+        Methods:
+            set_mood_pixmap(mood: str): Sets the mood icon from an image file corresponding to the given mood name.
+
+        Example:
+            entry = CalenderEntry(14)
+            entry.set_mood_pixmap("happy")
+    """
+    def __init__(self, number: int):
         super().__init__()
 
         self.setMinimumHeight(50)
-        self.mood_db = mood_db
+
+        self.mood_pixmap = None
+        self.mood_label = QtWidgets.QLabel(self)
+        self.mood_label.setGeometry(10, 10, 40, 40)
 
         quicksand_medium = QtGui.QFont("Quicksand Medium", 18)
         quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
@@ -198,16 +251,8 @@ class CalenderEntry(QtWidgets.QFrame):
         number_label = QtWidgets.QLabel(self)
         number_label.setFont(quicksand_medium)
         number_label.setGeometry(8, 5, 40, 40)
-        number_label.setStyleSheet("color:white;")
-
         if number != -1:
             number_label.setText(str(number))
-            mood = self.mood_db.get_mood_for_date(year, month, number)
-            if mood:
-                mood_pixmap = QtGui.QPixmap(f"resources/images/{mood}.png")
-                mood_label = QtWidgets.QLabel(self)
-                mood_label.setPixmap(mood_pixmap.scaled(40, 40, QtCore.Qt.KeepAspectRatio))
-                mood_label.setGeometry(50, 5, 40, 40)
         else:
             number_label.hide()
 
@@ -218,8 +263,33 @@ class CalenderEntry(QtWidgets.QFrame):
             }
         """)
 
+    def set_mood_pixmap(self, mood: str) -> None:
+        """
+        sets the image in a calender entry to the given mood.
+
+        :param mood: string e.g 'happy'
+        :return:
+        """
+        self.mood_pixmap = QtGui.QPixmap(f"resources/images/{mood}.png")
+        self.mood_label.setPixmap(self.mood_pixmap)
+
 
 class CalenderWeekdayTitleEntry(QtWidgets.QFrame):
+    """
+        A header cell used in the calendar grid to display the name of a weekday (e.g., "Monday").
+
+        This widget is styled consistently with other calendar elements and is intended to sit at
+        the top of each column in a `CalenderFrame`. It displays the day name in a styled QLabel.
+
+        Attributes:
+            day (str): The name of the weekday this entry represents (e.g., "Tuesday").
+
+        Parameters:
+            day (str): The weekday name to display in the header.
+
+        Example:
+            header = CalenderWeekdayTitleEntry("Wednesday")
+    """
     def __init__(self, day):
         super().__init__()
         self.day = day
@@ -237,7 +307,6 @@ class CalenderWeekdayTitleEntry(QtWidgets.QFrame):
 
         day_label = QtWidgets.QLabel(day)
         day_label.setFont(quicksand_medium)
-        day_label.setStyleSheet("""color:white;""")
 
         layout = QtWidgets.QHBoxLayout()
         layout.addWidget(day_label)
@@ -245,7 +314,7 @@ class CalenderWeekdayTitleEntry(QtWidgets.QFrame):
 
 
 if __name__ == "__main__":
-    april = [-1]*1 + list(range(1, 31)) + [-1]*4
+    april = [-1] * 1 + list(range(1, 31)) + [-1] * 4
 
     app = QtWidgets.QApplication(sys.argv)
     font_id = QtGui.QFontDatabase.addApplicationFont("resources/fonts/quicksand/Quicksand-Medium.ttf")
@@ -254,8 +323,6 @@ if __name__ == "__main__":
     quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
 
     window = CalenderContainer()
-    window.show_calender_frame_at_index(1)
+    window.show_calender_frame_at_index(2)
     window.show()
     sys.exit(app.exec())
-
-

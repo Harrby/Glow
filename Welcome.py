@@ -3,11 +3,13 @@ import os
 from PySide6 import QtGui, QtCore, QtWidgets
 from OpeningWidget import OpeningWidget
 
-class Welcome(QtWidgets.QWidget):
+class WelcomeWidget(QtWidgets.QWidget):
     page_clicked = QtCore.Signal()  # Custom signal
 
     def __init__(self, name="James"):
         super().__init__()
+
+        self.name = name
 
         self.setMinimumSize(800, 600)
         self.setWindowState(QtCore.Qt.WindowMaximized)
@@ -23,7 +25,7 @@ class Welcome(QtWidgets.QWidget):
             print(f"Warning: Background image not found at {background_path}")
 
         # Labels
-        self.main_label_hey = QtWidgets.QLabel(f"Hey {name}!", self)
+        self.main_label_hey = QtWidgets.QLabel(f"Hey {self.name}!", self)
         self.main_label_hey.setAlignment(QtCore.Qt.AlignCenter)
         self.main_label_hey.setTextFormat(QtCore.Qt.RichText)
 
@@ -117,6 +119,11 @@ class Welcome(QtWidgets.QWidget):
             self.image_label.setPixmap(scaled_pixmap)
 
         super().resizeEvent(event)
+
+    def set_name(self, name: str):
+        self.name = name
+        self.main_label_hey.setText(f"Hey {self.name}!")
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
