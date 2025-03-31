@@ -3,7 +3,7 @@ import sys
 from imageButton import ImageButton
 
 
-class OpeningWidget(QtWidgets.QWidget):
+class OpeningWidget(QtWidgets.QFrame):
     """
     Widget for the opening screen of the application. Displays the 10 mood options (ImageButtons)
     of how the user is feeling.
@@ -20,7 +20,9 @@ class OpeningWidget(QtWidgets.QWidget):
         super().__init__()
         # self.setMinimumSize(1200, 600)
         # self.setBaseSize(1920, 1080)
-        self.setStyleSheet("background-color: #4B4A63;")
+        self.setStyleSheet(".OpeningWidget{"
+                           "background-color: #4B4A63;"
+                           "}")
 
         quicksand_medium = QtGui.QFont("Quicksand Medium", 42)
         quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
