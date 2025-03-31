@@ -2,10 +2,39 @@ import sys
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtWidgets import QSizePolicy
 from PySide6.QtGui import QFont, QIcon
-from HoverButton import HoverButton
+from buttons.hoverButton import HoverButton
 
 
-class MyWindow(QtWidgets.QWidget):
+class DashboardWidget(QtWidgets.QWidget):
+    """
+        A QWidget-based main dashboard interface with categorized activity buttons and side action icons.
+
+        This widget serves as the main screen of the application, displaying four central activity buttons
+        (Screen Time, Alcohol Log, Exercise, and Sleep) with unique styling, as well as four side icon buttons
+        for actions like exiting, opening a calendar, viewing a logo, and editing mood. The layout is responsive,
+        with adaptive font scaling and proportional button sizing to maintain usability across different window sizes.
+
+        The dashboard emphasizes visual clarity with color-coded buttons, round icon buttons, and intuitive placement
+        using grid and box layouts. HoverButton is used throughout to provide enhanced interactivity.
+
+        Attributes:
+            screenTimeButton (HoverButton): Button for accessing screen time logging.
+            alcoholLogButton (HoverButton): Button for logging alcohol consumption.
+            exerciseButton (HoverButton): Button for tracking exercise activities.
+            sleepButton (HoverButton): Button for logging sleep.
+            exitButton (HoverButton): Circular icon button for exiting the application.
+            calenderButton (HoverButton): Circular icon button for opening the calendar view.
+            logoButton (HoverButton): Circular icon button showing the app's logo.
+            editMood (HoverButton): Circular icon button for editing mood-related entries.
+
+        Methods:
+            main_button_features(button, color): Applies a custom background color and style to a button.
+            resizeEvent(event): Dynamically adjusts button font sizes based on widget width.
+
+        Author: James
+        Created: 2025-03-27
+    """
+
     def __init__(self):
         super().__init__()
         self.setMinimumSize(800, 600)
@@ -95,6 +124,6 @@ class MyWindow(QtWidgets.QWidget):
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    window = MyWindow()
+    window = DashboardWidget()
     window.show()
     sys.exit(app.exec())

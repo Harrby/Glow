@@ -6,13 +6,37 @@ import pymongo
 
 def encrypt(password):
     return password
-    # Uncomment below to use hashed passwords instead
-    # password_bytes = password.encode("utf-8")
-    # hash_object = hashlib.sha256(password_bytes)
-    # return hash_object.hexdigest()
 
 
-class LoginScreenWidget(QtWidgets.QWidget):
+class LoginWidget(QtWidgets.QWidget):
+    """
+        A QWidget-based login interface with MongoDB authentication and custom signal on success.
+
+        This widget presents a login form consisting of a username field, a password field (with obscured input),
+        a login button, and dynamic error messaging. It authenticates users against a MongoDB Atlas database
+        and emits a custom signal with the username upon successful login. The layout is styled for clarity and
+        ease of use with large, accessible input fields and buttons.
+
+        The login logic is modular and can be connected to other application components using the `login_successful` signal.
+
+        Attributes:
+            username_input (QLineEdit): Input field for the user's username.
+            password_input (QLineEdit): Input field for the user's password (masked).
+            login_button (QPushButton): Button to submit the login form.
+            error_label (QLabel): Displays success or failure messages.
+            client (MongoClient): MongoDB client connection to the remote database.
+            db (Database): MongoDB database instance for user accounts.
+            collection (Collection): MongoDB collection containing user credentials.
+            login_successful (Signal): Custom PySide signal emitted with the username on successful login.
+
+        Methods:
+            init_ui(): Initializes the layout and UI components.
+            verify_login(): Verifies user credentials and emits a success signal if valid.
+
+        Author: Seb
+        Created: 2025-03-27
+    """
+
     login_successful = QtCore.Signal(str)  # Custom signal with username
 
     def __init__(self):
@@ -88,7 +112,7 @@ class LoginScreenWidget(QtWidgets.QWidget):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    window = LoginScreenWidget()
+    window = LoginWidget()
     window.login_successful.connect(lambda username: print(f"Logged in as: {username}"))  # Test connection
     window.show()
     sys.exit(app.exec())

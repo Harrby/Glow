@@ -1,9 +1,44 @@
 import sys
 import os
 from PySide6 import QtGui, QtCore, QtWidgets
-from OpeningWidget import OpeningWidget
+from openingWidget import OpeningWidget
 
 class WelcomeWidget(QtWidgets.QWidget):
+    """
+        A QWidget-based animated welcome screen with dynamic background, personalized greeting, and logo.
+
+        This widget creates an engaging welcome experience using animated fade-in effects for a personalized
+        greeting, the app logo, and a warm welcome message. It supports dynamic scaling, custom background imagery,
+        and emits a signal on mouse click to proceed to the next page.
+
+        The widget layout includes:
+        - A top row with a "Hey [name]!" message and app logo.
+        - A second line with a "Welcome back to Glow" message.
+        - A background image rendered using `paintEvent`.
+        - Smooth fade-in animations for all key visual elements.
+
+        Attributes:
+            name (str): The user’s name used in the greeting.
+            page_clicked (Signal): Custom PySide signal emitted on mouse press to proceed.
+            main_label_hey (QLabel): Displays a personalized "Hey [name]!" message.
+            main_label_welcome (QLabel): Displays a stylized welcome message.
+            image_label (QLabel): Displays the app logo.
+            background_pixmap (QPixmap): Background image rendered behind all content.
+            fade_animation_hey (QPropertyAnimation): Fade-in animation for the "Hey" label.
+            fade_animation_welcome (QPropertyAnimation): Fade-in animation for the welcome message.
+            fade_animation_image (QPropertyAnimation): Fade-in animation for the logo image.
+
+        Methods:
+            add_opacity_effects(): Initializes opacity effects and animations for all key elements.
+            mousePressEvent(event): Emits `page_clicked` signal when widget is clicked.
+            paintEvent(event): Draws the background image scaled to fit the widget size.
+            resizeEvent(event): Dynamically resizes fonts and images based on the window size.
+            set_name(name): Updates the name used in the greeting dynamically.
+
+        Author: Harry, James & Seb
+        Created: 2025-03-23
+    """
+
     page_clicked = QtCore.Signal()  # Custom signal
 
     def __init__(self, name="James"):
@@ -127,6 +162,6 @@ class WelcomeWidget(QtWidgets.QWidget):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    welcome = Welcome(name="James")
+    welcome = WelcomeWidget(name="James")
     welcome.show()
     sys.exit(app.exec())

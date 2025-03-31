@@ -2,9 +2,9 @@ from PySide6 import QtGui, QtWidgets
 import sys
 from PySide6.QtWidgets import QApplication, QStackedWidget
 
-from OpeningWidget import OpeningWidget
-from loginPage import LoginScreenWidget
-from Welcome import WelcomeWidget
+from openingWidget import OpeningWidget
+from loginWidget import LoginWidget
+from welcomeWidget import WelcomeWidget
 from quizWidget import QuizContainer
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -18,7 +18,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.stack = QStackedWidget()
 
-        self.login_page = LoginScreenWidget()
+        self.login_page = LoginWidget()
         self.login_page.login_successful.connect(self.show_welcome)
         self.stack.addWidget(self.login_page)  # index 0
 
@@ -57,5 +57,5 @@ class MainWindow(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow(app)
-    window.show()
+    window.showFullScreen()
     sys.exit(app.exec())

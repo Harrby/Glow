@@ -109,6 +109,6 @@ class ImageButton(QtWidgets.QPushButton):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    window = ImageButton(331, 296, "resources/images/excited.png")
+    window = ImageButton(331, 296, "../resources/images/excited.png")
     window.show()
     sys.exit(app.exec())

@@ -2,6 +2,32 @@ from PySide6 import QtGui, QtCore, QtWidgets
 import sys
 
 class QuizContainer(QtWidgets.QWidget):
+    """
+        A QWidget-based container for capturing user reflections or intentions with optional date input.
+
+        This widget presents a visually engaging quiz-like interface that includes a customizable title,
+        a subtitle prompt, a text input field, and an optional date input. It's ideal for gathering user thoughts,
+        goals, or plans in a friendly, approachable format. The layout is vertically stacked, with central alignment
+        and consistent styling, providing a responsive and aesthetically pleasing user experience.
+
+        Attributes:
+            title_label (QLabel): Displays the main title at the top of the widget.
+            subtitle_label (QLabel): Displays the prompt or instruction below the title.
+            input (QLineEdit): Main text input for the user's response.
+            date_label (QLabel, optional): Label prompting the user to enter a date.
+            date_input (QLineEdit, optional): Input field for date entry (dd/mm/yy format).
+            enter_button (QPushButton): Button to confirm the entry.
+
+        Parameters:
+            title (str): Text for the main title. Defaults to "Exciting Stuff!".
+            input_subtitle (str): Prompt text for the input field. Defaults to "What are you looking forward to?".
+            show_date (bool): Whether to show the optional date input section. Defaults to True.
+            parent (QWidget, optional): Optional parent widget.
+
+        Author: Seb & Eyela
+        Created: 2025-03-28
+    """
+
     def __init__(self, title="Exciting Stuff!", input_subtitle="What are you looking forward to?", show_date=True, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Quiz")
