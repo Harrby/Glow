@@ -77,7 +77,7 @@ class LoginScreenWidget(QtWidgets.QWidget):
 
         user = self.collection.find_one({"username": username, "password": password})
 
-        if True:
+        if user:
             self.error_label.setText("Login successful!")
             self.error_label.setStyleSheet("color: green")
             self.login_successful.emit(username)  # Emit signal with username
@@ -88,7 +88,7 @@ class LoginScreenWidget(QtWidgets.QWidget):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    window = LoginScreen()
+    window = LoginScreenWidget()
     window.login_successful.connect(lambda username: print(f"Logged in as: {username}"))  # Test connection
     window.show()
     sys.exit(app.exec())

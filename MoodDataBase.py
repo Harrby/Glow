@@ -1,3 +1,6 @@
+from pymongo import MongoClient
+
+
 class MoodDataBase:
 
     def __init__(self):
