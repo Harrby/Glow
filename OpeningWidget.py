@@ -20,6 +20,7 @@ class OpeningWidget(QtWidgets.QWidget):
         super().__init__()
         # self.setMinimumSize(1200, 600)
         # self.setBaseSize(1920, 1080)
+        self.setStyleSheet("background-color: #4B4A63;")
 
         quicksand_medium = QtGui.QFont("Quicksand Medium", 42)
         quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
