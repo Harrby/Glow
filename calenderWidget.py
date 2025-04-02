@@ -2,6 +2,30 @@ from PySide6 import QtGui, QtCore, QtWidgets
 import sys
 from buttons.imageButton import ImageButton
 import calendar
+from dataclasses import dataclass, field
+
+
+@dataclass
+class MonthData:
+    """
+        a data class (makes syntax cleaner / and less code to write)
+
+        attributes:
+            month (int): int 1-12 declares which month this is
+            year (int): any year, but probably going to be 2025 onwards
+            days (list[int]): the month data used to create a calender frame e.g [[-1], [-1], 1, 2, ..., 31, [-1]]
+            moods (list[str]): list of file path extensions of each mood in the month, e.g ["happy", "sad", ...]
+                (doesnt need to be passed to instantiate however / has a default arg of [])
+
+        Author: Harry
+        Created: 02-04-2025
+
+
+    """
+    month: int
+    year: int
+    days: list
+    moods: list = field(default_factory=list)
 
 
 class CalenderContainer(QtWidgets.QWidget):
@@ -9,14 +33,15 @@ class CalenderContainer(QtWidgets.QWidget):
         A QWidget-based container that displays a calendar interface with month and year navigation.
 
         This widget shows a background image, the current year and month, and a calendar grid for each month.
-        It includes left and right arrow buttons for navigating between months. The calendar frames are
-        preloaded for performance, prioritizing low CPU usage at the cost of higher memory consumption.
+        It includes left and right arrow buttons for navigating between months. 2 years worth of calendar frames are
+        preloaded for switching performance.
 
         Attributes:
-            current_month_index (int): Index of the currently displayed month (0–11).
-            current_year (int): The year currently displayed in the header.
-            months (list): A list of month data, where each month contains its name and a list of day values.
-            calender_frame_widgets (list): Pre-initialized CalenderFrame widgets for each month.
+            global_month_index (int): Index of month item from position 0 in self.months
+                                      that is currently displayed on screen.
+            months (list): A list of month data, where each month contains month index (int), year index (int)
+                           and a list of day values List[int].
+            calender_frame_widgets (list): List[CalenderFrame()], contains instances of CalenderFrame.
 
         Author: Harry
         Created: 2025-03-23
@@ -25,7 +50,6 @@ class CalenderContainer(QtWidgets.QWidget):
         super().__init__()
 
         self.global_month_index = 2
-        self.current_year = 2025
 
         self.setStyleSheet("""QLabel{color: white;}""")
 
@@ -37,6 +61,7 @@ class CalenderContainer(QtWidgets.QWidget):
         quicksand_medium_title.setStyleStrategy(QtGui.QFont.PreferAntialias)
         quicksand_medium_content.setStyleStrategy(QtGui.QFont.PreferAntialias)
 
+        # LAYOUTS
         self.year_label = QtWidgets.QLabel(alignment=QtCore.Qt.AlignCenter)
         self.year_label.setFont(quicksand_medium_title)
         self.month_label = QtWidgets.QLabel(alignment=QtCore.Qt.AlignCenter)
@@ -69,26 +94,21 @@ class CalenderContainer(QtWidgets.QWidget):
         left_v_layout.addStretch(1)
         left_v_layout.setContentsMargins(40, 0, 40, 0)
 
-
         self.months = [
 
         ]
-
         # pre load 2 years, unlikely to go further. But they'll be automatically generated if they want to go further
         for j in range(2025, 2027):
             for i in range(1, 13):
+                # instantiate MonthData dataclass
+                self.months.append(MonthData(i, j,  self.generate_month_data(j, i)))
 
-                self.months.append([i, j,  self.generate_month_data(j, i)])
-
-
-        self.calender_frame_widgets = [CalenderFrame(month[2]) for month in self.months]
+        self.calender_frame_widgets = [CalenderFrame(month.days) for month in self.months]
 
         self.v_layout = QtWidgets.QVBoxLayout()
         for calender_frame_widget in self.calender_frame_widgets:
             calender_frame_widget.hide()
             self.v_layout.addWidget(calender_frame_widget)
-
-
 
         self.v_layout.addSpacing(35)
 
@@ -113,26 +133,33 @@ class CalenderContainer(QtWidgets.QWidget):
         painter = QtGui.QPainter(self)
         painter.drawPixmap(self.rect(), self.pixmap)
 
-    def show_calender_frame_at_index(self, index: int)-> None:
+    def show_calender_frame_at_index(self, index: int) -> None:
         """
         Displays the calendar frame for the given month index.
-        :param index: (int) 0-11
+        :param index: (int) 0 - len(self.calender_frame_widgets)
         """
         self.hide_all_calender_frame_widget()
         self.calender_frame_widgets[index].show()
 
-    def hide_all_calender_frame_widget(self)-> None:
+    def hide_all_calender_frame_widget(self) -> None:
         """
         Hides all calendar frames.
         """
         for widget in self.calender_frame_widgets:
             widget.hide()
 
-    def get_month_and_year_from_index(self, index: int, start_year: int = None, start_month: int = None):
+    def get_month_and_year_from_index(self, index: int, start_year: int = None, start_month: int = None) -> tuple:
+        """
+
+        :param index: (int) global index from pos 0 of self.months list
+        :param start_year: (int) year to begin counting from  {default=year at beginning of self.months}
+        :param start_month: (int) month to begin counting on  {default=month at beginning of self.months}
+        :return: tuple(month, year): tuple(int, int) the month and year at the given index.
+        """
         if start_year is None:
-            start_year = self.months[0][1]
+            start_year = self.months[0].year
         if start_month is None:
-            start_month = self.months[0][0]
+            start_month = self.months[0].month
         total_months = (start_year * 12 + start_month - 1) + index
         year = total_months // 12
         month = total_months % 12 + 1
@@ -150,32 +177,40 @@ class CalenderContainer(QtWidgets.QWidget):
             days.append(-1)
         return days
 
-    def set_month_and_year(self, month: int, year: int)-> None:
+    def set_month_and_year(self, month: int, year: int) -> None:
         """
         Updates the labels and internal state to reflect the given month and year.
         :param month: (int) 0-11
         :param year:  (int) e.g. 2025
         """
         self.global_month_index = month
-        self.current_year = year
-        self.month_label.setText(calendar.month_name[self.months[month][0]])
+        self.month_label.setText(calendar.month_name[self.months[month].month])
         self.year_label.setText(str(year))
+
+    def set_month_mood_data(self, global_month_index: int, mood_data: list):
+        ...
 
     def right_button_clicked(self) -> None:
         """
-        Advances to the next month (if not at December).
+        Advances to the next month (if one doesnt exist it creates one)
         """
         self.global_month_index += 1
         if self.global_month_index < len(self.months):
             self.show_calender_frame_at_index(self.global_month_index)
-            self.set_month_and_year(self.global_month_index, self.months[self.global_month_index][1])
+            self.set_month_and_year(self.global_month_index, self.months[self.global_month_index].year)
         else:
-            month, year = self.get_month_and_year_from_index(self.global_month_index)
-            self.months.append([month, year, self.generate_month_data(year, month)])
-            self.calender_frame_widgets.append(CalenderFrame(self.months[self.global_month_index][2]))
-            self.v_layout.insertWidget(self.v_layout.count() -1, self.calender_frame_widgets[self.global_month_index])
+            self.create_new_month()
             self.show_calender_frame_at_index(self.global_month_index)
-            self.set_month_and_year(self.global_month_index, self.months[self.global_month_index][1])
+            self.set_month_and_year(self.global_month_index, self.months[self.global_month_index].year)
+
+    def create_new_month(self) -> None:
+        """
+        generates new month data, and uses this to instantiate another CalenderFrame
+        """
+        month, year = self.get_month_and_year_from_index(self.global_month_index)
+        self.months.append(MonthData(month, year, self.generate_month_data(year, month)))
+        self.calender_frame_widgets.append(CalenderFrame(self.months[self.global_month_index].days))
+        self.v_layout.insertWidget(self.v_layout.count() - 1, self.calender_frame_widgets[self.global_month_index])
 
     def left_button_clicked(self) -> None:
         """
@@ -184,7 +219,7 @@ class CalenderContainer(QtWidgets.QWidget):
         if self.global_month_index > 0:
             self.global_month_index -= 1
             self.show_calender_frame_at_index(self.global_month_index)
-            self.set_month_and_year(self.global_month_index, self.months[self.global_month_index][1])
+            self.set_month_and_year(self.global_month_index, self.months[self.global_month_index].year)
 
 
 class CalenderFrame(QtWidgets.QFrame):
@@ -265,8 +300,6 @@ class CalenderEntry(QtWidgets.QFrame):
     """
     def __init__(self, number: int):
         super().__init__()
-
-        #self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
         self.setMinimumHeight(50)
 
