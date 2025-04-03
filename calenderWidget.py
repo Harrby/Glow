@@ -2,6 +2,7 @@ from PySide6 import QtGui, QtCore, QtWidgets
 import sys
 from buttons.imageButton import ImageButton
 import calendar
+from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 
 
@@ -421,6 +422,68 @@ class CalenderWeekdayTitleEntry(QtWidgets.QFrame):
         self.setLayout(layout)
 
 
+class CalenderZoomInContainer(QtWidgets.QFrame):
+    RequestNextDayData = QtCore.Signal()  # sends a request for getting next days data
+    RequestPrevDayData = QtCore.Signal()
+
+    def __init__(self, day: int, month: int, year: int, diary_entry: str, mood: str, screen_time: float, exercise: int,
+                 alcohol: float, sleep: float):
+        super().__init__()
+
+        # setting variables
+        self.day = day
+        self.month = month
+        self.year = year
+        self.diary_entry = diary_entry
+        self.mood = mood
+        self.screen_time = screen_time
+        self.exercise = exercise
+        self.alcohol = alcohol
+        self.sleep = sleep
+
+        generic_background_img = QtGui.QPixmap("resources/images/calenderBackgroundNoFireflies.png")
+        self.pixmap = generic_background_img
+
+        self.setStyleSheet("""QLabel{color: white;}""")
+
+        quicksand_medium_title = QtGui.QFont("Quicksand Medium", 96)
+        quicksand_medium_content = QtGui.QFont("Quicksand Medium", 36)
+        quicksand_medium_title.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        quicksand_medium_content.setStyleStrategy(QtGui.QFont.PreferAntialias)
+
+        self.date_title = QtWidgets.QLabel()
+        self.date_title.setFont(quicksand_medium_title)
+
+        right_button = ImageButton(45, 83, "resources/images/right_arrow.png")
+        right_button.setFixedSize(QtCore.QSize(48, 104))
+        right_button.clicked.connect(self.right_button_clicked)
+        left_button = ImageButton(45, 83, "resources/images/left_arrow.png")
+        left_button.setFixedSize(QtCore.QSize(48, 104))
+        left_button.clicked.connect(self.left_button_clicked)
+
+    def paintEvent(self, event) -> None:
+        """
+        Draws the background image to the correct size on resize.
+        :param event:
+        """
+        painter = QtGui.QPainter(self)
+        painter.drawPixmap(self.rect(), self.pixmap)
+
+    def set_date(self, day: int, month: int, year: int):
+        self.day = day
+        self.month = month
+        self.year = year
+
+        self.date_title.setText(f"{day} {calendar.month_name[month]} {year}")
+
+    def right_button_clicked(self):
+        self.RequestNextDayData.emit()
+
+    def left_button_clicked(self):
+        self.RequestPrevDayData.emit()
+
+
+
 if __name__ == "__main__":
     april = [-1] * 1 + list(range(1, 31)) + [-1] * 4
 
@@ -430,7 +493,6 @@ if __name__ == "__main__":
     quicksand_medium = QtGui.QFont("Quicksand Medium", 42)
     quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
 
-    window = CalenderContainer()
-    window.show_calender_frame_at_index(2)
+    window = CalenderZoomInContainer()
     window.show()
     sys.exit(app.exec())
