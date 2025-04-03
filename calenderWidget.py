@@ -16,6 +16,7 @@ class MonthData:
             days (list[int]): the month data used to create a calender frame e.g [[-1], [-1], 1, 2, ..., 31, [-1]]
             moods (list[str]): list of file path extensions of each mood in the month, e.g ["happy", "sad", ...]
                 (doesnt need to be passed to instantiate however / has a default arg of [])
+                1 mood per day, if no mood then replace with a NONE e.g ["happy", "sad", None, "happy", None etc]
 
         Author: Harry
         Created: 02-04-2025
@@ -123,6 +124,9 @@ class CalenderContainer(QtWidgets.QWidget):
 
         self.set_month_and_year(2, 2025)
 
+        example_mood_data = ["happy", None, "tired", "proud", "sick", "sick", "stressed", "angry", "angry", "sad", None, None, None] *3
+        self.set_month_mood_data(2, example_mood_data)
+
         self.setLayout(main_h_layout)
 
     def paintEvent(self, event) -> None:
@@ -187,8 +191,25 @@ class CalenderContainer(QtWidgets.QWidget):
         self.month_label.setText(calendar.month_name[self.months[month].month])
         self.year_label.setText(str(year))
 
-    def set_month_mood_data(self, global_month_index: int, mood_data: list):
-        ...
+    def set_month_mood_data(self, global_month_index: int, mood_data: list) -> None:
+        """
+
+        takes in a list of mood data and the month index, and sets the mood data for that month. (will set the pictures too)
+
+        :param global_month_index: index of month from pos 0 in self.months array
+        :param mood_data: moods (list[str]): list of file path extensions of each mood in the month, e.g ["happy", "sad", ...]
+                (doesnt need to be passed to instantiate however / has a default arg of [])
+                1 mood per day, if no mood then replace with a NONE e.g ["happy", "sad", None, "happy", None etc]
+        """
+        current_month = self.months[global_month_index]
+        current_month.moods = mood_data
+        current_month_frame_widget = self.calender_frame_widgets[global_month_index]
+        calender_entries = list(filter(lambda x: x.number != -1, current_month_frame_widget.calender_entries))
+        for i, calender_entry in enumerate(calender_entries):
+            print(mood_data[i])
+            mood = mood_data[i]
+            if mood is not None:
+                calender_entry.set_mood_pixmap(mood)
 
     def right_button_clicked(self) -> None:
         """
@@ -256,19 +277,19 @@ class CalenderFrame(QtWidgets.QFrame):
 
         grid_layout = QtWidgets.QGridLayout()
 
-        calender_entries = []
+        self.calender_entries = []
         grid_layout.setSpacing(0)
         grid_layout.setContentsMargins(0, 0, 0, 0)
 
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-        day_calender_widgets = [CalenderWeekdayTitleEntry(day) for day in days]
+        self.day_calender_widgets = [CalenderWeekdayTitleEntry(day) for day in days]
 
-        for i, widget in enumerate(day_calender_widgets):
+        for i, widget in enumerate(self.day_calender_widgets):
             grid_layout.addWidget(widget, 0, i)
 
         for i, day in enumerate(month):
             new_calender_entry = CalenderEntry(day)
-            calender_entries.append(new_calender_entry)
+            self.calender_entries.append(new_calender_entry)
             row = 1 + (i // 7)
             col = i % 7
             grid_layout.addWidget(new_calender_entry, row, col)
@@ -301,11 +322,14 @@ class CalenderEntry(QtWidgets.QFrame):
     def __init__(self, number: int):
         super().__init__()
 
+        self.number = number
+
         self.setMinimumHeight(50)
 
         self.mood_pixmap = None
         self.mood_label = QtWidgets.QLabel(self)
-        self.mood_label.setGeometry(10, 10, 40, 40)
+        #self.mood_label.setGeometry(5, 10, 40, 40)
+        self.mood_label.setAlignment(QtCore.Qt.AlignCenter)
 
         quicksand_medium = QtGui.QFont("Quicksand Medium", 14)
         quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
@@ -334,7 +358,28 @@ class CalenderEntry(QtWidgets.QFrame):
         :return:
         """
         self.mood_pixmap = QtGui.QPixmap(f"resources/images/{mood}.png")
-        self.mood_label.setPixmap(self.mood_pixmap)
+        scaled_pixmap = self.mood_pixmap.scaled(40, 40, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+        self.mood_label.setPixmap(scaled_pixmap)
+
+    def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
+        """
+        resizes the mood label dynamically so its centered and the correct size.
+        :param event:
+        :return:
+        """
+        super().resizeEvent(event)
+        label_width = self.width() - 30
+        label_height = self.height() - 10
+
+        x = (self.width() - label_width) / 2
+        y = (self.height() - label_height) / 2
+
+        self.mood_label.setGeometry(int(x), int(y), int(label_width), int(label_height))
+
+        if self.mood_pixmap:
+            scaled_pixmap = self.mood_pixmap.scaled(label_width, label_height, QtCore.Qt.KeepAspectRatio,
+                                                    QtCore.Qt.SmoothTransformation)
+            self.mood_label.setPixmap(scaled_pixmap)
 
 
 class CalenderWeekdayTitleEntry(QtWidgets.QFrame):
