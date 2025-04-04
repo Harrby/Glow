@@ -48,6 +48,7 @@ class CalenderContainer(QtWidgets.QWidget):
         Author: Harry
         Created: 2025-03-23
         """
+
     def __init__(self):
         super().__init__()
 
@@ -103,7 +104,7 @@ class CalenderContainer(QtWidgets.QWidget):
         for j in range(2025, 2027):
             for i in range(1, 13):
                 # instantiate MonthData dataclass
-                self.months.append(MonthData(i, j,  self.generate_month_data(j, i)))
+                self.months.append(MonthData(i, j, self.generate_month_data(j, i)))
 
         self.calender_frame_widgets = [CalenderFrame(month.days) for month in self.months]
 
@@ -125,7 +126,8 @@ class CalenderContainer(QtWidgets.QWidget):
 
         self.set_month_and_year(2, 2025)
 
-        example_mood_data = ["happy", None, "tired", "proud", "sick", "sick", "stressed", "angry", "angry", "sad", None, None, None] *3
+        example_mood_data = ["happy", None, "tired", "proud", "sick", "sick", "stressed", "angry", "angry", "sad", None,
+                             None, None] * 3
         self.set_month_mood_data(2, example_mood_data)
 
         self.setLayout(main_h_layout)
@@ -265,6 +267,7 @@ class CalenderFrame(QtWidgets.QFrame):
         Author: Harry
         Created: 2025-03-23
     """
+
     def __init__(self, month: list):
         super().__init__()
 
@@ -320,6 +323,7 @@ class CalenderEntry(QtWidgets.QFrame):
             entry = CalenderEntry(14)
             entry.set_mood_pixmap("happy")
     """
+
     def __init__(self, number: int):
         super().__init__()
 
@@ -329,7 +333,7 @@ class CalenderEntry(QtWidgets.QFrame):
 
         self.mood_pixmap = None
         self.mood_label = QtWidgets.QLabel(self)
-        #self.mood_label.setGeometry(5, 10, 40, 40)
+        # self.mood_label.setGeometry(5, 10, 40, 40)
         self.mood_label.setAlignment(QtCore.Qt.AlignCenter)
 
         quicksand_medium = QtGui.QFont("Quicksand Medium", 14)
@@ -399,6 +403,7 @@ class CalenderWeekdayTitleEntry(QtWidgets.QFrame):
         Example:
             header = CalenderWeekdayTitleEntry("Wednesday")
     """
+
     def __init__(self, day):
         super().__init__()
         self.day = day
@@ -482,6 +487,22 @@ class CalenderZoomInContainer(QtWidgets.QFrame):
     def left_button_clicked(self):
         self.RequestPrevDayData.emit()
 
+    def receive_new_day_data(self, day: int, month: int, year: int, diary_entry: str, mood: str, screen_time: float,
+                             exercise: int, alcohol: float, sleep: float):
+        self.day = day
+        self.month = month
+        self.year = year
+        self.diary_entry = diary_entry
+        self.mood = mood
+        self.screen_time = screen_time
+        self.exercise = exercise
+        self.alcohol = alcohol
+        self.sleep = sleep
+
+        self.set_date(day, month, year)
+
+
+class CalenderZoomIn
 
 
 if __name__ == "__main__":
