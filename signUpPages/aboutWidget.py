@@ -4,7 +4,7 @@ from PySide6 import QtGui, QtCore, QtWidgets
 from PySide6.QtWidgets import QLineEdit
 
 class SignUpIntro(QtWidgets.QWidget):
-    """A Sign up introduction page: Author James"""
+    """An about you intro page which takes your name page: Author James"""
     page_clicked = QtCore.Signal()
 
     def __init__(self):
@@ -15,16 +15,14 @@ class SignUpIntro(QtWidgets.QWidget):
 
         font_path = os.path.join("resources", "fonts/quicksand", "Quicksand-Bold.ttf")
         QtGui.QFontDatabase.addApplicationFont(font_path)
-        # Dynamic image paths
+        
         base_dir = os.path.dirname(__file__)
         background_path = os.path.join("resources", "images", "Sign-up page (dark) (intro).png")
 
-        # Load background
         self.background_pixmap = QtGui.QPixmap(background_path)
         if self.background_pixmap.isNull():
             print(f"Warning: Background image not found at {background_path}")
 
-        # Labels
         self.main_label_hey = QtWidgets.QLabel("Now a bit about you!")
         self.main_label_hey.setAlignment(QtCore.Qt.AlignCenter)
         self.main_label_hey.setTextFormat(QtCore.Qt.RichText)
@@ -59,16 +57,25 @@ class SignUpIntro(QtWidgets.QWidget):
 
         top_line_layout = QtWidgets.QVBoxLayout()
         top_line_layout.setAlignment(QtCore.Qt.AlignCenter)
+        top_line_layout.addSpacing(40)
         top_line_layout.addWidget(self.main_label_hey)
         top_line_layout.addSpacing(10)
         top_line_layout.addWidget(self.main_label_glow)
         top_line_layout.addSpacing(10)
-        top_line_layout.addWidget(self.input_box)
-        top_line_layout.addSpacing(10)
-        top_line_layout.addWidget(self.button)
-        
 
-        # Main vertical layout
+        # Wrap input box in HBox to center it
+        input_layout = QtWidgets.QHBoxLayout()
+        input_layout.setAlignment(QtCore.Qt.AlignCenter)
+        input_layout.addWidget(self.input_box)
+        top_line_layout.addLayout(input_layout)
+        top_line_layout.addSpacing(10)
+
+        button_layout = QtWidgets.QHBoxLayout()
+        button_layout.setAlignment(QtCore.Qt.AlignCenter)
+        button_layout.addWidget(self.button)
+        top_line_layout.addLayout(button_layout)
+
+
         main_layout = QtWidgets.QHBoxLayout()
         main_layout.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignHCenter)
         main_layout.addLayout(top_line_layout)
@@ -76,7 +83,7 @@ class SignUpIntro(QtWidgets.QWidget):
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
-            self.page_clicked.emit()  # Emit signal with username
+            self.page_clicked.emit()  
 
     def paintEvent(self, event):
         if not self.background_pixmap.isNull():
@@ -103,10 +110,10 @@ class SignUpIntro(QtWidgets.QWidget):
         button_font_size = max(20, min(int(self.width() * 0.05), 48))
         button_font = QtGui.QFont("Quicksand", button_font_size)
         button_font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.button.setFixedWidth(self.width() // 8)
         self.button.setFont(button_font)
+        self.input_box.setFixedWidth(500)
+        self.button.setFixedWidth(200)
 
-        self.input_box.setFixedWidth(self.width() // 4)
         super().resizeEvent(event)
 
     
