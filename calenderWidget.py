@@ -564,106 +564,59 @@ class CalenderZoomInWidget(QtWidgets.QFrame):
         self.setStyleSheet("""QLabel{color: white;}""")
 
         quicksand_medium_title = QtGui.QFont("Quicksand Medium", 96)
-        quicksand_medium_content = QtGui.QFont("Quicksand Medium", 36)
-        diary_entry_font = QtGui.QFont("Quicksand Medium", 24)
+        quicksand_medium_content = QtGui.QFont("Quicksand Medium", 28)
+        diary_entry_font = QtGui.QFont("Quicksand Medium", 32)
         quicksand_medium_title.setStyleStrategy(QtGui.QFont.PreferAntialias)
         quicksand_medium_content.setStyleStrategy(QtGui.QFont.PreferAntialias)
 
         self.mood_img_label = QtWidgets.QLabel()
         self.mood_pixmap = QtGui.QPixmap(f"resources/images/{self.mood}.png")
 
+        self.mood_pixmap.scaled(
+                QtCore.QSize(200, 200), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+
         diary_entry_label = QtWidgets.QLabel("Diary entry:")
         diary_entry_label.setFont(diary_entry_font)
 
         # this seems a bit hacky
-        diary_entry_widget_container = QtWidgets.QWidget()
-        diary_entry_widget_container.setMinimumHeight(190)
-        diary_entry_widget_container.setMinimumWidth(820)
-        diary_entry_widget_container.raise_()
 
-        self.diary_entry_widget = DiaryEntryWidget("", parent=diary_entry_widget_container)
-        self.diary_entry_widget.setGeometry(0, 0, 800, self.diary_entry_widget.height())
-        self.diary_entry_widget.raise_()
-        self.diary_entry_widget.raise_()
-        self.diary_entry_widget.show()
 
-        mood_title_label = QtWidgets.QLabel("Mood")
-        screen_time_title_label = QtWidgets.QLabel("Screen time")
-        exercise_title_label = QtWidgets.QLabel("Exercise")
-        alcohol_title_label = QtWidgets.QLabel("Alcohol")
-        sleep_title_label = QtWidgets.QLabel("Sleep")
+        self.diary_entry_widget = DiaryEntryWidget("")
+        #self.diary_entry_widget.setGeometry(0, 0, 800, self.diary_entry_widget.height())
 
-        self.mood_label = QtWidgets.QLabel()
-        self.screen_time_label = QtWidgets.QLabel()
-        self.exercise_label = QtWidgets.QLabel()
-        self.alcohol_label = QtWidgets.QLabel()
-        self.sleep_label = QtWidgets.QLabel()
+        self.mood_stat_container = DiaryStatContainer("Mood")
+        self.screen_time_stat_container = DiaryStatContainer("Screen time")
+        self.exercise_stat_container = DiaryStatContainer("Exercise")
+        self.alcohol_stat_container = DiaryStatContainer("Alcohol")
+        self.sleep_stat_container = DiaryStatContainer("Sleep")
+
         self.set_stat_labels()
-
-        firefly_labels = []
-        for _ in range(5):
-            moving_firefly_label = QtWidgets.QLabel()
-            moving_firefly_pixmap = QtGui.QPixmap("resources/images/movingFirefly.png")
-            moving_firefly_label.setPixmap(moving_firefly_pixmap)
-            firefly_labels.append(moving_firefly_label)
-
-        mood_h_layout = QtWidgets.QHBoxLayout()
-        mood_h_layout.addWidget(mood_title_label)
-        mood_h_layout.addWidget(firefly_labels[0])
-        mood_h_layout.addWidget(self.mood_label)
-
-        screen_time_h_layout = QtWidgets.QHBoxLayout()
-        screen_time_h_layout.addWidget(screen_time_title_label)
-        screen_time_h_layout.addWidget(firefly_labels[1])
-        screen_time_h_layout.addWidget(self.screen_time_label)
-
-        exercise_h_layout = QtWidgets.QHBoxLayout()
-        exercise_h_layout.addWidget(exercise_title_label)
-        exercise_h_layout.addWidget(firefly_labels[2])
-        exercise_h_layout.addWidget(self.exercise_label)
-
-        alcohol_h_layout = QtWidgets.QHBoxLayout()
-        alcohol_h_layout.addWidget(alcohol_title_label)
-        alcohol_h_layout.addWidget(firefly_labels[3])
-        alcohol_h_layout.addWidget(self.alcohol_label)
-
-        sleep_h_layout = QtWidgets.QHBoxLayout()
-        sleep_h_layout.addWidget(sleep_title_label)
-        sleep_h_layout.addWidget(firefly_labels[4])
-        sleep_h_layout.addWidget(self.sleep_label)
-
-        main_v_layout = QtWidgets.QVBoxLayout()
-        #main_v_layout.addLayout(top_h_layout)
-        main_v_layout.addLayout(mood_h_layout)
-        main_v_layout.addLayout(screen_time_h_layout)
-        main_v_layout.addLayout(exercise_h_layout)
-        main_v_layout.addLayout(alcohol_h_layout)
-        main_v_layout.addLayout(sleep_h_layout)
-
-        diary_entry_widget_container.setLayout(main_v_layout)
-
-
 
         diary_entry_v_layout = QtWidgets.QVBoxLayout()
         diary_entry_v_layout.addWidget(diary_entry_label)
-        diary_entry_v_layout.addWidget(diary_entry_widget_container)
-        #diary_entry_v_layout.addSpacing(1)
+        diary_entry_v_layout.addWidget(self.diary_entry_widget)
+        diary_entry_v_layout.setSpacing(5)
 
-
+        diary_stat_layout = QtWidgets.QVBoxLayout()
+        diary_stat_layout.addWidget(self.mood_stat_container)
+        diary_stat_layout.addWidget(self.screen_time_stat_container)
+        diary_stat_layout.addWidget(self.exercise_stat_container)
+        diary_stat_layout.addWidget(self.alcohol_stat_container)
+        diary_stat_layout.addWidget(self.sleep_stat_container)
+        diary_stat_layout.setSpacing(0)
 
         top_h_layout = QtWidgets.QHBoxLayout()
         top_h_layout.addWidget(self.mood_img_label, 1)
         top_h_layout.addLayout(diary_entry_v_layout, 10)
+        top_h_layout.setSpacing(50)
 
-        """main_v_layout = QtWidgets.QVBoxLayout()
+        main_v_layout = QtWidgets.QVBoxLayout()
         main_v_layout.addLayout(top_h_layout)
-        main_v_layout.addLayout(mood_h_layout)
-        main_v_layout.addLayout(screen_time_h_layout)
-        main_v_layout.addLayout(exercise_h_layout)
-        main_v_layout.addLayout(alcohol_h_layout)
-        main_v_layout.addLayout(sleep_h_layout)"""
+        main_v_layout.addLayout(diary_stat_layout)
+        main_v_layout.setContentsMargins(90, 20, 90, 50)
+        main_v_layout.addStretch(1)
 
-        self.setLayout(top_h_layout)
+        self.setLayout(main_v_layout)
 
         self.set_widgets()
 
@@ -698,18 +651,18 @@ class CalenderZoomInWidget(QtWidgets.QFrame):
         :return:
         """
         self.mood_pixmap = QtGui.QPixmap(f"resources/images/{mood}.png")
-        scaled_pixmap = self.mood_pixmap.scaled(40, 40, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+        scaled_pixmap = self.mood_pixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         self.mood_img_label.setPixmap(scaled_pixmap)
 
     def set_diary_entry(self, entry: str):
         self.diary_entry_widget.set_diary_entry_text(entry)
 
     def set_stat_labels(self):
-        self.mood_label.setText(f"{self.mood}")
-        self.screen_time_label.setText(f"{self.screen_time} hours")
-        self.exercise_label.setText(f"{self.exercise} minutes")
-        self.alcohol_label.setText(f"{self.alcohol} units")
-        self.sleep_label.setText(f"{self.sleep} hours")
+        self.mood_stat_container.set_content_text(f"{self.mood}")
+        self.screen_time_stat_container.set_content_text(f"{self.screen_time} hours")
+        self.exercise_stat_container.set_content_text(f"{self.exercise} minutes")
+        self.alcohol_stat_container.set_content_text(f"{self.alcohol} units")
+        self.sleep_stat_container.set_content_text(f"{self.sleep} hours")
 
 
 class DiaryEntryWidget(QtWidgets.QFrame):
@@ -719,73 +672,111 @@ class DiaryEntryWidget(QtWidgets.QFrame):
         Created: 04-04-2025
 
     """
+
     def __init__(self, entry_text="", parent=None):
         super().__init__(parent)
 
         self.expanded = False
-        self.collapsed_height = 190
-        self.expanded_height = 600
-
-        self.setFixedWidth(800)  # for now
-        self.setFixedHeight(self.collapsed_height)
-
+        self.collapsed_height = 170
         self.entry_text = entry_text
 
         self.setStyleSheet("""
-        .DiaryEntryWidget{
-        background-color: #3b6254;
-        border-radius: 10px;
-        border: 2px solid #2e4e41;
+        .DiaryEntryWidget {
+            background-color: #3b6254;
+            border-radius: 10px;
+            border: 2px solid #2e4e41;
         }
-        
-        QLabel{color: white;}
+        QLabel { color: white; }
         """)
 
-        quicksand_medium_title = QtGui.QFont("Quicksand Medium", 96)
-        quicksand_medium_content = QtGui.QFont("Quicksand Medium", 36)
-        quicksand_medium_title.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        quicksand_medium_content.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        font_content = QtGui.QFont("Quicksand Medium", 24)
+        font_content.setStyleStrategy(QtGui.QFont.PreferAntialias)
 
-        self.diary_text_label = QtWidgets.QLabel(self.entry_text, parent=self)
-        self.diary_text_label.setFont(quicksand_medium_content)
+        self.diary_text_label = QtWidgets.QLabel(self.entry_text)
+        self.diary_text_label.setFont(font_content)
         self.diary_text_label.setWordWrap(True)
         self.diary_text_label.setMaximumWidth(800)
-        self.diary_text_label.setGeometry(25, int(self.height()/2), self.width()-120, self.height()-20)
+        self.diary_text_label.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
 
-        self.expand_button = ImageButton(39, 21, "resources/images/up_arrow.png", False, parent=self)
+        self.expand_button = ImageButton(39, 21, "resources/images/up_arrow.png", False)
         self.expand_button.setFixedSize(QtCore.QSize(39, 21))
         self.expand_button.clicked.connect(self.on_toggle_expand)
 
-        drop_shadow_effect = QtWidgets.QGraphicsDropShadowEffect()
+        layout = QtWidgets.QHBoxLayout(self)
+        layout.setContentsMargins(25, 10, 25, 10)
+
+        layout.addWidget(self.diary_text_label)
+        layout.addWidget(self.expand_button, alignment=QtCore.Qt.AlignTop)
+
+        self.setFixedHeight(self.collapsed_height)
+
+        drop_shadow_effect = QtWidgets.QGraphicsDropShadowEffect(self)
         drop_shadow_effect.setYOffset(4)
+        drop_shadow_effect.setXOffset(0)
         drop_shadow_effect.setColor(QtGui.QColor(42, 66, 57, 191))
         drop_shadow_effect.setBlurRadius(10)
-
         self.setGraphicsEffect(drop_shadow_effect)
-
-
 
     def on_toggle_expand(self):
         print("button was clicked")
         if self.expanded:
             self.setFixedHeight(self.collapsed_height)
-            self.diary_text_label.setFixedHeight(self.collapsed_height-10)
         else:
-            self.setFixedHeight(self.expanded_height)
-            self.diary_text_label.setFixedHeight(self.expanded_height-10)
+            self.diary_text_label.adjustSize()
+            self.setFixedHeight(self.diary_text_label.height() + 50)  # padding for button and margins
         self.expanded = not self.expanded
 
     def resizeEvent(self, event: QtGui.QResizeEvent, /) -> None:
         super().resizeEvent(event)
 
-        label_x = 25
+        """ label_x = 25
         label_y = 10
         self.diary_text_label.setGeometry(label_x, label_y, self.width()-120, self.height()-10)
         button_x = self.width() - (self.expand_button.width() + 10)
-        self.expand_button.setGeometry(button_x, 10, 39, 21)
+        self.expand_button.setGeometry(button_x, 10, 39, 21)"""
 
     def set_diary_entry_text(self, new_entry: str):
         self.diary_text_label.setText(new_entry)
+
+
+class DiaryStatContainer(QtWidgets.QFrame):
+    def __init__(self, title_text: str = "", content_text: str = ""):
+        super().__init__()
+
+        quicksand_medium_content = QtGui.QFont("Quicksand Medium", 36)
+        quicksand_medium_content.setStyleStrategy(QtGui.QFont.PreferAntialias)
+
+        self.title_text = title_text
+        self.content_text = content_text
+
+        self.title_label = QtWidgets.QLabel(self.title_text, alignment=QtCore.Qt.AlignLeft)
+        self.content_label = QtWidgets.QLabel(self.content_text)
+        self.title_label.setFont(quicksand_medium_content)
+        self.content_label.setFont(quicksand_medium_content)
+
+        self.title_label.setFixedWidth(270)
+        self.content_label.setFixedWidth(260)
+
+        self.firefly_pixmap = QtGui.QPixmap("resources/images/movingFirefly.png")
+        self.firefly_label = QtWidgets.QLabel()
+        self.firefly_label.setPixmap(self.firefly_pixmap)
+
+        h_layout = QtWidgets.QHBoxLayout()
+        h_layout.addStretch(1)
+        h_layout.addWidget(self.title_label)
+        h_layout.addWidget(self.firefly_label)
+        h_layout.addWidget(self.content_label)
+        h_layout.addStretch(1)
+        h_layout.setSpacing(30)
+        h_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.setLayout(h_layout)
+
+    def set_content_text(self, new_content_text: str) -> None:
+        self.content_text = new_content_text
+        self.content_label.setText(self.content_text)
+
+
 
 
 
