@@ -3,8 +3,12 @@ import os
 from PySide6 import QtGui, QtCore, QtWidgets
 from PySide6.QtWidgets import QLineEdit
 
-class SignUpIntro(QtWidgets.QWidget):
-    """An about you intro page which takes your name page: Author James"""
+class AgeWidget(QtWidgets.QWidget):
+    """A page asking for the user's age as part of the sign-up process.
+    :author: James
+    :created: 06-04-25
+    :contributors:
+        - Add your name here when you edit or maintain this class."""
     page_clicked = QtCore.Signal()
 
     def __init__(self):
@@ -23,13 +27,13 @@ class SignUpIntro(QtWidgets.QWidget):
         if self.background_pixmap.isNull():
             print(f"Warning: Background image not found at {background_path}")
 
-        self.main_label_hey = QtWidgets.QLabel("Great! One last question...")
-        self.main_label_hey.setAlignment(QtCore.Qt.AlignCenter)
-        self.main_label_hey.setTextFormat(QtCore.Qt.RichText)
+        self.intro_message_label = QtWidgets.QLabel("Great! One last question...")
+        self.intro_message_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.intro_message_label.setTextFormat(QtCore.Qt.RichText)
 
-        self.main_label_glow = QtWidgets.QLabel("How old are?", self)
-        self.main_label_glow.setAlignment(QtCore.Qt.AlignCenter)
-        self.main_label_glow.setTextFormat(QtCore.Qt.RichText)
+        self.question_label = QtWidgets.QLabel("How old are you?", self)
+        self.question_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.question_label.setTextFormat(QtCore.Qt.RichText)
 
         self.button = QtWidgets.QPushButton("enter", self)
         self.button.clicked.connect(self.on_button_click)
@@ -42,7 +46,6 @@ class SignUpIntro(QtWidgets.QWidget):
                 font-size: 48px;
             }
         """)
-        
 
         self.input_box = QLineEdit()
         self.input_box.setPlaceholderText("Input here")
@@ -59,9 +62,9 @@ class SignUpIntro(QtWidgets.QWidget):
         top_line_layout = QtWidgets.QVBoxLayout()
         top_line_layout.setAlignment(QtCore.Qt.AlignCenter)
         top_line_layout.addSpacing(40)
-        top_line_layout.addWidget(self.main_label_hey)
+        top_line_layout.addWidget(self.intro_message_label)
         top_line_layout.addSpacing(50)
-        top_line_layout.addWidget(self.main_label_glow)
+        top_line_layout.addWidget(self.question_label)
         top_line_layout.addSpacing(10)
 
         # Wrap input box in HBox to center it
@@ -76,7 +79,6 @@ class SignUpIntro(QtWidgets.QWidget):
         button_layout.addWidget(self.button)
         top_line_layout.addLayout(button_layout)
 
-
         main_layout = QtWidgets.QHBoxLayout()
         main_layout.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignHCenter)
         main_layout.addLayout(top_line_layout)
@@ -84,7 +86,7 @@ class SignUpIntro(QtWidgets.QWidget):
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
-            self.page_clicked.emit()  
+            self.page_clicked.emit()
 
     def paintEvent(self, event):
         if not self.background_pixmap.isNull():
@@ -105,8 +107,8 @@ class SignUpIntro(QtWidgets.QWidget):
         font2 = QtGui.QFont("Quicksand", font_size_2)
         font2.setStyleStrategy(QtGui.QFont.PreferAntialias)
 
-        self.main_label_hey.setFont(font1)
-        self.main_label_glow.setFont(font2)
+        self.intro_message_label.setFont(font1)
+        self.question_label.setFont(font2)
 
         button_font_size = max(20, min(int(self.width() * 0.05), 48))
         button_font = QtGui.QFont("Quicksand", button_font_size)
@@ -117,13 +119,11 @@ class SignUpIntro(QtWidgets.QWidget):
 
         super().resizeEvent(event)
 
-    
     def on_button_click(self):
         QtWidgets.QMessageBox.information(self, "Button Clicked", "You clicked the button!")
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    intro = SignUpIntro()
+    intro = AgeWidget()
     intro.show()
     sys.exit(app.exec())
-

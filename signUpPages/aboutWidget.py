@@ -3,8 +3,13 @@ import os
 from PySide6 import QtGui, QtCore, QtWidgets
 from PySide6.QtWidgets import QLineEdit
 
-class SignUpIntro(QtWidgets.QWidget):
-    """An about you intro page which takes your name page: Author James"""
+class AboutWidget(QtWidgets.QWidget):
+    """A page asking about the user as part of the sign-up process.
+    :author: James
+    :created: 06-04-25
+    :contributors:
+        - Add your name here when you edit or maintain this class."""
+    
     page_clicked = QtCore.Signal()
 
     def __init__(self):
@@ -123,7 +128,7 @@ class SignUpIntro(QtWidgets.QWidget):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    intro = SignUpIntro()
+    intro = AboutWidget()
     intro.show()
     sys.exit(app.exec())
 

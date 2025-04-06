@@ -3,8 +3,12 @@ import os
 from PySide6 import QtGui, QtCore, QtWidgets
 from PySide6.QtWidgets import QLineEdit
 
-class SignUpIntro(QtWidgets.QWidget):
-    """An about you intro page which takes your name page: Author James"""
+class EndWidget(QtWidgets.QWidget):
+    """An introduction page that prompts the user to finalize their sign-up details and click a button to proceed.
+    :author: James
+    :created: 06-04-25
+    :contributors:
+        - Add your name here when you edit or maintain this class."""
     page_clicked = QtCore.Signal()
 
     def __init__(self):
@@ -23,13 +27,13 @@ class SignUpIntro(QtWidgets.QWidget):
         if self.background_pixmap.isNull():
             print(f"Warning: Background image not found at {background_path}")
 
-        self.main_label_hey = QtWidgets.QLabel("You're all set")
-        self.main_label_hey.setAlignment(QtCore.Qt.AlignCenter)
-        self.main_label_hey.setTextFormat(QtCore.Qt.RichText)
+        self.intro_title_label = QtWidgets.QLabel("You're all set")
+        self.intro_title_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.intro_title_label.setTextFormat(QtCore.Qt.RichText)
 
-        self.main_label_glow = QtWidgets.QLabel("We hope you love your experience with us", self)
-        self.main_label_glow.setAlignment(QtCore.Qt.AlignCenter)
-        self.main_label_glow.setTextFormat(QtCore.Qt.RichText)
+        self.subtitle_label = QtWidgets.QLabel("We hope you love your experience with us", self)
+        self.subtitle_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.subtitle_label.setTextFormat(QtCore.Qt.RichText)
 
         self.button = QtWidgets.QPushButton("Lets Glow", self)
         self.button.clicked.connect(self.on_button_click)
@@ -45,9 +49,9 @@ class SignUpIntro(QtWidgets.QWidget):
         
         top_line_layout = QtWidgets.QVBoxLayout()
         top_line_layout.setAlignment(QtCore.Qt.AlignCenter)
-        top_line_layout.addWidget(self.main_label_hey)
+        top_line_layout.addWidget(self.intro_title_label)
         top_line_layout.addSpacing(10)
-        top_line_layout.addWidget(self.main_label_glow)
+        top_line_layout.addWidget(self.subtitle_label)
         top_line_layout.addSpacing(10)
 
         button_layout = QtWidgets.QHBoxLayout()
@@ -55,7 +59,6 @@ class SignUpIntro(QtWidgets.QWidget):
         button_layout.addWidget(self.button)
         top_line_layout.addSpacing(100)
         top_line_layout.addLayout(button_layout)
-
 
         main_layout = QtWidgets.QHBoxLayout()
         main_layout.setAlignment(QtCore.Qt.AlignHCenter)
@@ -85,8 +88,8 @@ class SignUpIntro(QtWidgets.QWidget):
         font2 = QtGui.QFont("Quicksand", font_size_2)
         font2.setStyleStrategy(QtGui.QFont.PreferAntialias)
 
-        self.main_label_hey.setFont(font1)
-        self.main_label_glow.setFont(font2)
+        self.intro_title_label.setFont(font1)
+        self.subtitle_label.setFont(font2)
 
         button_font_size = max(20, min(int(self.width() * 0.05), 48))
         button_font = QtGui.QFont("Quicksand", button_font_size)
@@ -96,13 +99,11 @@ class SignUpIntro(QtWidgets.QWidget):
 
         super().resizeEvent(event)
 
-    
     def on_button_click(self):
         QtWidgets.QMessageBox.information(self, "Button Clicked", "You clicked the button!")
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    intro = SignUpIntro()
+    intro = EndWidget()
     intro.show()
     sys.exit(app.exec())
-

@@ -2,8 +2,12 @@ import sys
 import os
 from PySide6 import QtGui, QtCore, QtWidgets
 
-class SignUpIntro(QtWidgets.QWidget):
-    """A Sign up speech page: Author James"""
+class SpeechWidget(QtWidgets.QWidget):
+    """A page which introduces glow.
+    :author: James
+    :created: 06-04-25
+    :contributors:
+        - Add your name here when you edit or maintain this class."""
     page_clicked = QtCore.Signal()
 
     def __init__(self):
@@ -97,6 +101,6 @@ class SignUpIntro(QtWidgets.QWidget):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    intro = SignUpIntro()
+    intro = SpeechWidget()
     intro.show()
     sys.exit(app.exec())

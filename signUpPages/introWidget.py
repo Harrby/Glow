@@ -3,7 +3,11 @@ import os
 from PySide6 import QtGui, QtCore, QtWidgets
 
 class SignUpIntro(QtWidgets.QWidget):
-    """A Sign up introduction page: Author James"""
+    """A Sign up introduction page
+    :author: James
+    :created: 06-04-25
+    :contributors:
+        - Add your name here when you edit or maintain this class."""
     page_clicked = QtCore.Signal()
 
     def __init__(self):

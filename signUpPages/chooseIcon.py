@@ -6,7 +6,7 @@ from PySide6.QtGui import QIcon
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from buttons.hoverButton import HoverButton   
 
-class SignUpIntro(QtWidgets.QWidget):
+class ChooseIcon(QtWidgets.QWidget):
     """A Select Icon page:
         :author: James
         :created: 06-04-25
@@ -101,6 +101,6 @@ class SignUpIntro(QtWidgets.QWidget):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    intro = SignUpIntro()
+    intro = ChooseIcon()
     intro.show()
     sys.exit(app.exec())
