@@ -131,6 +131,7 @@ class SignUpIntro(QtWidgets.QWidget):
         pronouns_container.addWidget(pronouns_label)
         pronouns_container.addSpacing(100)
         pronouns_container.addLayout(pronoun_inputs)
+        pronouns_container.addSpacing(100)
         # Center the contents in the pronouns container
         pronouns_container.setAlignment(QtCore.Qt.AlignCenter)
 

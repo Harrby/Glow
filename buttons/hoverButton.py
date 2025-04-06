@@ -11,6 +11,7 @@ class HoverButton(QtWidgets.QPushButton):
         self.effect.setOpacity(1.0)
         self.animation = QtCore.QPropertyAnimation(self.effect, b"opacity")
         self.animation.setDuration(200)
+        
 
     def enterEvent(self, event):
         self.animation.stop()
