@@ -30,15 +30,15 @@ class SignUpIntro(QtWidgets.QWidget):
         self.title.setAlignment(QtCore.Qt.AlignCenter)
         self.title.setTextFormat(QtCore.Qt.RichText)
         self.title.setFont(QtGui.QFont(self.font_family))
-
+        
         # Speech label
         self.speech = QtWidgets.QLabel("""
         We are Glow!<br>
-        Tiny fireflies, scattered throughout your journey, lighting the way to your goals. Glow is your personal companion — offering advice, motivation, and tailored suggestions to guide you forward. Wherever you are in your journey, we’ll be there, flickering with support and<br>
-        inspiration. You got this!
+        Tiny fireflies, scattered throughout your journey, lighting the way to your goals. Glow is your personal companion — offering advice, motivation, and tailored suggestions to guide you forward. Wherever you are in your journey, we’ll be there, flickering with support and inspiration. You got this!
         """, self)
         self.speech.setAlignment(QtCore.Qt.AlignCenter)
         self.speech.setWordWrap(True)
+        self.speech.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         self.speech.setFont(QtGui.QFont(self.font_family))
 
         # Content layout
@@ -46,6 +46,7 @@ class SignUpIntro(QtWidgets.QWidget):
         content_layout.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop)
         content_layout.addSpacing(90)
         content_layout.addWidget(self.title)
+        content_layout.addSpacing(50)
         content_layout.addWidget(self.speech)
         content_layout.addSpacing(20)
 
@@ -65,12 +66,7 @@ class SignUpIntro(QtWidgets.QWidget):
     def resizeEvent(self, event):
         """Handle dynamic resizing of fonts and widths"""
         super().resizeEvent(event)
-        
-        # Set labels to 80% of window width
-        label_width = int(self.width() * 0.8)
-        self.title.setMaximumWidth(label_width)
-        self.speech.setMaximumWidth(label_width)
-
+    
         # Calculate dynamic font sizes based on window height
         title_font_size = max(20, int(self.width() * 0.04))
         speech_font_size = max(12, int(self.width() * 0.02))

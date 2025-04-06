@@ -23,11 +23,11 @@ class SignUpIntro(QtWidgets.QWidget):
         if self.background_pixmap.isNull():
             print(f"Warning: Background image not found at {background_path}")
 
-        self.main_label_hey = QtWidgets.QLabel("Now a bit about you!")
+        self.main_label_hey = QtWidgets.QLabel("Great! One last question...")
         self.main_label_hey.setAlignment(QtCore.Qt.AlignCenter)
         self.main_label_hey.setTextFormat(QtCore.Qt.RichText)
 
-        self.main_label_glow = QtWidgets.QLabel("What would you like us to  call you", self)
+        self.main_label_glow = QtWidgets.QLabel("How old are?", self)
         self.main_label_glow.setAlignment(QtCore.Qt.AlignCenter)
         self.main_label_glow.setTextFormat(QtCore.Qt.RichText)
 
@@ -60,9 +60,9 @@ class SignUpIntro(QtWidgets.QWidget):
         top_line_layout.setAlignment(QtCore.Qt.AlignCenter)
         top_line_layout.addSpacing(40)
         top_line_layout.addWidget(self.main_label_hey)
-        top_line_layout.addSpacing(15)
+        top_line_layout.addSpacing(50)
         top_line_layout.addWidget(self.main_label_glow)
-        top_line_layout.addSpacing(15)
+        top_line_layout.addSpacing(10)
 
         # Wrap input box in HBox to center it
         input_layout = QtWidgets.QHBoxLayout()
