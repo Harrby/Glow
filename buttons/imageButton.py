@@ -11,6 +11,8 @@ class ImageButton(QtWidgets.QPushButton):
     :type height: int
     :param img_file_path: path to img that the button displays
     :type img_file_path: str
+    :param img_expand_to_fill: if image takes up all available space (will expand as much as possible)
+    :type img_expand_to_fill: bool
 
     :author: Harry
     :created: 22-03-25
@@ -18,8 +20,10 @@ class ImageButton(QtWidgets.QPushButton):
     :contributors:
         - Add your name here when you edit or maintain this class.
     """
-    def __init__(self, width: int, height: int, img_file_path: str):
-        super().__init__()
+    def __init__(self, width: int, height: int, img_file_path: str, img_expand_to_fill: bool = True, parent=None):
+        super().__init__(parent)
+
+        self.img_expand_to_fill = img_expand_to_fill
 
         self.setStyleSheet("""
             QPushButton {
@@ -55,19 +59,20 @@ class ImageButton(QtWidgets.QPushButton):
         self.pressed.connect(self.on_button_pressed)
         self.released.connect(self.on_button_released)
 
-    def resizeEvent(self, event: QtGui.QResizeEvent, /) -> None:
-        new_size = QtCore.QSize(self.width(), self.height())
-        self.setIconSize(new_size)
+    def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
+        if self.img_expand_to_fill:
+            new_size = QtCore.QSize(self.width(), self.height())
+            self.setIconSize(new_size)
 
-        # make new pixmap of new size then convert back to Qicon
-        self.img_icon_default = QtGui.QIcon(self._original_pixmap.scaled(
-            new_size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+            # make new pixmap of new size then convert back to Qicon
+            self.img_icon_default = QtGui.QIcon(self._original_pixmap.scaled(
+                new_size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
 
-        self.img_icon_hovered = QtGui.QIcon(self._pixmap_hovered.scaled(
-            new_size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+            self.img_icon_hovered = QtGui.QIcon(self._pixmap_hovered.scaled(
+                new_size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
 
-        self.img_icon_pressed = QtGui.QIcon(self._pixmap_pressed.scaled(
-            new_size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
+            self.img_icon_pressed = QtGui.QIcon(self._pixmap_pressed.scaled(
+                new_size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
 
         super().resizeEvent(event)
 
