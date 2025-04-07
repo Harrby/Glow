@@ -1,6 +1,8 @@
 from PySide6 import QtGui, QtCore, QtWidgets
 import sys
 from PySide6.QtGui import QFont
+from dns.rdtypes.ANY.DNAME import DNAME
+
 
 class ActivitiesWidget(QtWidgets.QWidget):
     """
@@ -37,28 +39,48 @@ class ActivitiesWidget(QtWidgets.QWidget):
         self.hobbies_list = ["Photography", "Knitting", "Crocheting", "Sewing",
                              "Reading", "Writing", "Yoga", "Walking", "Gardening",
                              "Board Games", "Dance", "Baking", "Video Games", "Travelling"]
-        self.hobby_labels = []
-        for hobby in self.hobbies_list:
-            self.hobby_labels.append(QtWidgets.QCheckBox(hobby, font=quicksand_medium_content))
+        self.sports_list = ["Football", "Basketball", "Netball", "Volleyball", "Gymnastics", "Tennis",
+                            "Cricket", "Cheerleading", "Water Polo", "Swimming", "Dance", "Rugby",
+                            "Martial Arts", "Climbing", "Golf", "Horse-riding", "Skiing", "Snowboarding", "Athletics"]
 
-        # Might have to change this to make the widgets more accessible but thinking when user clicks a
-        # button to confirm their selections, each checkboxes state is checked and then the label can be
-        # indexed from the hobby_labels list
+        self.labels = []
+        if self.activityType == "hobbies":
+            for hobby in self.hobbies_list:
+                self.labels.append(QtWidgets.QCheckBox(hobby, font=quicksand_medium_content))
+        else:
+            for sport in self.sports_list:
+                self.labels.append(QtWidgets.QCheckBox(sport, font=quicksand_medium_content))
+
         checkbox_grid_layout = QtWidgets.QGridLayout()
-        for i in range(len(self.hobby_labels)):
-            checkbox_grid_layout.addWidget(self.hobby_labels[i], i % 5, i // 5, alignment=QtCore.Qt.AlignLeft)
+        i = 0
+        while i < len(self.labels):
+            checkbox_grid_layout.addWidget(self.labels[i], i % 5, i // 5, alignment=QtCore.Qt.AlignLeft)
+            i += 1
 
         self.other_input = QtWidgets.QLineEdit()
         self.other_input.setPlaceholderText("Other...")
         self.other_input.setFont(quicksand_medium_content)
         self.other_input.setMinimumHeight(40)
         self.other_input.setMaximumWidth(250)
+        self.other_input.setEnabled(False)
 
-        checkbox_grid_layout.addWidget(self.other_input, 4, 2)
+        self.other_checkbox = QtWidgets.QCheckBox(font=quicksand_medium_content)
+        self.other_checkbox.toggled.connect(self.toggle_other_input)
 
+        other_layout = QtWidgets.QHBoxLayout()
+        other_layout.addWidget(self.other_checkbox)
+        other_layout.addWidget(self.other_input)
+        other_layout.addStretch(0)
+
+        checkbox_grid_layout.addLayout(other_layout, i % 5, i // 5, alignment=QtCore.Qt.AlignLeft)
 
         checkbox_grid_layout.setContentsMargins(10, 10, 10, 10)
         checkbox_grid_layout.setSpacing(15)
+
+        h_checkbox_layout = QtWidgets.QHBoxLayout()
+        h_checkbox_layout.addStretch(0)
+        h_checkbox_layout.addLayout(checkbox_grid_layout)
+        h_checkbox_layout.setAlignment(QtCore.Qt.AlignCenter)
 
         title_layout = QtWidgets.QVBoxLayout()
         title_layout.addWidget(main_label, alignment=QtCore.Qt.AlignCenter)
@@ -66,10 +88,9 @@ class ActivitiesWidget(QtWidgets.QWidget):
 
         main_layout = QtWidgets.QVBoxLayout()
         main_layout.addLayout(title_layout)
-        main_layout.addLayout(checkbox_grid_layout)
-        main_layout.setAlignment(QtCore.Qt.AlignCenter)
+        main_layout.addLayout(h_checkbox_layout)
         main_layout.setContentsMargins(20, 20, 20, 20)
-        main_layout.setSpacing(20)
+        main_layout.setSpacing(15)
 
         self.setLayout(main_layout)
 
@@ -103,11 +124,37 @@ class ActivitiesWidget(QtWidgets.QWidget):
                     }
                 """)
 
+    def toggle_other_input(self):
+        if self.other_checkbox.isChecked():
+            self.other_input.setEnabled(True)
+        else:
+            self.other_input.setEnabled(False)
+
+    def get_activity_type(self):
+        """
+            gets the activity type of the page
+        :return:
+        """
+        return self.activityType
+
+    def get_chosen_activities(self):
+        '''
+            returns which activites have been selected by the user
+        :return:
+        '''
+        chosen_activities = []
+        for label in self.labels:
+            if label.isChecked():
+                chosen_activities.append(label.text())
+        if self.other_checkbox.isChecked():
+            chosen_activities.append(self.other_input.text())
+        return chosen_activities
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     font_id = QtGui.QFontDatabase.addApplicationFont("resources/fonts/quicksand/Quicksand-Medium.ttf")
-    window = ActivitiesWidget("hobbies")
+    window = ActivitiesWidget("sports")
 
     window.show()
     sys.exit(app.exec())
