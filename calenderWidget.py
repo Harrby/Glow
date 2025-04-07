@@ -48,7 +48,7 @@ class MonthData:
             )
         except IndexError:
             # If any list is out of range for day_index, return None
-            return (None, None, None, None, None, None)
+            return None, None, None, None, None, None
 
 
 class CalenderContainer(QtWidgets.QWidget):
@@ -402,8 +402,6 @@ class CalenderContainer(QtWidgets.QWidget):
         print(day, month, year)
 
         args = current_month_data.get_days_data(day)
-        if args is None:
-            args = (None, None, None, None, None, None)
         sender.receive_new_day_data(day, month, year, *args)
 
 
