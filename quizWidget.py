@@ -1,7 +1,7 @@
 from PySide6 import QtGui, QtCore, QtWidgets
 import sys
 
-class QuizContainer(QtWidgets.QWidget):
+class QuizContainer(QtWidgets.QFrame):
     """
         A QWidget-based container for capturing user reflections or intentions with optional date input.
 
@@ -95,7 +95,7 @@ class QuizContainer(QtWidgets.QWidget):
 
         # Improved stylesheet for a modern look with hover and focus effects
         self.setStyleSheet("""
-            QWidget {
+            QFrame {
                 background-color: #d493bd;
                 color: #000000;
             }
