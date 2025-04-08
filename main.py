@@ -39,10 +39,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.opening_widget.start_quiz.connect(self.show_quizWidget)
         self.stack.addWidget(self.opening_widget)
 
-        self.quiz_widget = QuizContainer()
-        self.quiz_widget.main_dashboard.connect(self.show_dashboard_widget)
-        self.stack.addWidget(self.quiz_widget)
-
         # Set initial index for the stacked widget
         self.stack.setCurrentIndex(0)
         self.setCentralWidget(self.stack)
@@ -75,6 +71,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def show_dashboard_widget(self):
         self.dashboard_widget = DashboardWidget()
+
+        self.dashboard_widget.alcohol_widget.connect(self.show_alcohol_log_widget)
+        self.dashboard_widget.screenTime_widget.connect(self.show_screen_time_widget)
+        self.dashboard_widget.sleep_widget.connect(self.show_sleep_tracking_widget)
+        self.dashboard_widget.exercise_widget.connect(self.show_exercise_insights_widget)
+
         self.stack.addWidget(self.dashboard_widget)
         self.stack.setCurrentWidget(self.dashboard_widget)
 

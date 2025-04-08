@@ -35,6 +35,11 @@ class DashboardWidget(QtWidgets.QWidget):
         Created: 2025-03-27
     """
 
+    alcohol_widget = QtCore.Signal()
+    sleep_widget = QtCore.Signal()
+    screenTime_widget = QtCore.Signal()
+    exercise_widget = QtCore.Signal()
+
     def __init__(self):
         super().__init__()
         self.setMinimumSize(800, 600)
@@ -45,6 +50,11 @@ class DashboardWidget(QtWidgets.QWidget):
         self.alcoholLogButton = HoverButton("Alcohol log", self)
         self.exerciseButton = HoverButton("Exercise", self)
         self.sleepButton = HoverButton("Sleep", self)
+
+        self.screenTimeButton.clicked.connect(self.screenTime_widget.emit)
+        self.alcoholLogButton.clicked.connect(self.alcohol_widget.emit)
+        self.exerciseButton.clicked.connect(self.exercise_widget.emit)
+        self.sleepButton.clicked.connect(self.sleep_widget.emit)
 
         self.main_button_features(self.screenTimeButton, "#ACB0FF")
         self.main_button_features(self.alcoholLogButton, "#EB9573")
@@ -125,5 +135,11 @@ class DashboardWidget(QtWidgets.QWidget):
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     window = DashboardWidget()
+
+    window.screenTime_widget.connect(lambda: print("screenTime_widget signal"))
+    window.sleep_widget.connect(lambda: print("sleep_widget signal"))
+    window.alcohol_widget.connect(lambda: print("alcohol_widget signal"))
+    window.exercise_widget.connect(lambda: print("exercise_widget signal"))
+
     window.show()
     sys.exit(app.exec())
