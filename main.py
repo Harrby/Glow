@@ -77,6 +77,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.dashboard_widget.sleep_widget.connect(self.show_sleep_tracking_widget)
         self.dashboard_widget.exercise_widget.connect(self.show_exercise_insights_widget)
         self.dashboard_widget.calender_widget.connect(self.show_calender_container)
+        self.dashboard_widget.opening_widget.connect(self.show_opening_widget)
 
         self.stack.addWidget(self.dashboard_widget)
         self.stack.setCurrentWidget(self.dashboard_widget)

@@ -40,6 +40,8 @@ class DashboardWidget(QtWidgets.QWidget):
     screenTime_widget = QtCore.Signal()
     exercise_widget = QtCore.Signal()
     calender_widget = QtCore.Signal()
+    logo_widget = QtCore.Signal()
+    opening_widget = QtCore.Signal()
 
     def __init__(self):
         super().__init__()
@@ -68,17 +70,18 @@ class DashboardWidget(QtWidgets.QWidget):
 
         # For icon buttons, you can also use HoverButton
         self.exitButton = HoverButton("", self)
-        self.exitButton.setIcon(QIcon("Glow/resources/images/exit.png"))
+        self.exitButton.setIcon(QIcon("resources/images/exit.png"))
 
         self.calenderButton = HoverButton("", self)
-        self.calenderButton.setIcon(QIcon("Glow/resources/images/calender.png"))
+        self.calenderButton.setIcon(QIcon("resources/images/calender.png"))
         self.calenderButton.clicked.connect(self.calender_widget.emit)
 
         self.logoButton = HoverButton("", self)
-        self.logoButton.setIcon(QIcon("Glow/resources/images/glowlogo.png"))
+        self.logoButton.setIcon(QIcon("resources/images/glowlogo.png"))
 
         self.editMood = HoverButton("", self)
-        self.editMood.setIcon(QIcon("Glow/resources/images/miniLogos.png"))
+        self.editMood.setIcon(QIcon("resources/images/miniLogos.png"))
+        self.editMood.clicked.connect(self.opening_widget.emit)
 
         for button in [self.exitButton, self.calenderButton, self.logoButton, self.editMood]:
             button.setFixedSize(140, 140)  
@@ -143,6 +146,7 @@ if __name__ == '__main__':
     window.alcohol_widget.connect(lambda: print("alcohol_widget signal"))
     window.exercise_widget.connect(lambda: print("exercise_widget signal"))
     window.calender_widget.connect(lambda: print("calender_widget signal"))
+    window.opening_widget.connect(lambda: print("opening_widget signal"))
 
     window.show()
     sys.exit(app.exec())
