@@ -9,6 +9,7 @@ from openingWidget import OpeningWidget
 from welcomeWidget import WelcomeWidget
 from quizWidget import QuizContainer
 from dashboardWidget import DashboardWidget
+from profileWidget import ProfileWidget
 from calenderWidget import CalenderContainer
 from alcoholLogWidget import AlcoholLogWidget
 from exerciseInsightsWidget import ExerciseInsightsWidget
@@ -64,6 +65,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.stack.addWidget(self.signup_screen)
         self.stack.setCurrentWidget(self.signup_screen)
 
+    def show_profile_widget(self):
+        self.profile_widget = ProfileWidget()
+        self.profile_widget.dashboard_widget.connect(self.show_dashboard_widget)
+        self.stack.addWidget(self.profile_widget)
+        self.stack.setCurrentWidget(self.profile_widget)
+
     def show_activities_widget(self):
         self.activities_widget = ActivitiesWidget()
         self.stack.addWidget(self.activities_widget)
@@ -78,6 +85,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.dashboard_widget.exercise_widget.connect(self.show_exercise_insights_widget)
         self.dashboard_widget.calender_widget.connect(self.show_calender_container)
         self.dashboard_widget.opening_widget.connect(self.show_opening_widget)
+        self.dashboard_widget.logo_widget.connect(self.show_profile_widget)
 
         self.stack.addWidget(self.dashboard_widget)
         self.stack.setCurrentWidget(self.dashboard_widget)

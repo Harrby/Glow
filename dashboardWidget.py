@@ -78,6 +78,7 @@ class DashboardWidget(QtWidgets.QWidget):
 
         self.logoButton = HoverButton("", self)
         self.logoButton.setIcon(QIcon("resources/images/glowlogo.png"))
+        self.logoButton.clicked.connect(self.logo_widget.emit)
 
         self.editMood = HoverButton("", self)
         self.editMood.setIcon(QIcon("resources/images/miniLogos.png"))
@@ -147,6 +148,7 @@ if __name__ == '__main__':
     window.exercise_widget.connect(lambda: print("exercise_widget signal"))
     window.calender_widget.connect(lambda: print("calender_widget signal"))
     window.opening_widget.connect(lambda: print("opening_widget signal"))
+    window.logo_widget.connect(lambda: print("logo_widget signal"))
 
     window.show()
     sys.exit(app.exec())
