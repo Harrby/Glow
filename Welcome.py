@@ -1,7 +1,7 @@
 import sys
 import os
 from PySide6 import QtGui, QtCore, QtWidgets
-from OpeningWidget import OpeningWidget
+from openingWidget import OpeningWidget
 
 class WelcomeWidget(QtWidgets.QWidget):
     page_clicked = QtCore.Signal()  # Custom signal
@@ -127,6 +127,6 @@ class WelcomeWidget(QtWidgets.QWidget):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    welcome = Welcome(name="James")
+    welcome = WelcomeWidget(name="James")
     welcome.show()
     sys.exit(app.exec())

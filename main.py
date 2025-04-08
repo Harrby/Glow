@@ -2,10 +2,18 @@ from PySide6 import QtGui, QtWidgets
 import sys
 from PySide6.QtWidgets import QApplication, QStackedWidget
 
-from openingWidget import OpeningWidget
+from signupPage import SignupScreen
+from activitiesWidget import ActivitiesWidget
 from loginWidget import LoginWidget
+from openingWidget import OpeningWidget
 from welcomeWidget import WelcomeWidget
 from quizWidget import QuizContainer
+from dashboardWidget import DashboardWidget
+from calenderWidget import CalenderContainer
+from alcoholLogWidget import AlcoholLogWidget
+from exerciseInsightsWidget import ExerciseInsightsWidget
+from screenTimeWidget import ScreenTimeWidget
+from sleepTrackingWidget import SleepTrackingWidget
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, app: QtWidgets.QApplication):
@@ -18,6 +26,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.stack = QStackedWidget()
 
+        # Initially added widgets
         self.login_page = LoginWidget()
         self.login_page.login_successful.connect(self.show_welcome)
         self.stack.addWidget(self.login_page)  # index 0
@@ -30,11 +39,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.opening_widget.start_quiz.connect(self.show_quizWidget)
         self.stack.addWidget(self.opening_widget)
 
+        self.quiz_widget = QuizContainer()
+        self.quiz_widget.main_dashboard.connect(self.show_dashboard_widget)
+        self.stack.addWidget(self.quiz_widget)
 
-
-        # Remove the connection below because self.quiz_widget doesn't exist yet.
-        # self.quiz_widget.start_quiz.connect(self.show_quizWidget)
-
+        # Set initial index for the stacked widget
         self.stack.setCurrentIndex(0)
         self.setCentralWidget(self.stack)
 
@@ -47,8 +56,52 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def show_quizWidget(self, title, input_subtitle, show_date):
         self.quiz_widget = QuizContainer(title=title, input_subtitle=input_subtitle, show_date=show_date)
+        # Connect the signal for the new instance
+        self.quiz_widget.main_dashboard.connect(self.show_dashboard_widget)
         self.stack.addWidget(self.quiz_widget)
         self.stack.setCurrentWidget(self.quiz_widget)
+
+    # --- New show_() methods for additional widgets/containers ---
+
+    def show_signup_screen(self):
+        self.signup_screen = SignupScreen()
+        self.stack.addWidget(self.signup_screen)
+        self.stack.setCurrentWidget(self.signup_screen)
+
+    def show_activities_widget(self):
+        self.activities_widget = ActivitiesWidget()
+        self.stack.addWidget(self.activities_widget)
+        self.stack.setCurrentWidget(self.activities_widget)
+
+    def show_dashboard_widget(self):
+        self.dashboard_widget = DashboardWidget()
+        self.stack.addWidget(self.dashboard_widget)
+        self.stack.setCurrentWidget(self.dashboard_widget)
+
+    def show_calender_container(self):
+        self.calender_container = CalenderContainer()
+        self.stack.addWidget(self.calender_container)
+        self.stack.setCurrentWidget(self.calender_container)
+
+    def show_alcohol_log_widget(self):
+        self.alcohol_log_widget = AlcoholLogWidget()
+        self.stack.addWidget(self.alcohol_log_widget)
+        self.stack.setCurrentWidget(self.alcohol_log_widget)
+
+    def show_exercise_insights_widget(self):
+        self.exercise_insights_widget = ExerciseInsightsWidget()
+        self.stack.addWidget(self.exercise_insights_widget)
+        self.stack.setCurrentWidget(self.exercise_insights_widget)
+
+    def show_screen_time_widget(self):
+        self.screen_time_widget = ScreenTimeWidget()
+        self.stack.addWidget(self.screen_time_widget)
+        self.stack.setCurrentWidget(self.screen_time_widget)
+
+    def show_sleep_tracking_widget(self):
+        self.sleep_tracking_widget = SleepTrackingWidget()
+        self.stack.addWidget(self.sleep_tracking_widget)
+        self.stack.setCurrentWidget(self.sleep_tracking_widget)
 
     @staticmethod
     def load_fonts():
