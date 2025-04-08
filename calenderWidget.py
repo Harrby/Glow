@@ -81,7 +81,7 @@ class CalenderContainer(QtWidgets.QWidget):
         Created: 2025-03-23
         """
 
-    RequestExit = QtCore.Signal()
+    request_exit = QtCore.Signal()
     def __init__(self):
         super().__init__()
 
@@ -101,7 +101,7 @@ class CalenderContainer(QtWidgets.QWidget):
 
         self.exit_button = ImageButton(70, 70, "resources/images/exit_dark.png", parent=self)
         self.exit_button.setGeometry(self.width() - self.exit_button.width() - 37, 37, 70, 70)
-        self.exit_button.clicked.connect(self.RequestExit)
+        self.exit_button.clicked.connect(self.request_exit)
 
 
         # LAYOUTS
@@ -1162,8 +1162,9 @@ if __name__ == "__main__":
     quicksand_medium = QtGui.QFont("Quicksand Medium", 42)
     quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
 
-
     window = CalenderContainer()
+
+    window.request_exit.connect(lambda: print("exit_button signal"))
 
     window.show()
     sys.exit(app.exec())

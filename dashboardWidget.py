@@ -39,6 +39,7 @@ class DashboardWidget(QtWidgets.QWidget):
     sleep_widget = QtCore.Signal()
     screenTime_widget = QtCore.Signal()
     exercise_widget = QtCore.Signal()
+    calender_widget = QtCore.Signal()
 
     def __init__(self):
         super().__init__()
@@ -71,6 +72,7 @@ class DashboardWidget(QtWidgets.QWidget):
 
         self.calenderButton = HoverButton("", self)
         self.calenderButton.setIcon(QIcon("Glow/resources/images/calender.png"))
+        self.calenderButton.clicked.connect(self.calender_widget.emit)
 
         self.logoButton = HoverButton("", self)
         self.logoButton.setIcon(QIcon("Glow/resources/images/glowlogo.png"))
@@ -140,6 +142,7 @@ if __name__ == '__main__':
     window.sleep_widget.connect(lambda: print("sleep_widget signal"))
     window.alcohol_widget.connect(lambda: print("alcohol_widget signal"))
     window.exercise_widget.connect(lambda: print("exercise_widget signal"))
+    window.calender_widget.connect(lambda: print("calender_widget signal"))
 
     window.show()
     sys.exit(app.exec())

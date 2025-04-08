@@ -76,12 +76,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.dashboard_widget.screenTime_widget.connect(self.show_screen_time_widget)
         self.dashboard_widget.sleep_widget.connect(self.show_sleep_tracking_widget)
         self.dashboard_widget.exercise_widget.connect(self.show_exercise_insights_widget)
+        self.dashboard_widget.calender_widget.connect(self.show_calender_container)
 
         self.stack.addWidget(self.dashboard_widget)
         self.stack.setCurrentWidget(self.dashboard_widget)
 
     def show_calender_container(self):
         self.calender_container = CalenderContainer()
+        self.calender_container.request_exit.connect(self.show_dashboard_widget)
         self.stack.addWidget(self.calender_container)
         self.stack.setCurrentWidget(self.calender_container)
 
