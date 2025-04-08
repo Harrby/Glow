@@ -111,6 +111,18 @@ class ImageButton(QtWidgets.QPushButton):
 
         return result
 
+    def set_new_icon(self, path: str, width: int, height: int):
+        self._original_pixmap = QtGui.QPixmap(path)
+        self._pixmap_hovered = self.generate_new_opacity_image(path, 0.8)
+        self._pixmap_pressed = self.generate_new_opacity_image(path, 0.5)
+
+        # icons are used directly onto the pushbutton (using set icon)
+        self.img_icon_default = QtGui.QIcon(self._original_pixmap)
+        self.img_icon_hovered = QtGui.QIcon(self._pixmap_hovered)
+        self.img_icon_pressed = QtGui.QIcon(self._pixmap_pressed)
+
+        self.setIcon(self.img_icon_default)
+        self.setIconSize(QtCore.QSize(width, height))
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

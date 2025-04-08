@@ -20,6 +20,11 @@ class MonthData:
             moods (list[str]): list of file path extensions of each mood in the month, e.g ["happy", "sad", ...]
                 (doesnt need to be passed to instantiate however / has a default arg of [])
                 1 mood per day, if no mood then replace with a NONE e.g ["happy", "sad", None, "happy", None etc]
+            diary_entries (list[str]): list of diary entries e.g ["today I went gym", "chill day, didn't do much" etc]
+            screen_time (list[float]): list of hours of screen time. e.g. [2.2, 1.9, 2.0, etc.]
+            exercise (list[int]): list of minutes of exercise. e.g. [50, 0, 30, etc.]
+            alcohol (list[float]): list of units of alcohol. e.g. [2.5, 0, 0, 5, etc.]
+            sleep (list[float]) list of hours of sleep. e.g. [8, 8.5, 6, 9, etc.]
 
         Author: Harry
         Created: 02-04-2025
@@ -36,7 +41,13 @@ class MonthData:
     alcohol: list = field(default_factory=list)
     sleep: list = field(default_factory=list)
 
-    def get_days_data(self, day_index: int):
+    def get_days_data(self, day_index: int) -> tuple:
+        """
+        gets all data for a given day.
+
+        :param day_index: e.g IMPORTANT: if want 3rd day, day index is 2.
+        :return: mood, diary entry, screen time, exercise, alcohol, sleep.
+        """
         try:
             return (
                 self.moods[day_index],
@@ -70,6 +81,7 @@ class CalenderContainer(QtWidgets.QWidget):
         Created: 2025-03-23
         """
 
+    RequestExit = QtCore.Signal()
     def __init__(self):
         super().__init__()
 
@@ -86,6 +98,10 @@ class CalenderContainer(QtWidgets.QWidget):
         quicksand_medium_content.setStyleStrategy(QtGui.QFont.PreferAntialias)
 
         self.stack = QtWidgets.QStackedLayout()
+
+        self.exit_button = ImageButton(70, 70, "resources/images/exit_dark.png", parent=self)
+        self.exit_button.setGeometry(self.width() - self.exit_button.width() - 37, 37, 70, 70)
+        self.exit_button.clicked.connect(self.RequestExit)
 
 
         # LAYOUTS
@@ -136,7 +152,6 @@ class CalenderContainer(QtWidgets.QWidget):
             new_frame.RequestCalenderZoomInWidget.connect(self.on_calender_zoom_in_widget_request)
             self.calender_frame_widgets.append(new_frame)
 
-
         self.v_layout = QtWidgets.QVBoxLayout()
         for calender_frame_widget in self.calender_frame_widgets:
             calender_frame_widget.hide()
@@ -144,23 +159,34 @@ class CalenderContainer(QtWidgets.QWidget):
 
         self.v_layout.addSpacing(35)
 
-        self.calender_zoom_widgets = []
 
         main_layout = QtWidgets.QVBoxLayout()
         main_layout.addLayout(h_title_layout)
         main_layout.addLayout(self.v_layout, 4)
 
-        main_h_layout = QtWidgets.QHBoxLayout()
-        main_h_layout.addLayout(left_v_layout)
-        main_h_layout.addLayout(main_layout)
-        main_h_layout.addLayout(right_v_layout)
+        self.main_h_layout = QtWidgets.QHBoxLayout()
+        self.main_h_layout.addLayout(left_v_layout)
+        self.main_h_layout.addLayout(main_layout)
+        self.main_h_layout.addLayout(right_v_layout)
 
+        self.set_month_and_year(2, 2025)
+        self.show_calender_frame_at_index(self.global_month_index)
+
+        self.setLayout(self.main_h_layout)
+
+    def set_example_data(self):
         example_mood_data = ["happy", None, "tired", "proud", "sick", "sick", "stressed", "angry", "angry", "sad", None,
                              None, None] * 3
 
         example_diary_entries = [
-            "Felt super productive today, got a lot of coding done.",
-            "Woke up late but still managed to hit the gym.",
+            "bla bla bla super tired today this needs a character limit so it doesn’t overflow sdffjv"
+            "njvsn flnfvfjkvnfjnfvjfnvjfkvnfjnfvnfjvf lots more waffle wah wah wah wah wah wah wah wah"
+            " wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah"
+            " wah wah wah wah wah wah wah wah wah wah wah wah wah",
+            "bla bla bla super tired today this needs a character limit so it doesn’t overflow sdffjv"
+            "njvsn flnfvfjkvnfjnfvjfnvjfkvnfjnfvnfjvf lots more waffle wah wah wah wah wah wah wah wah"
+            " wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah"
+            " wah wah wah wah wah wah wah wah wah wah wah wah wah",
             "Kind of a lazy day, watched YouTube and played guitar.",
             "Wasn't feeling great, took it easy.",
             "Had a great chat with a friend I hadn’t seen in ages.",
@@ -195,22 +221,13 @@ class CalenderContainer(QtWidgets.QWidget):
 
         example_screen_time = [random.randint(1, 10) for _ in range(32)]
         example_exercise = [random.randint(1, 200) for _ in range(32)]
-        example_alcohol = [random.randint(1, 100)/10 for _ in range(32)]
-        example_sleep = [random.randint(10, 90)/10 for _ in range(32)]
+        example_alcohol = [random.randint(1, 100) / 10 for _ in range(32)]
+        example_sleep = [random.randint(10, 90) / 10 for _ in range(32)]
 
-
-        self.set_month_data(2, example_mood_data, example_diary_entries,  example_screen_time, example_exercise, example_alcohol, example_sleep)
-        self.set_month_data(3, example_mood_data, example_diary_entries,  example_screen_time, example_exercise, example_alcohol, example_sleep)
-
-
-        example_mood_data = ["happy", None, "tired", "proud", "sick", "sick", "stressed", "angry", "angry", "sad", None,
-                             None, None] * 3
-
-        self.set_month_and_year(2, 2025)
-        self.show_calender_frame_at_index(self.global_month_index)
-
-
-        self.setLayout(main_h_layout)
+        self.set_month_data(2, example_mood_data, example_diary_entries, example_screen_time, example_exercise,
+                            example_alcohol, example_sleep)
+        self.set_month_data(3, example_mood_data, example_diary_entries, example_screen_time, example_exercise,
+                            example_alcohol, example_sleep)
 
     def paintEvent(self, event) -> None:
         """
@@ -219,6 +236,13 @@ class CalenderContainer(QtWidgets.QWidget):
         """
         painter = QtGui.QPainter(self)
         painter.drawPixmap(self.rect(), self.pixmap)
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+
+        x = self.width() - self.exit_button.width() - 37
+        y = 37
+        self.exit_button.move(x, y)
 
     def show_calender_frame_at_index(self, index: int) -> None:
         """
@@ -313,6 +337,20 @@ class CalenderContainer(QtWidgets.QWidget):
                 calender_entry.set_mood_pixmap(mood)
 
     def set_month_data(self, global_month_index: int, mood_data: list, diary_entries: list, screen_time: list, exercise: list, alcohol: list, sleep: list):
+        """
+
+        updates the local monthData object in self.months and sets the mood data in children classes, such as caledner
+        frame etc, so it can be displayed for the user.
+
+        :param global_month_index: (int) index in self.months list (e.g. Jan 2025 would be index = 0)
+        :param mood_data: (list[str])
+        :param diary_entries: (list[str])
+        :param screen_time: (list[float])
+        :param exercise: (list[int])
+        :param alcohol: (list[float])
+        :param sleep: (list[float])
+        :return:
+        """
         self.set_month_mood_data(global_month_index, mood_data)
         current_month = self.months[global_month_index]
         current_month.diary_entries = diary_entries
@@ -352,42 +390,76 @@ class CalenderContainer(QtWidgets.QWidget):
             self.show_calender_frame_at_index(self.global_month_index)
             self.set_month_and_year(self.global_month_index, self.months[self.global_month_index].year)
 
+    def on_zoom_in_widget_close_request(self):
+        self.setLayout(self.main_h_layout)
 
     @QtCore.Slot(int, int, int)
-    def on_calender_zoom_in_widget_request(self, year, month, day):
+    def on_calender_zoom_in_widget_request(self, year: int, month: int, day: int) -> None:
+        """
+        When user clicks on a calender sub frame widget e.g. a day, say jan 1st 2025, then this slot wil be called.
+        Which will create a new calender zoom in widget.
+
+        :param year: (int) e.g. 2025
+        :param month: (int) e.g. 4 (which would be April)
+        :param day: (int) e.g. 4 (would be 4th day in the month)
+        :return:
+        """
+        day_index = day - 1  # as index starts from 0 not 1
 
         month_index = self.get_index_from_month_and_year(month, year)
         current_month_data = self.months[month_index]
 
-        args = current_month_data.get_days_data(day)
+        args = current_month_data.get_days_data(day_index)
 
         new_calender_zoom_in_widget = CalenderZoomInContainer(day, month, year, *args)
+        new_calender_zoom_in_widget.RequestExit.connect(self.on_zoom_in_widget_close_request)
         new_calender_zoom_in_widget.RequestNextDayData.connect(self.return_request_next_day_data)
         new_calender_zoom_in_widget.RequestPrevDayData.connect(self.return_request_prev_day_data)
-        print("created new cal zoom widget")
 
         self.stack.addWidget(new_calender_zoom_in_widget)
         self.stack.setCurrentWidget(new_calender_zoom_in_widget)
         self.setLayout(self.stack)
 
-        """continue here, create a zoom in widget and show it."""
+    @QtCore.Slot(QtWidgets.QWidget, int, int, int)
+    def return_request_next_day_data(self, sender: QtWidgets.QWidget, day: int, month: int, year: int) -> None:
+        """
+            Calculates and sends the data for the next calendar day to the given widget.
 
-    def return_request_next_day_data(self, sender, day, month, year):
+            If the next day exceeds the number of days in the current month, it rolls over to the first day of the next month.
+            Updates the global month index and refreshes the calendar view accordingly.
+
+            :param sender: The widget requesting the next day's data. Must implement `receive_new_day_data`.
+            :param day: Current day (1-based index).
+            :param month: Current month (1-based index).
+            :param year: Current year.
+
+        """
+
 
         month_index = self.get_index_from_month_and_year(month, year)
         day += 1
         current_month_data = self.months[month_index]
-        if day >= len(list(filter(lambda x: x!=-1, current_month_data.days))) +1:
+        if day >= len(list(filter(lambda x: x != -1, current_month_data.days))) + 1:
             day = 1
             month_index += 1
             current_month_data = self.months[month_index]
         self.global_month_index = month_index
         self.show_calender_frame_at_index(month_index)
         month, year = self.get_month_and_year_from_index(month_index)
-        sender.receive_new_day_data(day, month, year, *current_month_data.get_days_data(day))
-
+        sender.receive_new_day_data(day, month, year, *current_month_data.get_days_data(day-1))
 
     def return_request_prev_day_data(self, sender, day, month, year):
+        """
+            Calculates and sends the data for the previous calendar day to the given widget.
+
+            If the previous day is less than 1, it rolls back to the last day of the previous month.
+            Updates the global month index and refreshes the calendar view accordingly.
+
+            :param sender: The widget requesting the previous day's data. Must implement `receive_new_day_data`.
+            :param day: Current day (1-based index).
+            :param month: Current month (1-based index).
+            :param year: Current year.
+        """
 
         month_index = self.get_index_from_month_and_year(month, year)
         day -= 1
@@ -395,13 +467,12 @@ class CalenderContainer(QtWidgets.QWidget):
         if day <= 0:
             month_index -= 1
             current_month_data = self.months[month_index]
-            day = len(list(filter(lambda x: x!=-1, current_month_data.days)))
+            day = len(list(filter(lambda x: x != -1, current_month_data.days)))
         self.global_month_index = month_index
         self.show_calender_frame_at_index(month_index)
         month, year = self.get_month_and_year_from_index(self.global_month_index)
-        print(day, month, year)
 
-        args = current_month_data.get_days_data(day)
+        args = current_month_data.get_days_data(day-1)
         sender.receive_new_day_data(day, month, year, *args)
 
 
@@ -426,11 +497,12 @@ class CalenderFrame(QtWidgets.QFrame):
         Author: Harry
         Created: 2025-03-23
     """
-    RequestCalenderZoomInWidget = QtCore.Signal(int, int, int)  #year, month, day
+    RequestCalenderZoomInWidget = QtCore.Signal(int, int, int)  # year, month, day
+
     def __init__(self, month: MonthData):
         super().__init__()
 
-        self.month = month
+        self.month: MonthData = month
 
         self.setStyleSheet("""
         .CalenderFrame{
@@ -462,11 +534,14 @@ class CalenderFrame(QtWidgets.QFrame):
 
         self.setLayout(grid_layout)
 
-
     @QtCore.Slot(int)
     def on_calender_entry_click(self, day: int):
+        """
+        called, when a day on the calender frame is clicked.
+        :param day: (int)
+        :return:
+        """
         self.RequestCalenderZoomInWidget.emit(self.month.year, self.month.month, day)
-
 
 
 class CalenderEntry(QtWidgets.QFrame):
@@ -492,6 +567,7 @@ class CalenderEntry(QtWidgets.QFrame):
             entry.set_mood_pixmap("happy")
     """
     CalenderEntryWasClicked = QtCore.Signal(int)  # number / day that was clicked
+
     def __init__(self, number: int):
         super().__init__()
 
@@ -556,15 +632,19 @@ class CalenderEntry(QtWidgets.QFrame):
 
     def enterEvent(self, event):
         super().leaveEvent(event)
-        self.setCursor(QtCore.Qt.PointingHandCursor)
+        if self.number != -1:
+            self.setCursor(QtCore.Qt.PointingHandCursor)
 
     def leaveEvent(self, event):
         super().leaveEvent(event)
-        self.setCursor(QtCore.Qt.ArrowCursor)
+        if self.number != -1:
+            self.setCursor(QtCore.Qt.ArrowCursor)
 
     def mousePressEvent(self, event):
+        super().mousePressEvent(event)
         if event.button() == QtCore.Qt.LeftButton:
-            self.CalenderEntryWasClicked.emit(self.number)
+            if self.number != -1:
+                self.CalenderEntryWasClicked.emit(self.number)
 
 
 class CalenderWeekdayTitleEntry(QtWidgets.QFrame):
@@ -610,19 +690,31 @@ class CalenderWeekdayTitleEntry(QtWidgets.QFrame):
 class CalenderZoomInContainer(QtWidgets.QFrame):
     """
 
-    container for the Calender zoom in widget, (when user clicks on a day, it will open a zoomed in version of that day
-    with more detail about stats that day)
+    A container widget for displaying a zoomed-in view of a specific calendar day with detailed stats.
 
-    attributes:
-        day (int): the day within the current month that the data is relevant to (e.g 3 would mean 3rd day).
-        month (int): the month within the current year. (e.g 4 would mean April).
-        year (int): the current year (e.g 2025).
-        diary_entry (str): text of diary entry (e.g "today i shat myself").
-        mood (str): the mood the user felt on this day (e.g "happy").
-        screen_time (float): number of hours of screen time on this day (e.g 2).
-        exercise (int): number of minutes of exercise on this day (e.g 40).
-        alcohol (float): units of alcohol on this day (e.g. 22).
-        sleep (float): hours of sleep on this day (e.g 8).
+    This widget is shown when the user clicks on a day in the calendar. It displays:
+    - The selected date
+    - A diary entry
+    - Mood with an associated image
+    - Screen time, exercise, alcohol consumption, and sleep statistics
+
+    Users can navigate to the previous or next day using arrow buttons. The widget emits signals to request
+    new data for adjacent days and updates itself accordingly.
+
+    Attributes:
+        day (int): The day of the month being displayed (e.g., 3 for the 3rd).
+        month (int): The month being displayed (e.g., 4 for April).
+        year (int): The year of the selected day (e.g., 2025).
+        diary_entry (str): The diary entry text for the selected day.
+        mood (str): The mood on that day (e.g., "happy", "sad").
+        screen_time (float): Hours of screen time on that day.
+        exercise (int): Minutes of exercise.
+        alcohol (float): Units of alcohol consumed.
+        sleep (float): Hours of sleep.
+
+    Signals:
+        RequestNextDayData (object, int, int, int): Emitted when the user requests the next day's data.
+        RequestPrevDayData (object, int, int, int): Emitted when the user requests the previous day's data.
 
 
     Author: Harry
@@ -631,6 +723,7 @@ class CalenderZoomInContainer(QtWidgets.QFrame):
     """
     RequestNextDayData = QtCore.Signal(object, int, int, int)  # sends a request for getting next days data
     RequestPrevDayData = QtCore.Signal(object, int, int, int)
+    RequestExit = QtCore.Signal()
 
     def __init__(self, day: int, month: int, year: int, mood: str, diary_entry: str, screen_time: float, exercise: int,
                  alcohol: float, sleep: float):
@@ -651,6 +744,10 @@ class CalenderZoomInContainer(QtWidgets.QFrame):
         self.pixmap = generic_background_img
 
         self.setStyleSheet("""QLabel{color: white;}""")
+
+        self.exit_button = ImageButton(70, 70, "resources/images/exit_dark.png", parent=self)
+        self.exit_button.setGeometry(self.width() - self.exit_button.width() - 37, 37, 70, 70)
+        self.exit_button.clicked.connect(self.RequestExit)
 
         quicksand_medium_title = QtGui.QFont("Quicksand Medium", 64)
         quicksand_medium_content = QtGui.QFont("Quicksand Medium", 36)
@@ -710,6 +807,13 @@ class CalenderZoomInContainer(QtWidgets.QFrame):
         painter = QtGui.QPainter(self)
         painter.drawPixmap(self.rect(), self.pixmap)
 
+    def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
+        super().resizeEvent(event)
+        # Position the button 37px from the top and right
+        x = self.width() - self.exit_button.width() - 37
+        y = 37
+        self.exit_button.move(x, y)
+
     def set_date_text(self):
         self.date_title.setText(f"{self.day} {calendar.month_name[self.month]} {self.year}")
 
@@ -737,13 +841,37 @@ class CalenderZoomInContainer(QtWidgets.QFrame):
         self.main_widget.set_widgets()
 
 
-
 class CalenderZoomInWidget(QtWidgets.QFrame):
-    """
-        Author: Harry
-        Created: 04-04-2025
 
     """
+    A widget used within the CalenderZoomInContainer to display detailed stats and diary content for a specific day.
+
+    This widget visually represents:
+    - A mood icon based on the user's mood
+    - A diary entry
+    - Statistics such as screen time, exercise, alcohol intake, and sleep
+
+    It is dynamically updated when the user navigates between days via the parent container.
+
+    Attributes:
+        diary_entry (str): The diary text for the selected day.
+        mood (str): The mood associated with the day (used to load an image).
+        screen_time (float): Hours spent on screen.
+        exercise (int): Minutes of exercise performed.
+        alcohol (float): Units of alcohol consumed.
+        sleep (float): Hours of sleep.
+
+    Methods:
+        receive_new_day_data(): Updates the internal data with values for a new day.
+        set_widgets(): Updates all UI components based on current attributes.
+        set_mood_pixmap(mood): Updates the mood image.
+        set_diary_entry(entry): Updates the displayed diary text.
+        set_stat_labels(): Refreshes the stat containers with the current values.
+
+    Author: Harry
+    Created: 04-04-2025
+    """
+
     def __init__(self, diary_entry: str, mood: str, screen_time: float,
                              exercise: int, alcohol: float, sleep: float):
         super().__init__()
@@ -760,6 +888,7 @@ class CalenderZoomInWidget(QtWidgets.QFrame):
 
         self.setStyleSheet("""QLabel{color: white;}""")
 
+
         quicksand_medium_title = QtGui.QFont("Quicksand Medium", 96)
         quicksand_medium_content = QtGui.QFont("Quicksand Medium", 28)
         diary_entry_font = QtGui.QFont("Quicksand Medium", 32)
@@ -767,6 +896,7 @@ class CalenderZoomInWidget(QtWidgets.QFrame):
         quicksand_medium_content.setStyleStrategy(QtGui.QFont.PreferAntialias)
 
         self.mood_img_label = QtWidgets.QLabel()
+        self.mood_img_label.setFixedSize(QtCore.QSize(200, 200))
         self.mood_pixmap = QtGui.QPixmap(f"resources/images/{self.mood}.png")
 
         self.mood_pixmap.scaled(
@@ -789,7 +919,7 @@ class CalenderZoomInWidget(QtWidgets.QFrame):
 
         diary_entry_v_layout = QtWidgets.QVBoxLayout()
         diary_entry_v_layout.addWidget(diary_entry_label)
-        diary_entry_v_layout.addWidget(self.diary_entry_widget, alignment=QtCore.Qt.AlignLeft)
+        diary_entry_v_layout.addWidget(self.diary_entry_widget)
         diary_entry_v_layout.setSpacing(5)
 
         diary_stat_layout = QtWidgets.QVBoxLayout()
@@ -870,17 +1000,35 @@ class CalenderZoomInWidget(QtWidgets.QFrame):
 
 class DiaryEntryWidget(QtWidgets.QFrame):
     """
+        A styled widget for displaying a diary entry with optional expand/collapse functionality.
+
+        This widget shows a snippet of diary text in a fixed height by default, but can expand vertically
+        to reveal the full entry when the arrow button is clicked. Used in the CalenderZoomInWidget
+        for showing a user's journal log for a given day.
+
+        Attributes:
+            entry_text (str): The diary entry to display.
+            expanded (bool): Whether the widget is currently expanded.
+            collapsed_height (int): The fixed height when collapsed.
+            diary_text_label (QLabel): The label that displays the entry text.
+            expand_button (ImageButton): The button used to toggle expand/collapse.
+
+        Methods:
+            on_toggle_expand(): Toggles the expanded state and adjusts height accordingly.
+            set_diary_entry_text(new_entry): Updates the displayed diary text.
 
         Author: Harry
         Created: 04-04-2025
-
     """
 
     def __init__(self, entry_text="", parent=None):
         super().__init__(parent)
 
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
         self.expanded = False
-        self.collapsed_height = 170
+        self.collapsed_height = 120
+        self.setMinimumHeight(120)
         self.entry_text = entry_text
 
         self.setStyleSheet("""
@@ -894,14 +1042,20 @@ class DiaryEntryWidget(QtWidgets.QFrame):
 
         font_content = QtGui.QFont("Quicksand Medium", 24)
         font_content.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        print("entry text is")
+        print(self.entry_text)
+        if self.entry_text == "":
+            self.entry_text = "No diary entry for this day."
 
+        print(self.entry_text)
         self.diary_text_label = QtWidgets.QLabel(self.entry_text)
         self.diary_text_label.setFont(font_content)
         self.diary_text_label.setWordWrap(True)
         self.diary_text_label.setMaximumWidth(800)
-        self.diary_text_label.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        self.diary_text_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
-        self.expand_button = ImageButton(39, 21, "resources/images/up_arrow.png", False)
+        self.expand_button = ImageButton(39, 21, "resources/images/down_arrow.png", False)
+        self.expand_button.setToolTip("expand")
         self.expand_button.setFixedSize(QtCore.QSize(39, 21))
         self.expand_button.clicked.connect(self.on_toggle_expand)
 
@@ -923,8 +1077,10 @@ class DiaryEntryWidget(QtWidgets.QFrame):
     def on_toggle_expand(self):
         print("button was clicked")
         if self.expanded:
+            self.expand_button.set_new_icon("resources/images/down_arrow.png", 39, 21)
             self.setFixedHeight(self.collapsed_height)
         else:
+            self.expand_button.set_new_icon("resources/images/up_arrow.png", 39, 21)
             self.diary_text_label.adjustSize()
             self.setFixedHeight(self.diary_text_label.height() + 50)  # padding for button and margins
         self.expanded = not self.expanded
@@ -932,17 +1088,34 @@ class DiaryEntryWidget(QtWidgets.QFrame):
     def resizeEvent(self, event: QtGui.QResizeEvent, /) -> None:
         super().resizeEvent(event)
 
-        """ label_x = 25
-        label_y = 10
-        self.diary_text_label.setGeometry(label_x, label_y, self.width()-120, self.height()-10)
-        button_x = self.width() - (self.expand_button.width() + 10)
-        self.expand_button.setGeometry(button_x, 10, 39, 21)"""
-
     def set_diary_entry_text(self, new_entry: str):
+        if new_entry is None:
+            new_entry = "No diary entry for this day."
+        print("text was set to", new_entry)
         self.diary_text_label.setText(new_entry)
 
 
 class DiaryStatContainer(QtWidgets.QFrame):
+    """
+        A container for displaying a single diary statistic with a title and corresponding value.
+
+        This widget is used in the zoomed-in calendar view to show daily stats such as mood, sleep,
+        screen time, exercise, and alcohol consumption. Includes a decorative firefly icon.
+
+        Attributes:
+            title_text (str): The title or label of the statistic (e.g. "Mood").
+            content_text (str): The current value of the statistic (e.g. "Happy", "8 hours").
+            title_label (QLabel): Label displaying the title text.
+            content_label (QLabel): Label displaying the content text.
+            firefly_pixmap (QPixmap): Decorative icon loaded from resources.
+            firefly_label (QLabel): Label that displays the firefly image.
+
+        Methods:
+            set_content_text(new_content_text): Updates the value shown for the stat.
+
+        Author: Harry
+        Created: 04-04-2025
+    """
     def __init__(self, title_text: str = "", content_text: str = ""):
         super().__init__()
 
@@ -980,13 +1153,6 @@ class DiaryStatContainer(QtWidgets.QFrame):
         self.content_label.setText(self.content_text)
 
 
-
-
-
-
-
-
-
 if __name__ == "__main__":
     april = [-1] * 1 + list(range(1, 31)) + [-1] * 4
 
@@ -996,19 +1162,6 @@ if __name__ == "__main__":
     quicksand_medium = QtGui.QFont("Quicksand Medium", 42)
     quicksand_medium.setStyleStrategy(QtGui.QFont.PreferAntialias)
 
-    """window = CalenderZoomInContainer(11, 3, 2025, "bla bla bla super tired today this needs a character limit so it doesn’t overflow sdffjv"
-                              "njvsn flnfvfjkvnfjnfvjfnvjfkvnfjnfvnfjvf lots more waffle wah wah wah wah wah wah wah wah"
-                              " wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah"
-                              " wah wah wah wah wah wah wah wah wah wah wah wah wah", "happy", 2.2, 40, 4.5, 8.5)"""
-    """window = DiaryEntryWidget("bla bla bla super tired today this needs a character limit so it doesn’t overflow sdffjv"
-                              "njvsn flnfvfjkvnfjnfvjfnvjfkvnfjnfvnfjvf lots more waffle wah wah wah wah wah wah wah wah"
-                              " wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah"
-                              " wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah"
-                              " wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah"
-                              " wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah"
-                              " wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah "
-                              "wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah wah "
-                              "wah wah wah wah wah wah wah wah wah wah wah wah wah wah")"""
 
     window = CalenderContainer()
 
