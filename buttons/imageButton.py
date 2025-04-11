@@ -23,6 +23,9 @@ class ImageButton(QtWidgets.QPushButton):
     def __init__(self, width: int, height: int, img_file_path: str, img_expand_to_fill: bool = True, parent=None):
         super().__init__(parent)
 
+        self._initial_width = width
+        self._initial_height = height
+
         self.img_expand_to_fill = img_expand_to_fill
 
         self.setStyleSheet("""
@@ -32,7 +35,8 @@ class ImageButton(QtWidgets.QPushButton):
             }
         """)
 
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
+        self.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
 
         # setting icon
         # pixmaps are stored as they scale very well (lossless)
@@ -59,22 +63,31 @@ class ImageButton(QtWidgets.QPushButton):
         self.pressed.connect(self.on_button_pressed)
         self.released.connect(self.on_button_released)
 
+    def sizeHint(self):
+        return QtCore.QSize(self._initial_width, self._initial_height)
+
     def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
+
         if self.img_expand_to_fill:
             new_size = QtCore.QSize(self.width(), self.height())
             self.setIconSize(new_size)
 
-            # make new pixmap of new size then convert back to Qicon
+            # Create scaled icons
             self.img_icon_default = QtGui.QIcon(self._original_pixmap.scaled(
                 new_size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-
             self.img_icon_hovered = QtGui.QIcon(self._pixmap_hovered.scaled(
                 new_size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
-
             self.img_icon_pressed = QtGui.QIcon(self._pixmap_pressed.scaled(
                 new_size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation))
 
+            # Re-apply the current icon to force a redraw -> fixes resizing bug
+            if self.underMouse():
+                self.setIcon(self.img_icon_hovered)
+            else:
+                self.setIcon(self.img_icon_default)
+
         super().resizeEvent(event)
+
 
     def enterEvent(self, event: QtCore.QEvent) -> None:
         # adjusts look of button and changes cursor when hovering over this widget.

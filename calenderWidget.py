@@ -70,6 +70,9 @@ class CalenderContainer(QtWidgets.QWidget):
         It includes left and right arrow buttons for navigating between months. 2 years worth of calendar frames are
         preloaded for switching performance.
 
+        IMPORTANT! -> Signals:
+            request_exit() - signal when user clicks exit button
+
         Attributes:
             global_month_index (int): Index of month item from position 0 in self.months
                                       that is currently displayed on screen.
@@ -102,7 +105,6 @@ class CalenderContainer(QtWidgets.QWidget):
         self.exit_button = ImageButton(70, 70, "resources/images/exit_dark.png", parent=self)
         self.exit_button.setGeometry(self.width() - self.exit_button.width() - 37, 37, 70, 70)
         self.exit_button.clicked.connect(self.request_exit)
-
 
         # LAYOUTS
         self.year_label = QtWidgets.QLabel(alignment=QtCore.Qt.AlignCenter)

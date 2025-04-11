@@ -1,4 +1,4 @@
-from PySide6 import QtGui, QtWidgets
+from PySide6 import QtGui, QtWidgets, QtCore
 import sys
 from PySide6.QtWidgets import QApplication, QStackedWidget
 
@@ -16,9 +16,14 @@ from exerciseInsightsWidget import ExerciseInsightsWidget
 from screenTimeWidget import ScreenTimeWidget
 from sleepTrackingWidget import SleepTrackingWidget
 
+
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, app: QtWidgets.QApplication):
         super().__init__()
+
+        # key esc toggles full screen
+        QtGui.QShortcut(QtGui.QKeySequence("Escape"), self, activated=self.toggle_fullscreen)
+        self.show_fullscreen_hint()
 
         self.app = app
         self.setWindowTitle("Glow")
@@ -43,6 +48,32 @@ class MainWindow(QtWidgets.QMainWindow):
         # Set initial index for the stacked widget
         self.stack.setCurrentIndex(0)
         self.setCentralWidget(self.stack)
+
+    def toggle_fullscreen(self):
+        if self.isFullScreen():
+            self.showNormal()
+        else:
+            self.showFullScreen()
+
+    def show_fullscreen_hint(self):
+        hint = QtWidgets.QLabel("Press Esc to exit fullscreen", self)
+        hint.setStyleSheet("""
+            QLabel {
+                background-color: rgba(0, 0, 0, 160);
+                color: white;
+                padding: 6px 12px;
+                border-radius: 8px;
+                font-size: 14px;
+            }
+        """)
+        hint.setAlignment(QtCore.Qt.AlignCenter)
+        hint.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
+        hint.adjustSize()
+        hint.move(20, 10)
+        hint.show()
+
+        # Auto-hide after 3 seconds
+        QtCore.QTimer.singleShot(3000, hint.deleteLater)
 
     def show_welcome(self, username):
         self.welcome_page.set_name(username)
@@ -119,6 +150,7 @@ class MainWindow(QtWidgets.QMainWindow):
     @staticmethod
     def load_fonts():
         QtGui.QFontDatabase.addApplicationFont("resources/fonts/quicksand/Quicksand-Medium.ttf")
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
