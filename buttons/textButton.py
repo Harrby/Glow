@@ -47,6 +47,8 @@ class TextButton(QtWidgets.QPushButton):
         self._pressed_color = self._color_with_opacity(background_color, 0.5)
         self._text_color = text_color
 
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
         # Configure the button text
         self.setText(text)
         if font is not None:
@@ -79,8 +81,7 @@ class TextButton(QtWidgets.QPushButton):
         # (StyleSheet handles coloring, but we can still use enter/leave events for cursors)
         self.setMouseTracking(True)
 
-    def sizeHint(self) -> QtCore.QSize:
-        return QtCore.QSize(self._initial_width, self._initial_height)
+
 
     def enterEvent(self, event: QtCore.QEvent) -> None:
         # Change mouse cursor to pointing hand

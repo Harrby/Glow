@@ -36,7 +36,7 @@ class ImageButton(QtWidgets.QPushButton):
         """)
 
 
-        self.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        #self.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
 
         # setting icon
         # pixmaps are stored as they scale very well (lossless)
