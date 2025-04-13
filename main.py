@@ -45,6 +45,32 @@ class MainWindow(QtWidgets.QMainWindow):
         self.opening_widget.start_quiz.connect(self.show_quizWidget)
         self.stack.addWidget(self.opening_widget)
 
+        self.calender_container = CalenderContainer()
+        self.stack.addWidget(self.calender_container)
+        self.calender_container.request_exit.connect(self.show_dashboard_widget)
+
+        self.dashboard_widget = DashboardWidget()
+        self.dashboard_widget.alcohol_widget.connect(self.show_alcohol_log_widget)
+        self.dashboard_widget.screenTime_widget.connect(self.show_screen_time_widget)
+        self.dashboard_widget.sleep_widget.connect(self.show_sleep_tracking_widget)
+        self.dashboard_widget.exercise_widget.connect(self.show_exercise_insights_widget)
+        self.dashboard_widget.calender_widget.connect(self.show_calender_container)
+        self.dashboard_widget.opening_widget.connect(self.show_opening_widget)
+        self.dashboard_widget.logo_widget.connect(self.show_profile_widget)
+        self.stack.addWidget(self.dashboard_widget)
+
+        self.alcohol_log_widget = AlcoholLogContainer()
+        self.stack.addWidget(self.alcohol_log_widget)
+
+        self.exercise_insights_widget = ExerciseInsightsWidget()
+        self.stack.addWidget(self.exercise_insights_widget)
+
+        self.screen_time_widget = ScreenTimeWidget()
+        self.stack.addWidget(self.screen_time_widget)
+
+        self.sleep_tracking_widget = SleepTrackingWidget()
+        self.stack.addWidget(self.sleep_tracking_widget)
+
         # Set initial index for the stacked widget
         self.stack.setCurrentIndex(0)
         self.setCentralWidget(self.stack)
@@ -108,43 +134,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.stack.setCurrentWidget(self.activities_widget)
 
     def show_dashboard_widget(self):
-        self.dashboard_widget = DashboardWidget()
 
-        self.dashboard_widget.alcohol_widget.connect(self.show_alcohol_log_widget)
-        self.dashboard_widget.screenTime_widget.connect(self.show_screen_time_widget)
-        self.dashboard_widget.sleep_widget.connect(self.show_sleep_tracking_widget)
-        self.dashboard_widget.exercise_widget.connect(self.show_exercise_insights_widget)
-        self.dashboard_widget.calender_widget.connect(self.show_calender_container)
-        self.dashboard_widget.opening_widget.connect(self.show_opening_widget)
-        self.dashboard_widget.logo_widget.connect(self.show_profile_widget)
-
-        self.stack.addWidget(self.dashboard_widget)
         self.stack.setCurrentWidget(self.dashboard_widget)
 
     def show_calender_container(self):
-        self.calender_container = CalenderContainer()
-        self.calender_container.request_exit.connect(self.show_dashboard_widget)
-        self.stack.addWidget(self.calender_container)
         self.stack.setCurrentWidget(self.calender_container)
 
     def show_alcohol_log_widget(self):
-        self.alcohol_log_widget = AlcoholLogContainer()
-        self.stack.addWidget(self.alcohol_log_widget)
         self.stack.setCurrentWidget(self.alcohol_log_widget)
 
     def show_exercise_insights_widget(self):
-        self.exercise_insights_widget = ExerciseInsightsWidget()
-        self.stack.addWidget(self.exercise_insights_widget)
         self.stack.setCurrentWidget(self.exercise_insights_widget)
 
     def show_screen_time_widget(self):
-        self.screen_time_widget = ScreenTimeWidget()
-        self.stack.addWidget(self.screen_time_widget)
         self.stack.setCurrentWidget(self.screen_time_widget)
 
     def show_sleep_tracking_widget(self):
-        self.sleep_tracking_widget = SleepTrackingWidget()
-        self.stack.addWidget(self.sleep_tracking_widget)
         self.stack.setCurrentWidget(self.sleep_tracking_widget)
 
     @staticmethod
