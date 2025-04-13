@@ -3,7 +3,7 @@ import os
 from PySide6 import QtGui, QtCore, QtWidgets
 from PySide6.QtWidgets import QLineEdit, QHBoxLayout, QFrame, QVBoxLayout
 
-class AfterGoal(QtWidgets.QWidget):
+class NoGoal(QtWidgets.QWidget):
     page_clicked = QtCore.Signal()
     def __init__(self):
         super().__init__()
@@ -34,24 +34,32 @@ class AfterGoal(QtWidgets.QWidget):
 
         # Description
         self.description = QtWidgets.QLabel(
-            "That’s a really good goal. Lets set up your profile now!"
+            "That’s perfectly okay!"
         )
         self.description.setAlignment(QtCore.Qt.AlignCenter)
         self.description.setWordWrap(True)
 
+        # Description
+        self.description2 = QtWidgets.QLabel(
+            "Everyone’s path looks different. Let’s take it one day at a time :)"
+        )
+        self.description2.setAlignment(QtCore.Qt.AlignCenter)
+        self.description2.setWordWrap(True)
         # Buttons
-        self.yes_button = QtWidgets.QPushButton("Continue")
-        self.yes_button.clicked.connect(self.on_button_click)
+        self.continue_button = QtWidgets.QPushButton("Continue")
+        self.conitnue_button.clicked.connect(self.on_button_click)
 
         button_layout = QHBoxLayout()
         button_layout.setAlignment(QtCore.Qt.AlignCenter)
-        button_layout.addWidget(self.yes_button)
+        button_layout.addWidget(self.continue_button)
 
         # Wrap description and buttons in a container widget
         center_widget = QtWidgets.QWidget()
         center_layout = QVBoxLayout(center_widget)
         center_layout.setAlignment(QtCore.Qt.AlignCenter)
         center_layout.addWidget(self.description)
+        center_layout.addSpacing(200)
+        center_layout.addWidget(self.description2)
         center_layout.addSpacing(100)
         center_layout.addLayout(button_layout)
 
@@ -77,7 +85,8 @@ class AfterGoal(QtWidgets.QWidget):
         font_button.setStyleStrategy(QtGui.QFont.PreferAntialias)
 
         self.description.setFont(font_label)
-        self.yes_button.setFont(font_button)
+        self.description2.setFont(font_label)
+        self.continue_button.setFont(font_button)
 
         # Responsive height
         button_height = max(40, int(self.height() * 0.08))
@@ -92,6 +101,6 @@ class AfterGoal(QtWidgets.QWidget):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    intro = AfterGoal()
+    intro = NoGoal()
     intro.show()
     sys.exit(app.exec())

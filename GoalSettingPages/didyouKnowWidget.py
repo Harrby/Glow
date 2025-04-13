@@ -84,13 +84,13 @@ class didYouKnow(QtWidgets.QWidget):
         self.button.clicked.connect(self.on_button_click)
         
         if type == "Alcohol goal":
-            button_color = "rgba(217, 122, 90, 1)"  # Dark coral
+            button_color = "rgba(217, 122, 90, 1)"  
         elif type == "Sleep goal":
-            button_color = "rgba(107, 168, 192, 1)"  # Steel blue
+            button_color = "rgba(107, 168, 192, 1)"  
         elif type == "Screen goal":
-            button_color = "rgba(140, 144, 225, 1)"  # Periwinkle
+            button_color = "rgba(140, 144, 225, 1)"  
         elif type == "Exercise goal":
-            button_color = "rgba(141, 194, 155, 1)"  # Forest green
+            button_color = "rgba(141, 194, 155, 1)"  
             
         self.button.setStyleSheet(f"""
             QPushButton {{
@@ -287,7 +287,7 @@ class didYouKnow(QtWidgets.QWidget):
 
     # UI feedback
     # -----------
-
+    
     def show_success_message(self):
         QtWidgets.QMessageBox.information(
             self, 
