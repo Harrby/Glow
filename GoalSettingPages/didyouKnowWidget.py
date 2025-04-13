@@ -4,7 +4,12 @@ from PySide6 import QtGui, QtCore, QtWidgets
 from PySide6.QtWidgets import QLineEdit
 
 class didYouKnow(QtWidgets.QWidget):
-    """A page which allows you to set goals"""
+    """A page that shows helpful facts and asks the user to set a goal.
+    :author: James
+    :created: 12-04-25
+    :contributors:
+        - Add your name here when you edit or maintain this class."""
+
     page_clicked = QtCore.Signal()
 
     def __init__(self, type):
@@ -287,7 +292,7 @@ class didYouKnow(QtWidgets.QWidget):
 
     # UI feedback
     # -----------
-    
+
     def show_success_message(self):
         QtWidgets.QMessageBox.information(
             self, 

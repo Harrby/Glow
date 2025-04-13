@@ -6,6 +6,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from buttons.hoverButton import HoverButton    # Ensure this import works correctly
 
 class dashBoard(QtWidgets.QWidget):
+    """The main dashboard displaying all of the user's current goals and progress IN SIG  UP PROCESS.
+    :author: James
+    :created: 07-04-25
+    :contributors:
+        - Add your name here when you edit or maintain this class."""
+
     page_clicked = QtCore.Signal()
 
     def __init__(self):

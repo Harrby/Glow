@@ -4,6 +4,12 @@ from PySide6 import QtGui, QtCore, QtWidgets
 from PySide6.QtWidgets import QLineEdit, QHBoxLayout, QFrame, QVBoxLayout
 
 class NoGoal(QtWidgets.QWidget):
+    """A page that reassures the user when they choose not to set a goal.
+    :author: James
+    :created: 13-04-25
+    :contributors:
+        - Add your name here when you edit or maintain this class."""
+
     page_clicked = QtCore.Signal()
     def __init__(self):
         super().__init__()

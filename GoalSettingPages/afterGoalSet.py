@@ -4,6 +4,12 @@ from PySide6 import QtGui, QtCore, QtWidgets
 from PySide6.QtWidgets import QLineEdit, QHBoxLayout, QFrame, QVBoxLayout
 
 class AfterGoal(QtWidgets.QWidget):
+    """A page that confirms a goal has been set and provides encouraging feedback.
+    :author: James
+    :created: 09-04-25
+    :contributors:
+        - Add your name here when you edit or maintain this class."""
+
     page_clicked = QtCore.Signal()
     def __init__(self):
         super().__init__()
