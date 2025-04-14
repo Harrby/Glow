@@ -2,6 +2,8 @@ from PySide6 import QtGui, QtWidgets, QtCore
 import sys
 from PySide6.QtWidgets import QApplication, QStackedWidget
 
+from globalState import AppContext
+
 from logQuizWidget import LogQuizWidget
 from signupPage import SignupScreen
 from activitiesWidget import ActivitiesWidget
@@ -22,6 +24,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, app: QtWidgets.QApplication):
         super().__init__()
 
+        self.context = AppContext()
+
         # key esc toggles full screen
         QtGui.QShortcut(QtGui.QKeySequence("Escape"), self, activated=self.toggle_fullscreen)
         self.show_fullscreen_hint()
@@ -34,7 +38,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.stack = QStackedWidget()
 
         # Initially added widgets
-        self.login_page = LoginWidget()
+        self.login_page = LoginWidget(self.context)
         self.login_page.login_successful.connect(self.show_welcome)
         self.stack.addWidget(self.login_page)  # index 0
 
@@ -129,7 +133,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.stack.setCurrentWidget(self.signup_screen)
 
     def show_profile_widget(self):
-        self.profile_widget = ProfileWidget()
+        self.profile_widget = ProfileWidget(self.context)
         self.profile_widget.dashboard_widget.connect(self.show_dashboard_widget)
         self.stack.addWidget(self.profile_widget)
         self.stack.setCurrentWidget(self.profile_widget)

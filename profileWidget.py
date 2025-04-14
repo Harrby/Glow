@@ -21,8 +21,11 @@ class ProfileWidget(QWidget):
 
     dashboard_widget = QtCore.Signal()
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, context):
+        super().__init__()
+
+        self.context = context
+        self.context.username_changed.connect(self.update_ui)
 
         # Fonts
         quicksand_medium_content = QtGui.QFont("Quicksand Medium", 30)
@@ -61,7 +64,9 @@ class ProfileWidget(QWidget):
 
         # ---- Top bar with a username label and an exit button ----
         top_bar_layout = QHBoxLayout()
-        username_label = QLabel("[username]")
+        self.username = self.context.username
+
+        username_label = QLabel(self.username)
         username_label.setFont(quicksand_medium_content)
         # Set text color to black along with font sizing
         username_label.setStyleSheet("color: black;")
@@ -110,8 +115,7 @@ class ProfileWidget(QWidget):
                     }"""
 
         # placeholder username variable for function to work
-        username = ""
-        name, age, sports, hobbies, sex = self.get_profile_data(username)
+        name, age, sports, hobbies, sex = self.get_profile_data(self.username)
         user_info = [["Name: ", name], ["Age: ", age], ["Sports: ", sports], ["Hobbies: ", hobbies], ["Sex: ", sex]]
         self.checkboxes = []
         self.input_lines = []
@@ -153,6 +157,9 @@ class ProfileWidget(QWidget):
         # Basic window settings
         self.setMinimumSize(600, 400)
         self.setWindowTitle("PySide6 Profile Page")
+
+    def update_ui(self, username):
+        self.username = username
 
     def resizeEvent(self, event):
         """

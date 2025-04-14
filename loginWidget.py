@@ -39,8 +39,11 @@ class LoginWidget(QtWidgets.QWidget):
 
     login_successful = QtCore.Signal(str)  # Custom signal with username
 
-    def __init__(self):
+    def __init__(self, context):
         super().__init__()
+
+        self.context = context  # Store the AppContext
+
         self.setWindowTitle("LOGIN")
         self.setGeometry(100, 100, 900, 600)
 
@@ -104,6 +107,7 @@ class LoginWidget(QtWidgets.QWidget):
         if user:
             self.error_label.setText("Login successful!")
             self.error_label.setStyleSheet("color: green")
+            self.context.username = username
             self.login_successful.emit(username)  # Emit signal with username
         else:
             self.error_label.setText("Username or password incorrect")
