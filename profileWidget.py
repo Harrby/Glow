@@ -12,7 +12,9 @@ from PySide6.QtWidgets import (
     QFrame,
     QGraphicsDropShadowEffect,
     QSizePolicy,
-    QPushButton
+    QPushButton,
+    QLineEdit,
+    QCheckBox
 )
 
 class ProfileWidget(QWidget):
@@ -23,7 +25,7 @@ class ProfileWidget(QWidget):
         super().__init__(parent)
 
         # Fonts
-        quicksand_medium_content = QtGui.QFont("Quicksand Medium", 18)
+        quicksand_medium_content = QtGui.QFont("Quicksand Medium", 30)
 
 
         # Store the main layout as an instance attribute
@@ -83,20 +85,63 @@ class ProfileWidget(QWidget):
         container_layout.addLayout(top_bar_layout)
 
         # ---- User data labels ----
+        input_style = "color: black; background-color: #E4DCCF; border-radius: 5px;"
         label_style = "color: black;"
-        # name, age, sports, hobbies, sex = self.get_profile_data(username)
-        user_info_texts = [
-            "Name: Ruby (she/her)",
-            "Age: 18",
-            "Sport: Cheerleading",
-            "Hobbies: Chess, Photography",
-            "Sex: Female"
-        ]
-        for text in user_info_texts:
-            lbl = QLabel(text)
+
+        # --- Editing checkbox style ---
+        checkbox_style = """
+                    QCheckBox::indicator:checked {
+                        background-image: url(resources/images/checked.png);
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        background-color: #4B4A63;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 5px;
+                    }
+                    QCheckBox::indicator:unchecked {
+                        background-image: url(resources/images/NotEditing.png);
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        background-color: #FFFFFF;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 5px;
+                    }"""
+
+        # placeholder username variable for function to work
+        username = ""
+        name, age, sports, hobbies, sex = self.get_profile_data(username)
+        user_info = [["Name: ", name], ["Age: ", age], ["Sports: ", sports], ["Hobbies: ", hobbies], ["Sex: ", sex]]
+        self.checkboxes = []
+        self.input_lines = []
+
+        for field in user_info:
+            field_layout = QHBoxLayout()
+
+            info = QLineEdit()
+            info.setFont(quicksand_medium_content)
+            info.setMinimumHeight(50)
+            info.setMaximumWidth(1000)
+            info.setPlaceholderText(field[1])
+            info.setEnabled(False)
+            info.setStyleSheet(input_style)
+            self.input_lines.append(info)
+
+            lbl = QLabel(field[0])
             lbl.setFont(quicksand_medium_content)
             lbl.setStyleSheet(label_style)
-            container_layout.addWidget(lbl)
+
+            chckbox = QCheckBox(font=quicksand_medium_content)
+            chckbox.setStyleSheet(checkbox_style)
+            self.checkboxes.append(chckbox)
+            chckbox.toggled.connect(self.toggle_info_fields)
+
+            field_layout.addWidget(lbl)
+            field_layout.addWidget(info)
+            field_layout.addWidget(chckbox)
+
+            container_layout.addLayout(field_layout)
         container_layout.addStretch()
 
         # Add the container frame to the main layout.
@@ -150,6 +195,43 @@ class ProfileWidget(QWidget):
         # hobbies = inter.intermediaryScript.getHobbies(username)
         # sex = inter.intermediaryScript.getSex(username)
         # return name, age, sports, hobbies, sex
+
+        user_info_texts = [
+            "Ruby",
+            "18",
+            "Cheerleading",
+            "Chess, Photography",
+            "Female"
+        ]
+        return user_info_texts[0], user_info_texts[1], user_info_texts[2], user_info_texts[3], user_info_texts[4]
+
+    def toggle_info_fields(self, i):
+        """
+            Allows the user to change their profile information if the associated edit checkbox is checked.
+        :param i:
+        :return:
+        """
+        for i in range(len(self.checkboxes)):
+            if self.checkboxes[i].isChecked():
+                self.input_lines[i].setEnabled(True)
+            else:
+                self.input_lines[i].setEnabled(False)
+
+    def get_updated_info(self):
+        """
+            Gets the data that has been entered into each field.
+
+            Doesn't currently check whether that is new data or what is already stored
+            in the database.
+
+            Also isn't called yet.
+        :return:
+        """
+        info = []
+        for field in self.input_lines:
+            info.append(field.text())
+        return info
+
 
 
 if __name__ == "__main__":
