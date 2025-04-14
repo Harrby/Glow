@@ -67,28 +67,38 @@ class ActivitiesWidget(QtWidgets.QWidget):
         self.other_checkbox = QtWidgets.QCheckBox(font=quicksand_medium_content)
         self.other_checkbox.toggled.connect(self.toggle_other_input)
 
+        self.enter_button = QtWidgets.QPushButton("Enter")
+        self.enter_button.setFont(quicksand_medium_content)
+        self.enter_button.setMinimumHeight(50)
+        self.enter_button.setMaximumWidth(200)
+
         other_layout = QtWidgets.QHBoxLayout()
         other_layout.addWidget(self.other_checkbox)
         other_layout.addWidget(self.other_input)
         other_layout.addStretch(0)
 
         checkbox_grid_layout.addLayout(other_layout, i % 5, i // 5, alignment=QtCore.Qt.AlignLeft)
+        checkbox_grid_layout.addWidget(self.enter_button, 5, i % 5, alignment=QtCore.Qt.AlignLeft)
 
         checkbox_grid_layout.setContentsMargins(10, 10, 10, 10)
         checkbox_grid_layout.setSpacing(15)
 
         h_checkbox_layout = QtWidgets.QHBoxLayout()
-        h_checkbox_layout.addStretch(0)
+        h_checkbox_layout.addStretch()
         h_checkbox_layout.addLayout(checkbox_grid_layout)
         h_checkbox_layout.setAlignment(QtCore.Qt.AlignCenter)
+        h_checkbox_layout.addStretch()
+
 
         title_layout = QtWidgets.QVBoxLayout()
         title_layout.addWidget(main_label, alignment=QtCore.Qt.AlignCenter)
         title_layout.addWidget(heading_label, alignment=QtCore.Qt.AlignCenter)
 
         main_layout = QtWidgets.QVBoxLayout()
+        main_layout.addStretch()
         main_layout.addLayout(title_layout)
         main_layout.addLayout(h_checkbox_layout)
+        main_layout.addStretch()
         main_layout.setContentsMargins(20, 20, 20, 20)
         main_layout.setSpacing(15)
 
