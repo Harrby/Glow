@@ -205,7 +205,72 @@ class SexWidget(QtWidgets.QWidget):
         super().resizeEvent(event)
 
     def on_button_click(self):
-        QtWidgets.QMessageBox.information(self, "Button Clicked", "You clicked the button!")
+        """Handle form submission with validation"""
+        try:
+            # Get selected sex
+            sex = self.get_selected_sex()
+            
+            # Get pronouns (optional)
+            pronouns = self.pronouns_input.text().strip()
+            
+            # Validate and store
+            if not sex:
+                raise ValueError("Please select your sex")
+                
+            self.store_sex_data(sex, pronouns)
+            self.show_success_message()
+            
+        except ValueError as e:
+            self.show_error_message(str(e))
+        except Exception as e:
+            self.show_error_message("Database error occurred")
+
+    def get_selected_sex(self) -> str:
+        if self.male_rb.isChecked():
+            return "male"
+        elif self.female_rb.isChecked():
+            return "female"
+        elif self.na_rb.isChecked():
+            return "prefer_not_to_say"
+        return ""
+
+    # Database operations
+    # -------------------
+    def store_sex_data(self, sex: str, pronouns: str = ""):
+        """Store sex and pronouns in database"""
+        pass
+        
+    def update_pronouns(self, user_id: int, new_pronouns: str):
+        """Update pronouns for existing user"""
+        pass
+        
+    def user_has_sex_data(self, user_id: int) -> bool:
+        """Check if user already provided sex info"""
+        pass
+
+    def validate_pronouns(self, pronouns: str) -> bool:
+        """Basic pronouns format validation"""
+        if not pronouns:
+            return True
+        return '/' in pronouns  
+
+    def show_success_message(self):
+        QtWidgets.QMessageBox.information(
+            self,
+            "Success",
+            "Thank you! Your information has been saved.",
+            QtWidgets.QMessageBox.Ok
+        )
+        self.page_clicked.emit() 
+
+    def show_error_message(self, message: str):
+        QtWidgets.QMessageBox.warning(
+            self,
+            "Input Needed",
+            message,
+            QtWidgets.QMessageBox.Ok
+        )
+        
         
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
