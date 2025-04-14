@@ -4,8 +4,9 @@ import httpx
 BASE_URL = "http://16.170.211.11:8000"
 
 class intermediaryScript():
-    def getUserID(self, user_id: str):
-        url = f"{BASE_URL}/moods/userID/getUserID/{user_id}"
+##WORKS
+    def getUserID(self, username: str):
+        url = f"{BASE_URL}/moods/userID/getUserID/{username}"
         try:
             response = httpx.get(url)
             response.raise_for_status()
@@ -15,8 +16,9 @@ class intermediaryScript():
         except Exception as e:
             print(f"Error: {str(e)}")
 
-    def getUsername(self, username: str):
-        url = f"{BASE_URL}/moods/username/getUsername/{username}"
+##WORKS
+    def getUsername(self, user_id: str):
+        url = f"{BASE_URL}/moods/username/getUsername/{user_id}"
         try:
             response = httpx.get(url)
             response.raise_for_status()
@@ -26,11 +28,11 @@ class intermediaryScript():
         except Exception as e:
             print(f"Error: {str(e)}")
 
-    ##DO I NEED TO RETURN ANYTHING?
-    def insertMood(self, username: str):
+##NEEDS TO BE FIXED
+    def insertMood(self, username: str, body: __dict__):
         url = f"{BASE_URL}/moods/{username}/insert"
         try:
-            response = httpx.get(url)
+            response = httpx.post(url)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:
@@ -49,11 +51,11 @@ class intermediaryScript():
         except Exception as e:
             print(f"Error: {str(e)}")
 
-    ##DO I NEED TO RETURN ANYTHING?
+
     def addCustomActivity(self, username: str):
         url = f"{BASE_URL}/accounts/{username}/addActivity"
         try:
-            response = httpx.get(url)
+            response = httpx.post(url)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:
@@ -61,22 +63,11 @@ class intermediaryScript():
         except Exception as e:
             print(f"Error: {str(e)}")
 
-    def getMonthlyFactorList(self, username: str, month: int, year: int, factor: str):
-        url = f"{BASE_URL}/moods/monthly/{username}/{month}/{year}/{factor}"
-        try:
-            response = httpx.get(url)
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
-        except Exception as e:
-            print(f"Error: {str(e)}")
 
-    ##DO I NEED TO RETURN ANYTHING?
     def updateMood(self, username: str):
         url = f"{BASE_URL}/moods/{username}/update"
         try:
-            response = httpx.get(url)
+            response = httpx.put(url)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:
@@ -84,11 +75,11 @@ class intermediaryScript():
         except Exception as e:
             print(f"Error: {str(e)}")
 
-    ##DO I NEED TO RETURN ANYTHING?
+##FAILING
     def deleteAllMoods(self, username: str):
         url = f"{BASE_URL}/moods/{username}/delete"
         try:
-            response = httpx.get(url)
+            response = httpx.delete(url)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:
@@ -96,11 +87,11 @@ class intermediaryScript():
         except Exception as e:
             print(f"Error: {str(e)}")
 
-    ##DO I NEED TO RETURN ANYTHING?
+##WORKS
     def deleteUser(self, username: str):
         url = f"{BASE_URL}/accounts/{username}/delete"
         try:
-            response = httpx.get(url)
+            response = httpx.delete(url)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:
@@ -108,6 +99,7 @@ class intermediaryScript():
         except Exception as e:
             print(f"Error: {str(e)}")
 
+##FAILS
     def hasLoggedIn(self, username: str, date: str):
         url = f"{BASE_URL}/moods/{username}/hasLoggedIn/{date}"
         try:
@@ -119,7 +111,57 @@ class intermediaryScript():
         except Exception as e:
             print(f"Error: {str(e)}")
 
+##FAILS
+    def nhsSearch(self):
+        url = f"{BASE_URL}/nhs-search"
+        try:
+            response = httpx.get(url)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
+##BASIC WORKS  - BUT TEST END DATE
+    def getFactorForLastXDays(self, username: str, factor: str, days: int):
+        url = f"{BASE_URL}/moods/lastXDays/{username}/{factor}/{days}"
+        try:
+            response = httpx.get(url)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
+        except Exception as e:
+            print(f"Error: {str(e)}")
+##WORKS
+    def getAverageFactorForLastXDays(self, username: str, factor: str, days: int):
+        url = f"{BASE_URL}/moods/average/{username}/{factor}/{days}"
+        try:
+            response = httpx.get(url)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
+##WORKS
+    def getTopFactorForLastXDays(self, username: str, days: int):
+        url = f"{BASE_URL}/moods/mostPopularMood/{username}/{days}"
+        try:
+            response = httpx.get(url)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
 #testywesty = intermediaryScript()
-#output = testywesty.getMonthlyFactorList("Kenya Park")
+#output = testywesty.hasLoggedIn("sammy", "01-01-2025")
 #print(output)
-       
+
+##VALIDATE DATE FUNCTION HAS LOGGED IN!!
+##VALIDATE MOOD FORMAT INSTER MOOD
+##LOOK INTO BODY THING
