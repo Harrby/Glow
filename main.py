@@ -2,6 +2,7 @@ from PySide6 import QtGui, QtWidgets, QtCore
 import sys
 from PySide6.QtWidgets import QApplication, QStackedWidget
 
+from logQuizWidget import LogQuizWidget
 from signupPage import SignupScreen
 from activitiesWidget import ActivitiesWidget
 from loginWidget import LoginWidget
@@ -111,11 +112,16 @@ class MainWindow(QtWidgets.QMainWindow):
     def show_quizWidget(self, title, input_subtitle, show_date):
         self.quiz_widget = QuizContainer(title=title, input_subtitle=input_subtitle, show_date=show_date)
         # Connect the signal for the new instance
-        self.quiz_widget.main_dashboard.connect(self.show_dashboard_widget)
+        self.quiz_widget.main_dashboard.connect(self.show_logQuiz_widget)
         self.stack.addWidget(self.quiz_widget)
         self.stack.setCurrentWidget(self.quiz_widget)
 
-    # --- New show_() methods for additional widgets/containers ---
+    def show_logQuiz_widget(self):
+        self.logQuiz_widget = LogQuizWidget()
+        self.stack.addWidget(self.logQuiz_widget)
+        self.stack.setCurrentWidget(self.logQuiz_widget)
+
+        self.logQuiz_widget.logQuizNext.connect(self.show_dashboard_widget)
 
     def show_signup_screen(self):
         self.signup_screen = SignupScreen()
