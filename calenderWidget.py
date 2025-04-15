@@ -380,7 +380,9 @@ class CalenderContainer(QtWidgets.QWidget):
         """
         month, year = self.get_month_and_year_from_index(self.global_month_index)
         self.months.append(MonthData(month, year, self.generate_month_data(year, month)))
-        self.calender_frame_widgets.append(CalenderFrame(self.months[self.global_month_index].days))
+        self.calender_frame_widgets.append(CalenderFrame(
+            self.months[self.global_month_index]
+        ))
         self.v_layout.insertWidget(self.v_layout.count() - 1, self.calender_frame_widgets[self.global_month_index])
 
     def left_button_clicked(self) -> None:
@@ -1028,6 +1030,8 @@ class DiaryEntryWidget(QtWidgets.QFrame):
 
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
+        # self.setToolTip("double click to edit")
+
         self.expanded = False
         self.collapsed_height = 120
         self.setMinimumHeight(120)
@@ -1050,11 +1054,19 @@ class DiaryEntryWidget(QtWidgets.QFrame):
             self.entry_text = "No diary entry for this day."
 
         print(self.entry_text)
-        self.diary_text_label = QtWidgets.QLabel(self.entry_text)
+        self.diary_text_label = ClickableLabel(self.entry_text)
+        self.diary_text_label.doubleClicked.connect(self.enable_editing)
         self.diary_text_label.setFont(font_content)
         self.diary_text_label.setWordWrap(True)
         self.diary_text_label.setMaximumWidth(800)
         self.diary_text_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
+        self.text_edit = EditableTextEdit(self.entry_text)
+        self.text_edit.setFont(font_content)
+        self.text_edit.setMaximumWidth(800)
+        self.text_edit.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.text_edit.hide()
+        self.text_edit.requestSave.connect(self.save_edit_text)
 
         self.expand_button = ImageButton(39, 21, "resources/images/down_arrow.png", False)
         self.expand_button.setToolTip("expand")
@@ -1065,6 +1077,7 @@ class DiaryEntryWidget(QtWidgets.QFrame):
         layout.setContentsMargins(25, 10, 25, 10)
 
         layout.addWidget(self.diary_text_label)
+        layout.addWidget(self.text_edit)
         layout.addWidget(self.expand_button, alignment=QtCore.Qt.AlignTop)
 
         self.setFixedHeight(self.collapsed_height)
@@ -1095,6 +1108,59 @@ class DiaryEntryWidget(QtWidgets.QFrame):
             new_entry = "No diary entry for this day."
         print("text was set to", new_entry)
         self.diary_text_label.setText(new_entry)
+
+    def enable_editing(self):
+        print("editing mode")
+        self.text_edit.setPlainText(self.diary_text_label.text())
+        self.diary_text_label.hide()
+        self.text_edit.show()
+        self.text_edit.setFocus()
+
+    def save_edit_text(self):
+        print("saved")
+        new_text = self.text_edit.toPlainText()
+        self.diary_text_label.setText(new_text)
+        self.entry_text = new_text
+        self.text_edit.hide()
+        self.diary_text_label.show()
+
+
+class ClickableLabel(QtWidgets.QLabel):
+    doubleClicked = QtCore.Signal()
+
+    def mouseDoubleClickEvent(self, event) -> None:
+        self.doubleClicked.emit()
+        super().mouseDoubleClickEvent(event)
+
+
+class EditableTextEdit(QtWidgets.QTextEdit):
+    requestSave = QtCore.Signal()
+
+    def __init__(self, text: str, parent=None):
+        super().__init__(text, parent)
+
+        self.setStyleSheet("""
+            QTextEdit {
+                border: none;
+                background-color: transparent;
+                outline: none;
+            }
+        """)
+
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+
+    def keyPressEvent(self, event) -> None:
+        if event.key() in (QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter):
+            self.requestSave.emit()
+        else:
+            super().keyPressEvent(event)
+
+    def focusOutEvent(self, event) -> None:
+        self.requestSave.emit()
+        super().focusOutEvent(event)
+
+
 
 
 class DiaryStatContainer(QtWidgets.QFrame):
