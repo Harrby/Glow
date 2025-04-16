@@ -85,6 +85,7 @@ class CalenderContainer(QtWidgets.QWidget):
         """
 
     request_exit = QtCore.Signal()
+
     def __init__(self):
         super().__init__()
 
@@ -160,7 +161,6 @@ class CalenderContainer(QtWidgets.QWidget):
             self.v_layout.addWidget(calender_frame_widget)
 
         self.v_layout.addSpacing(35)
-
 
         main_layout = QtWidgets.QVBoxLayout()
         main_layout.addLayout(h_title_layout)
@@ -892,7 +892,6 @@ class CalenderZoomInWidget(QtWidgets.QFrame):
 
         self.setStyleSheet("""QLabel{color: white;}""")
 
-
         quicksand_medium_title = QtGui.QFont("Quicksand Medium", 96)
         quicksand_medium_content = QtGui.QFont("Quicksand Medium", 28)
         diary_entry_font = QtGui.QFont("Quicksand Medium", 32)
@@ -912,6 +911,7 @@ class CalenderZoomInWidget(QtWidgets.QFrame):
         # this seems a bit hacky
 
         self.diary_entry_widget = DiaryEntryWidget("")
+        # self.diary_entry_widget.UserEditedText.connect()
 
         self.mood_stat_container = DiaryStatContainer("Mood")
         self.screen_time_stat_container = DiaryStatContainer("Screen time")
@@ -986,7 +986,6 @@ class CalenderZoomInWidget(QtWidgets.QFrame):
         :param mood: string e.g 'happy'
         :return:
         """
-        print("setting modd pix to ", mood)
         self.mood_pixmap = QtGui.QPixmap(f"resources/images/{mood}.png")
         scaled_pixmap = self.mood_pixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         self.mood_img_label.setPixmap(scaled_pixmap)
@@ -995,11 +994,11 @@ class CalenderZoomInWidget(QtWidgets.QFrame):
         self.diary_entry_widget.set_diary_entry_text(entry)
 
     def set_stat_labels(self):
-        self.mood_stat_container.set_content_text(f"{self.mood}")
-        self.screen_time_stat_container.set_content_text(f"{self.screen_time} hours")
-        self.exercise_stat_container.set_content_text(f"{self.exercise} minutes")
-        self.alcohol_stat_container.set_content_text(f"{self.alcohol} units")
-        self.sleep_stat_container.set_content_text(f"{self.sleep} hours")
+        self.mood_stat_container.set_content_text(str(self.mood), "")
+        self.screen_time_stat_container.set_content_text(str(self.screen_time), "hours")
+        self.exercise_stat_container.set_content_text(str(self.exercise), "minutes")
+        self.alcohol_stat_container.set_content_text(str(self.alcohol), "units")
+        self.sleep_stat_container.set_content_text(str(self.sleep) ,"hours")
 
 
 class DiaryEntryWidget(QtWidgets.QFrame):
@@ -1024,6 +1023,7 @@ class DiaryEntryWidget(QtWidgets.QFrame):
         Author: Harry
         Created: 04-04-2025
     """
+    UserEditedText = QtCore.Signal(str)
 
     def __init__(self, entry_text="", parent=None):
         super().__init__(parent)
@@ -1048,8 +1048,6 @@ class DiaryEntryWidget(QtWidgets.QFrame):
 
         font_content = QtGui.QFont("Quicksand Medium", 24)
         font_content.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        print("entry text is")
-        print(self.entry_text)
         if self.entry_text == "":
             self.entry_text = "No diary entry for this day."
 
@@ -1090,7 +1088,6 @@ class DiaryEntryWidget(QtWidgets.QFrame):
         self.setGraphicsEffect(drop_shadow_effect)
 
     def on_toggle_expand(self):
-        print("button was clicked")
         if self.expanded:
             self.expand_button.set_new_icon("resources/images/down_arrow.png", 39, 21)
             self.setFixedHeight(self.collapsed_height)
@@ -1106,21 +1103,20 @@ class DiaryEntryWidget(QtWidgets.QFrame):
     def set_diary_entry_text(self, new_entry: str):
         if new_entry is None:
             new_entry = "No diary entry for this day."
-        print("text was set to", new_entry)
         self.diary_text_label.setText(new_entry)
 
     def enable_editing(self):
-        print("editing mode")
         self.text_edit.setPlainText(self.diary_text_label.text())
         self.diary_text_label.hide()
         self.text_edit.show()
         self.text_edit.setFocus()
 
     def save_edit_text(self):
-        print("saved")
         new_text = self.text_edit.toPlainText()
         self.diary_text_label.setText(new_text)
-        self.entry_text = new_text
+        if self.entry_text != new_text:
+            self.UserEditedText.emit(new_text)
+            self.entry_text = new_text
         self.text_edit.hide()
         self.diary_text_label.show()
 
@@ -1161,8 +1157,6 @@ class EditableTextEdit(QtWidgets.QTextEdit):
         super().focusOutEvent(event)
 
 
-
-
 class DiaryStatContainer(QtWidgets.QFrame):
     """
         A container for displaying a single diary statistic with a title and corresponding value.
@@ -1184,22 +1178,47 @@ class DiaryStatContainer(QtWidgets.QFrame):
         Author: Harry
         Created: 04-04-2025
     """
-    def __init__(self, title_text: str = "", content_text: str = ""):
+    UserEditedValue = QtCore.Signal(str)
+
+    def __init__(self, title_text: str = "", content_value: str = "", content_unit: str = ""):
         super().__init__()
+
+        self.title_to_check_dict = {"Mood": self.valid_mood_input, "Screen time": self.valid_screen_time,
+                                    "Exercise": self.valid_exercise_input, "Alcohol": self.valid_alcohol_input,
+                                    "Sleep": self.valid_sleep_input}
+
+        if content_unit == "":
+            self.content_label_width = 303
+            self.content_unit_label_width = 0
+        else:
+            self.content_label_width = 128
+            self.content_unit_label_width = 175
 
         quicksand_medium_content = QtGui.QFont("Quicksand Medium", 36)
         quicksand_medium_content.setStyleStrategy(QtGui.QFont.PreferAntialias)
 
         self.title_text = title_text
-        self.content_text = content_text
+        self.content_value = content_value
+        self.content_unit = content_unit
 
         self.title_label = QtWidgets.QLabel(self.title_text, alignment=QtCore.Qt.AlignLeft)
-        self.content_label = QtWidgets.QLabel(self.content_text)
+        self.content_label = ClickableLabel(self.content_value)
+        self.content_label.doubleClicked.connect(self.enable_editing)
+        self.content_unit_label = QtWidgets.QLabel(self.content_unit)
         self.title_label.setFont(quicksand_medium_content)
         self.content_label.setFont(quicksand_medium_content)
+        self.content_unit_label.setFont(quicksand_medium_content)
+
+        self.text_edit = EditableTextEdit(self.content_value)
+        self.text_edit.hide()
+        self.text_edit.requestSave.connect(self.save_edit_text)
+        self.text_edit.setFont(quicksand_medium_content)
+        self.text_edit.setFixedWidth(self.content_label_width)
+        self.text_edit.setFixedHeight(80)
 
         self.title_label.setFixedWidth(270)
-        self.content_label.setFixedWidth(260)
+        self.content_label.setFixedWidth(self.content_label_width)
+        self.content_unit_label.setFixedWidth(self.content_unit_label_width)
 
         self.firefly_pixmap = QtGui.QPixmap("resources/images/movingFirefly.png")
         self.firefly_label = QtWidgets.QLabel()
@@ -1208,17 +1227,92 @@ class DiaryStatContainer(QtWidgets.QFrame):
         h_layout = QtWidgets.QHBoxLayout()
         h_layout.addStretch(1)
         h_layout.addWidget(self.title_label)
+        h_layout.addSpacing(30)
         h_layout.addWidget(self.firefly_label)
+        h_layout.addSpacing(30)
         h_layout.addWidget(self.content_label)
+        h_layout.addWidget(self.text_edit)
+        h_layout.addSpacing(5)
+        h_layout.addWidget(self.content_unit_label)
         h_layout.addStretch(1)
-        h_layout.setSpacing(30)
         h_layout.setContentsMargins(0, 0, 0, 0)
 
         self.setLayout(h_layout)
 
-    def set_content_text(self, new_content_text: str) -> None:
-        self.content_text = new_content_text
-        self.content_label.setText(self.content_text)
+    def set_content_text(self, new_content_value: str, new_content_unit: str) -> None:
+        self.content_value = new_content_value
+        self.content_unit = new_content_unit
+        self.content_label.setText(self.content_value)
+        self.content_unit_label.setText(self.content_unit)
+
+        if new_content_unit == "":
+            self.content_label_width = 303
+            self.content_unit_label_width = 0
+        else:
+            self.content_label_width = 128
+            self.content_unit_label_width = 175
+
+        self.resize_labels()
+
+    def resize_labels(self):
+        self.content_label.setFixedWidth(self.content_label_width)
+        self.content_unit_label.setFixedWidth(self.content_unit_label_width)
+        self.text_edit.setFixedWidth(self.content_label_width)
+
+    @QtCore.Slot()
+    def enable_editing(self):
+        self.text_edit.setPlainText(self.content_label.text())
+        self.content_label.hide()
+        self.text_edit.show()
+        self.text_edit.setFocus()
+
+    @QtCore.Slot()
+    def save_edit_text(self):
+        new_text = self.text_edit.toPlainText()
+        if self.content_value != new_text and self.check_legal_input(new_text):
+            self.content_label.setText(new_text)
+            self.UserEditedValue.emit(new_text)
+            self.content_value = new_text
+            self.content_label.setText(self.content_value)
+        self.text_edit.hide()
+        self.content_label.show()
+
+    def check_legal_input(self, new_input: str) -> bool:
+        print("checked if legal input")
+        self.title_to_check_dict = {"Mood": self.valid_mood_input, "Screen time": self.valid_screen_time,
+                                   "Exercise": self.valid_exercise_input, "Alcohol": self.valid_alcohol_input,
+                                   "Sleep": self.valid_sleep_input }
+        try:
+            return self.title_to_check_dict[self.title_text](new_input)
+        except :
+            return False
+
+    @staticmethod
+    def valid_mood_input(mood: str) -> bool:
+        moods = {
+            "Excited", "Happy", "Proud", "Content", "Unsure",
+            "Sick", "Stressed", "Angry", "Sad", "Tired"
+        }
+        if mood.title() in moods:
+            return True
+        return False
+
+    @staticmethod
+    def valid_screen_time(screen_time: str) -> bool:
+
+        return 0 <= float(screen_time) <= 24
+
+    @staticmethod
+    def valid_exercise_input(exercise: str) -> bool:
+        return 0 <= int(exercise) <= 1440
+
+    @staticmethod
+    def valid_alcohol_input(alcohol: str):
+        return 0 <= float(alcohol)
+
+    @staticmethod
+    def valid_sleep_input(sleep: str) -> bool:
+        return 0 <= float(sleep) <= 24
 
 
 if __name__ == "__main__":
