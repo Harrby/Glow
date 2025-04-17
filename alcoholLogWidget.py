@@ -2,6 +2,7 @@ from PySide6 import QtGui, QtCore, QtWidgets
 import sys
 from buttons.imageButton import ImageButton
 from buttons.textButton import TextButton
+from unitsCard import UnitsCardWidget
 
 
 class AlcoholLogContainer(QtWidgets.QWidget):
@@ -118,16 +119,22 @@ class AlcoholLogWidget(QtWidgets.QFrame):
         buttons_v_layout.addWidget(self.alcohol_tips_button, 1)
         buttons_v_layout.addWidget(self.suggestions_button, 1)
         buttons_v_layout.setSpacing(50)
-        buttons_v_layout.setContentsMargins(300, 0, 300, 0)
+        buttons_v_layout.setContentsMargins(100, 0, 100, 100)
+        
+        # get existing data from quiz?
+        card = UnitsCardWidget(units=5)
+        main_h_layout = QtWidgets.QHBoxLayout()
+        main_h_layout.addLayout(buttons_v_layout, 1)
+        main_h_layout.addWidget(card, 1)
+        main_h_layout.setAlignment(QtCore.Qt.AlignCenter)
 
         layout = QtWidgets.QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 50)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(20)
 
         # Add widgets to layout
         layout.addLayout(title_h_layout)
-        layout.addLayout(buttons_v_layout, 1)
-
+        layout.addLayout(main_h_layout)
         self.setLayout(layout)
 
     def paintEvent(self, event) -> None:
