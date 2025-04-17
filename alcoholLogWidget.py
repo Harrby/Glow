@@ -58,7 +58,7 @@ class AlcoholLogWidget(QtWidgets.QFrame):
         Frame containing buttons of different options.
 
         Authors:
-            Harry + Seb
+            Harry + Seb + James
 
     """
     RequestWeeklyAnalytics = QtCore.Signal()
