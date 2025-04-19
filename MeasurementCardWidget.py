@@ -3,7 +3,7 @@ from PySide6 import QtWidgets, QtGui, QtCore
 
 class MeasurementCardWidget(QtWidgets.QFrame):
     """author: James"""
-    def __init__(self, number=5, class_name="sleep", parent=None):
+    def __init__(self, number=5, class_name="alcohol", parent=None):
         super().__init__(parent)
         self.number = number
         self.class_name = class_name.lower()
@@ -54,14 +54,14 @@ class MeasurementCardWidget(QtWidgets.QFrame):
         self.setLayout(v_widget)
 
     def get_background_image_path(self):
-        """Returns the appropriate background image path based on the category."""
+        """Returns the appropriate background image path based on the class_name."""
         image_paths = {
             "alcohol": "resources/images/alcohol_images/box_design.png",
             "exercise": "resources/images/exercise_images/box_design.png",
             "sleep": "resources/images/sleep_images/box_design.png",
             "screen time": "resources/images/screen_images/box_design.png"
         }
-        return image_paths.get(self.category, "resources/images/alcohol_images/box_design.png")  # fallback default
+        return image_paths.get(self.class_name, "resources/images/alcohol_images/box_design.png")  # fallback default
 
     def get_measurement_label(self):
         if self.class_name in ["exercise", "sleep", "screen time"]:
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     window.setMinimumSize(300, 220)
 
     # Change class_name to test different categories
-    card = MeasurementCardWidget(number=5, class_name="sleep")
+    card = MeasurementCardWidget(number=5, class_name="alcohol")
     central_widget = QtWidgets.QWidget(window)
     layout = QtWidgets.QVBoxLayout(central_widget)
     layout.addWidget(card)

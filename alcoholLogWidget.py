@@ -2,8 +2,7 @@ from PySide6 import QtGui, QtCore, QtWidgets
 import sys
 from buttons.imageButton import ImageButton
 from buttons.textButton import TextButton
-from unitsCard import UnitsCardWidget
-
+from MeasurementCardWidget import MeasurementCardWidget
 
 class AlcoholLogContainer(QtWidgets.QWidget):
     """
@@ -122,7 +121,7 @@ class AlcoholLogWidget(QtWidgets.QFrame):
         buttons_v_layout.setContentsMargins(100, 0, 100, 100)
         
         # get existing data from quiz?
-        card = UnitsCardWidget(units=5)
+        card = MeasurementCardWidget(number=5, class_name="alcohol")
         main_h_layout = QtWidgets.QHBoxLayout()
         main_h_layout.addLayout(buttons_v_layout, 1)
         main_h_layout.addWidget(card, 1)
