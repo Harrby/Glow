@@ -53,16 +53,15 @@ class MeasurementCardWidget(QtWidgets.QFrame):
         v_widget.setAlignment(QtCore.Qt.AlignCenter)
         self.setLayout(v_widget)
 
-        def get_background_image_path(self):
-            """Returns the appropriate background image path based on the category."""
-            image_paths = {
-                "alcohol": "resources/images/alcohol_images/box_design.png",
-                "exercise": "resources/images/exercise_images/box_design.png",
-                "sleep": "resources/images/sleep_images/box_design.png",
-                "screen time": "resources/images/screen_images/box_design.png"
-            }
-            return image_paths.get(self.category, "resources/images/alcohol_images/box_design.png")  # fallback default
-
+    def get_background_image_path(self):
+        """Returns the appropriate background image path based on the category."""
+        image_paths = {
+            "alcohol": "resources/images/alcohol_images/box_design.png",
+            "exercise": "resources/images/exercise_images/box_design.png",
+            "sleep": "resources/images/sleep_images/box_design.png",
+            "screen time": "resources/images/screen_images/box_design.png"
+        }
+        return image_paths.get(self.category, "resources/images/alcohol_images/box_design.png")  # fallback default
 
     def get_measurement_label(self):
         if self.class_name in ["exercise", "sleep", "screen time"]:
