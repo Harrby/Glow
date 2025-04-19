@@ -1,5 +1,6 @@
 import sys
-
+from globalState import AppContext
+from buttons.imageButton import ImageButton
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QColor, QPainter
@@ -16,6 +17,8 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QCheckBox
 )
+#import intermediaryScript as inter
+
 
 class ProfileWidget(QWidget):
 
@@ -66,26 +69,17 @@ class ProfileWidget(QWidget):
         top_bar_layout = QHBoxLayout()
         self.username = self.context.username
 
+        self.close_button = ImageButton(50, 50, "resources/images/alcohol_images/close.png", False)
+        self.close_button.setFixedSize(50, 50)
+
         username_label = QLabel(self.username)
         username_label.setFont(quicksand_medium_content)
         # Set text color to black along with font sizing
         username_label.setStyleSheet("color: black;")
         top_bar_layout.addWidget(username_label, alignment=Qt.AlignVCenter)
 
-        exit_button = QPushButton("X", font=quicksand_medium_content)
-        exit_button.setFixedSize(24, 24)
-        exit_button.setStyleSheet("""
-            QPushButton {
-                border: none;
-                background: transparent;
-                color: black;
-            }
-            QPushButton:hover {
-                color: red;
-            }
-        """)
-        exit_button.clicked.connect(self.dashboard_widget.emit)
-        top_bar_layout.addWidget(exit_button, alignment=Qt.AlignVCenter)
+        self.close_button.clicked.connect(self.dashboard_widget.emit)
+        top_bar_layout.addWidget(self.close_button, alignment=Qt.AlignRight)
         container_layout.addStretch()
         container_layout.addLayout(top_bar_layout)
 
@@ -96,7 +90,7 @@ class ProfileWidget(QWidget):
         # --- Editing checkbox style ---
         checkbox_style = """
                     QCheckBox::indicator:checked {
-                        background-image: url(resources/images/checked.png);
+                        background-image: url(resources/images/editing.png);
                         background-repeat: no-repeat;
                         background-position: center;
                         background-color: #4B4A63;
@@ -135,15 +129,16 @@ class ProfileWidget(QWidget):
             lbl = QLabel(field[0])
             lbl.setFont(quicksand_medium_content)
             lbl.setStyleSheet(label_style)
-
-            chckbox = QCheckBox(font=quicksand_medium_content)
-            chckbox.setStyleSheet(checkbox_style)
-            self.checkboxes.append(chckbox)
-            chckbox.toggled.connect(self.toggle_info_fields)
-
             field_layout.addWidget(lbl)
             field_layout.addWidget(info)
-            field_layout.addWidget(chckbox)
+
+            if user_info.index(field) != 4:
+                chckbox = QCheckBox(font=quicksand_medium_content)
+                chckbox.setStyleSheet(checkbox_style)
+                self.checkboxes.append(chckbox)
+                chckbox.toggled.connect(self.toggle_info_fields)
+
+                field_layout.addWidget(chckbox)
 
             container_layout.addLayout(field_layout)
         container_layout.addStretch()
@@ -196,19 +191,21 @@ class ProfileWidget(QWidget):
             This will fetch the name, age, sports, hobbies and sex of the current user.
         :return:
         """
-        # name = inter.intermediaryScript.getName(username)
-        # age = inter.intermediaryScript.getAge(username)
-        # sports = inter.intermediaryScript.getSports(username)
-        # hobbies = inter.intermediaryScript.getHobbies(username)
-        # sex = inter.intermediaryScript.getSex(username)
-        # return name, age, sports, hobbies, sex
+        #data = inter.getProfileDate(username)
+        data = {"name" : "ruby",
+                "age" : "18",
+                "sports" : ["Cheerleading, Hockey"],
+                "hobbies" : ["Knitting, Reading"],
+                "sex" : "Female"}
+        sports = ", ".join(data["sports"])
+        hobbies = ", ".join(data["hobbies"])
 
         user_info_texts = [
-            "Ruby",
-            "18",
-            "Cheerleading",
-            "Chess, Photography",
-            "Female"
+            data["name"],
+            data["age"],
+            sports,
+            hobbies,
+            data["sex"]
         ]
         return user_info_texts[0], user_info_texts[1], user_info_texts[2], user_info_texts[3], user_info_texts[4]
 
@@ -235,15 +232,17 @@ class ProfileWidget(QWidget):
         :return:
         """
         info = []
-        for field in self.input_lines:
+        for field in self.input_lines[:4]:
             info.append(field.text())
+        info[2] = info[2].split(", ")
+        info[3] = info[3].split(", ")
         return info
 
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = ProfileWidget()
+    window = ProfileWidget(AppContext())
     window.show()
     window.dashboard_widget.connect(lambda: print("dashboard_widget signal"))
     sys.exit(app.exec())
