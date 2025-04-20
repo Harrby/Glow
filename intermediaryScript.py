@@ -40,6 +40,7 @@ class intermediaryScript():
         except Exception as e:
             print(f"Error: {str(e)}")
 
+##WORKS
     def getRandomActivity(self, username: str):
         url = f"{BASE_URL}/moods/{username}/random_activity"
         try:
@@ -51,7 +52,7 @@ class intermediaryScript():
         except Exception as e:
             print(f"Error: {str(e)}")
 
-
+##CHECK ME
     def addCustomActivity(self, username: str):
         url = f"{BASE_URL}/accounts/{username}/addActivity"
         try:
@@ -63,7 +64,7 @@ class intermediaryScript():
         except Exception as e:
             print(f"Error: {str(e)}")
 
-
+##CHECK ME
     def updateMood(self, username: str):
         url = f"{BASE_URL}/moods/{username}/update"
         try:
@@ -75,7 +76,7 @@ class intermediaryScript():
         except Exception as e:
             print(f"Error: {str(e)}")
 
-##FAILING
+##CHECK ME
     def deleteAllMoods(self, username: str):
         url = f"{BASE_URL}/moods/{username}/delete"
         try:
@@ -99,7 +100,7 @@ class intermediaryScript():
         except Exception as e:
             print(f"Error: {str(e)}")
 
-##FAILS
+##CHECK ME
     def hasLoggedIn(self, username: str, date: str):
         url = f"{BASE_URL}/moods/{username}/hasLoggedIn/{date}"
         try:
@@ -151,6 +152,90 @@ class intermediaryScript():
         url = f"{BASE_URL}/moods/mostPopularMood/{username}/{days}"
         try:
             response = httpx.get(url)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
+##CHECK ME
+    def getAccount(self, username: str):
+        url = f"{BASE_URL}/account/{username}"
+        try:
+            response = httpx.get(url)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
+##CHECK ME
+    def getMoodEntry(self, username: str, date: str):
+        url = f"{BASE_URL}/moods/{username}/getMoodEntry/{date}"
+        try:
+            response = httpx.get(url)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
+##CHECK ME - BODY
+    def addExerciseEntry(self, username: str, body: __dict__):
+        url = f"{BASE_URL}/exercise/{username}/insert"
+        try:
+            response = httpx.post(url)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
+##CHECK ME - BODY
+    def tryLogin(self, body: __dict__):
+        url = f"{BASE_URL}/accounts/login"
+        try:
+            response = httpx.post(url)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
+##CHECK ME - BODY
+    def trySignup(self, body: __dict__):
+        url = f"{BASE_URL}/accounts/signup"
+        try:
+            response = httpx.post(url)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
+##CHECK ME - BODY
+    def addCustomHobby(self, username: str, body: __dict__):
+        url = f"{BASE_URL}/accounts/{username}/addHobby"
+        try:
+            response = httpx.post(url)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
+##CHECK ME
+    def updateProfile(self, username: str):
+        url = f"{BASE_URL}/accounts/{username}/update"
+        try:
+            response = httpx.put(url)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:
