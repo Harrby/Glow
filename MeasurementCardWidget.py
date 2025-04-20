@@ -26,6 +26,8 @@ class MeasurementCardWidget(QtWidgets.QFrame):
         self.num_edit.setAlignment(QtCore.Qt.AlignCenter)
         self.num_edit.setFrame(False)
         self.num_edit.setStyleSheet("background: transparent; border: none; color: #3C2A3E;")
+        self.num_edit.setValidator(QtGui.QIntValidator(0, 999))
+
         self.num_edit.hide()
         self.num_edit.editingFinished.connect(self.finish_edit)
         
