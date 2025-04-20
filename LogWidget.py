@@ -8,7 +8,7 @@ class Log(QtWidgets.QWidget):
     """
         Container for all logging stuff.
         Authors:
-            Harry
+            Harry + James
 
     """
     RequestExit = QtCore.Signal()
