@@ -3,6 +3,7 @@ import sys
 from buttons.imageButton import ImageButton
 from buttons.textButton import TextButton
 from MeasurementCardWidget import MeasurementCardWidget
+from resources.extra_classes.ScalablePixmapLabel import ScalablePixmapLabel
 
 class Log(QtWidgets.QWidget):
     """
@@ -13,7 +14,7 @@ class Log(QtWidgets.QWidget):
     """
     RequestExit = QtCore.Signal()
 
-    def __init__(self, page="sleep", name="Name"): 
+    def __init__(self, page="alcohol", name="Name"): 
         super().__init__()
         self.page = page
         self.name = name
@@ -199,38 +200,52 @@ class LogWidget(QtWidgets.QFrame):
 #Button 1 clicked
 class WeeklyAnalyticsWidget(QtWidgets.QFrame):
     """
-            Frame for weekly analytics
-
-            Authors:
-                Harry
-
-        """
+    Frame for weekly analytics (placeholder background + title only)
+    Authors: Harry + James
+    """
     RequestExit = QtCore.Signal()
 
-    def __init__(self, page="sleep"): 
+    PAGE_CONFIGS = {
+        "sleep":   {"bg_color": QtGui.QColor(133,200,220,255)},
+        "exercise":{"bg_color": QtGui.QColor(173,226,187,255)},
+        "screen time":{"bg_color": QtGui.QColor(172,176,255,255)},
+        "alcohol": {"bg_color": QtGui.QColor(235,149,115,255)},  
+    }
+
+    def __init__(self, page="sleep"):  
         super().__init__()
         self.page = page
+        cfg = self.PAGE_CONFIGS.get(page, {})
 
-        background_img = QtGui.QPixmap("resources/images/alcohol_images/subWidgetBackground.png")
-        self.pixmap = background_img
+        # set background color
+        bg = cfg.get("bg_color")
+        if bg:
+            pal = self.palette()
+            pal.setColor(QtGui.QPalette.Window, bg)
+            self.setAutoFillBackground(True)
+            self.setPalette(pal)
 
+        # Close button
         self.close_button = ImageButton(50, 50, "resources/images/alcohol_images/close.png", False)
-        self.close_button.setFixedSize(50, 50)
         self.close_button.clicked.connect(self.RequestExit)
 
-        v_layout = QtWidgets.QVBoxLayout()
-        v_layout.addWidget(self.close_button, alignment=QtCore.Qt.AlignRight)
-        v_layout.addStretch(1)
+        # Title label
+        self.title_label = QtWidgets.QLabel("Weekly Analytics")
+        font = QtGui.QFont("Quicksand Medium", 24)
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.title_label.setFont(font)
+        self.title_label.setAlignment(QtCore.Qt.AlignCenter)
 
-        self.setLayout(v_layout)
+        # layout
+        v = QtWidgets.QVBoxLayout(self)
+        v.setContentsMargins(20, 20, 20, 20)
+        v.addWidget(self.close_button, alignment=QtCore.Qt.AlignRight)
+        v.addWidget(self.title_label)
+        v.addStretch(1)
+        self.setLayout(v)
 
-    def paintEvent(self, event) -> None:
-        """
-        Draws the background image to the correct size on resize.
-        :param event:
-        """
-        painter = QtGui.QPainter(self)
-        painter.drawPixmap(self.rect(), self.pixmap)
+    def paintEvent(self, event):
+        super().paintEvent(event)
 
 #Button 2 clicked
 class TipsWidget(QtWidgets.QFrame):
@@ -329,7 +344,7 @@ class TipsWidget(QtWidgets.QFrame):
         super().resizeEvent(event)
         self.update_main_tips_pixmap()
 
-#button 2 exercise clicked
+#button 2 pressed exercise
 class ActivityBreakdown(QtWidgets.QFrame):
     """
     Frame for exercise activity
@@ -338,7 +353,7 @@ class ActivityBreakdown(QtWidgets.QFrame):
         James
     """
     RequestExit = QtCore.Signal()
-    
+
     def __init__(self, page="exercise"):
         super().__init__()
         self.page = page
@@ -359,29 +374,23 @@ class ActivityBreakdown(QtWidgets.QFrame):
         title_label.setFont(title_font)
         title_label.setAlignment(QtCore.Qt.AlignCenter)
 
-       # First image widget
-        image1_label = QtWidgets.QLabel()
-        pixmap1 = QtGui.QPixmap("resources/images/exercise_images/week_pie.png")  
-        image1_label.setPixmap(pixmap1)
-        image1_label.setAlignment(QtCore.Qt.AlignCenter)
-        image1_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        # First scalable image
+        pixmap1 = QtGui.QPixmap("resources/images/exercise_images/week_pie.png")
+        image1_label = ScalablePixmapLabel(pixmap1, scale_ratio=0.45, parent=self)
 
-        # Second image widget
-        image2_label = QtWidgets.QLabel()
-        pixmap2 = QtGui.QPixmap("resources/images/exercise_images/month_pie.png") 
-        image2_label.setPixmap(pixmap2)
-        image2_label.setAlignment(QtCore.Qt.AlignCenter)
-        image2_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        # Second scalable image
+        pixmap2 = QtGui.QPixmap("resources/images/exercise_images/month_pie.png")
+        image2_label = ScalablePixmapLabel(pixmap2, scale_ratio=0.45, parent=self)
 
         # Layout setup
-
         h_layout = QtWidgets.QHBoxLayout()
         h_layout.addWidget(image1_label)
         h_layout.addWidget(image2_label)
-        
+
         v_layout = QtWidgets.QVBoxLayout()
         v_layout.addWidget(self.close_button, alignment=QtCore.Qt.AlignRight)
         v_layout.addWidget(title_label)
+        v_layout.addStretch(1)
         v_layout.addLayout(h_layout)
         v_layout.addStretch(1)
 
@@ -389,9 +398,16 @@ class ActivityBreakdown(QtWidgets.QFrame):
 
     def paintEvent(self, event) -> None:
         painter = QtGui.QPainter(self)
-        background_color = QtGui.QColor(173, 226, 187)  
+        background_color = QtGui.QColor(173, 226, 187)
         painter.fillRect(self.rect(), background_color)
-        painter.drawPixmap(self.rect(), self.pixmap)
+        scaled_pixmap = self.pixmap.scaled(
+            self.size(),
+            QtCore.Qt.KeepAspectRatioByExpanding,
+            QtCore.Qt.SmoothTransformation
+        )
+        painter.drawPixmap(0, 0, scaled_pixmap)
+
+
 
 
 #Button 3 clicked

@@ -14,7 +14,6 @@ class MeasurementCardWidget(QtWidgets.QFrame):
         self.background = QtWidgets.QLabel(self)
         self.background.setPixmap(QtGui.QPixmap(self.get_background_image_path()))
         self.background.setScaledContents(True)
-
         
         # Main number display label
         self.num_label = QtWidgets.QLabel(str(self.number), self)
