@@ -84,7 +84,7 @@ class ProfileWidget(QWidget):
         username_label.setStyleSheet("color: black;")
         top_bar_layout.addWidget(username_label, alignment=Qt.AlignVCenter)
 
-        self.close_button.clicked.connect(self.dashboard_widget.emit)
+        self.close_button.clicked.connect(self.update_database_profile)
         top_bar_layout.addWidget(self.close_button, alignment=Qt.AlignRight)
         container_layout.addStretch()
         container_layout.addLayout(top_bar_layout)
@@ -129,7 +129,7 @@ class ProfileWidget(QWidget):
             info.setFont(quicksand_medium_content)
             info.setMinimumHeight(50)
             info.setMaximumWidth(1000)
-            info.setPlaceholderText(field[1])
+            info.setText(field[1])
             info.setEnabled(False)
             info.setStyleSheet(input_style)
             self.input_lines.append(info)
@@ -202,7 +202,7 @@ class ProfileWidget(QWidget):
         #data = inter.getProfileDate(username,)
         data = {"name" : self.intScript.getAccount(username=username, detail="name")["name"],
                 "age" : str(self.intScript.getAccount(username=username, detail="age")["age"]),
-                "sports" : self.intScript.getAccount(username=username, detail="activities")["activities"],
+                "sports" : self.intScript.getAccount(username=username, detail="exercises")["exercises"],
                 "hobbies" : self.intScript.getAccount(username=username, detail="hobbies")["hobbies"],
                 "sex" : self.intScript.getAccount(username=username, detail="sex")["sex"]}
         sports = ", ".join(data["sports"])
@@ -217,7 +217,7 @@ class ProfileWidget(QWidget):
         ]
         return user_info_texts[0], user_info_texts[1], user_info_texts[2], user_info_texts[3], user_info_texts[4]
 
-    def toggle_info_fields(self, i):
+    def toggle_info_fields(self):
         """
             Allows the user to change their profile information if the associated edit checkbox is checked.
         :param i:
@@ -246,12 +246,13 @@ class ProfileWidget(QWidget):
         info[3] = info[3].split(", ")
         return info
 
-    def update_database_profile(self, username):
+    def update_database_profile(self):
         info = self.get_updated_info()
-        self.intScript.updateProfile(username=username, body={"detail" : "name", "value" : info[0]})
-        self.intScript.updateProfile(username=username, body={"detail" : "age", "value" : info[1]})
-        self.intScript.updateProfile(username=username, body={"detail" : "sports", "value" : info[2]})
-        self.intScript.updateProfile(username=username, body={"detail" : "hobbies", "value" : info[3]})
+        self.intScript.updateProfile(username=self.username, body={"detail" : "name", "value" : info[0]})
+        self.intScript.updateProfile(username=self.username, body={"detail" : "age", "value" : info[1]})
+        self.intScript.updateProfile(username=self.username, body={"detail" : "sports", "value" : info[2]})
+        self.intScript.updateProfile(username=self.username, body={"detail" : "hobbies", "value" : info[3]})
+        self.dashboard_widget.emit()
 
 
 
