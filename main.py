@@ -14,7 +14,7 @@ from quizWidget import QuizContainer
 from dashboardWidget import DashboardWidget
 from profileWidget import ProfileWidget
 from calenderWidget import CalenderContainer
-from alcoholLogWidget import AlcoholLogContainer
+from LogWidget import Log
 from exerciseInsightsWidget import ExerciseInsightsWidget
 from screenTimeWidget import ScreenTimeWidget
 from sleepTrackingWidget import SleepTrackingWidget
@@ -64,7 +64,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.dashboard_widget.logo_widget.connect(self.show_profile_widget)
         self.stack.addWidget(self.dashboard_widget)
 
-        self.alcohol_log_widget = AlcoholLogContainer()
+        self.alcohol_log_widget = Log(page="alcohol", name="Name")
         self.stack.addWidget(self.alcohol_log_widget)
 
         self.exercise_insights_widget = ExerciseInsightsWidget()
