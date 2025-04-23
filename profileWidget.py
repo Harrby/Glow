@@ -1,7 +1,5 @@
 import sys
 
-from setuptools.package_index import user_agent
-
 from globalState import AppContext
 from buttons.imageButton import ImageButton
 from PySide6 import QtCore, QtGui
