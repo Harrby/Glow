@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QCheckBox
 )
+from calenderWidget import ClickableLabel
 #import intermediaryScript as inter
 
 
@@ -116,6 +117,8 @@ class ProfileWidget(QWidget):
 
         for field in user_info:
             field_layout = QHBoxLayout()
+
+            # change to a clickable label
 
             info = QLineEdit()
             info.setFont(quicksand_medium_content)
