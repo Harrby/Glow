@@ -41,8 +41,8 @@ class intermediaryScript():
             print(f"Error: {str(e)}")
 
 ##WORKS
-    def getRandomActivity(self, username: str):
-        url = f"{BASE_URL}/accounts/{username}/getRandomActivity"
+    def getRandomExercise(self, username: str):
+        url = f"{BASE_URL}/accounts/{username}/getRandomExercise"
         try:
             response = httpx.get(url)
             response.raise_for_status()
@@ -53,10 +53,10 @@ class intermediaryScript():
             print(f"Error: {str(e)}")
 
 ##WORKS
-    def addCustomActivity(self, username: str, activity: str):
-        url = f"{BASE_URL}/accounts/{username}/addActivity"
+    def addCustomExercise(self, username: str, exercise: str):
+        url = f"{BASE_URL}/accounts/{username}/addExercise"
         try:
-            response = httpx.post(url, params={"activity": activity})
+            response = httpx.post(url, params={"exercise": exercise})
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:
@@ -64,9 +64,9 @@ class intermediaryScript():
         except Exception as e:
             print(f"Error: {str(e)}")
 
-##DOESN'T WORK
-    def updateMood(self, username: str, date: str, body: dict):
-        url = f"{BASE_URL}/moods/{username}/update"
+##WORKS
+    def updateFactor(self, username: str, date: str, body: dict):
+        url = f"{BASE_URL}/moods/{username}/updateFactor"
         try:
             response = httpx.put(url, params={"date": date}, json=body)
             response.raise_for_status()
@@ -246,8 +246,10 @@ class intermediaryScript():
 
 #keyworder = "sick"
 #hobby = "starving"
-#activity = "strangling"
+#exercise = "hanging"
 #body = {
+#    "factor": "alcohol",
+#    "value": 2
 #  "mood": "stressed",
 #  "sleep": 2,
 #  "screen": 12,
@@ -257,8 +259,9 @@ class intermediaryScript():
 #  "diary": "noooooooooo"
 #}
 
+
 #testywesty = intermediaryScript()
-#output = testywesty.addCustomHobby("TestDummy01", activity)
+#output = testywesty.addCustomExercise("TestDummy01", exercise)
 #print(output)
 
 ##VALIDATE DATE FUNCTION HAS LOGGED IN!!
