@@ -1,4 +1,7 @@
 import sys
+
+from setuptools.package_index import user_agent
+
 from globalState import AppContext
 from buttons.imageButton import ImageButton
 from PySide6 import QtCore, QtGui
@@ -18,7 +21,7 @@ from PySide6.QtWidgets import (
     QCheckBox
 )
 from calenderWidget import ClickableLabel
-#import intermediaryScript as inter
+import intermediaryScript as inter
 
 
 class ProfileWidget(QWidget):
@@ -27,6 +30,8 @@ class ProfileWidget(QWidget):
 
     def __init__(self, context):
         super().__init__()
+
+        self.intScript = inter.intermediaryScript()
 
         self.context = context
         self.context.username_changed.connect(self.update_ui)
@@ -194,12 +199,12 @@ class ProfileWidget(QWidget):
             This will fetch the name, age, sports, hobbies and sex of the current user.
         :return:
         """
-        #data = inter.getProfileDate(username)
-        data = {"name" : "ruby",
-                "age" : "18",
-                "sports" : ["Cheerleading, Hockey"],
-                "hobbies" : ["Knitting, Reading"],
-                "sex" : "Female"}
+        #data = inter.getProfileDate(username,)
+        data = {"name" : self.intScript.getAccount(username=username, detail="name"),
+                "age" : str(self.intScript.getAccount(username=username, detail="age")),
+                "sports" : self.intScript.getAccount(username=username, detail="activities"),
+                "hobbies" : self.intScript.getAccount(username=username, detail="hobbies"),
+                "sex" : self.intScript.getAccount(username=username, detail="sex")}
         sports = ", ".join(data["sports"])
         hobbies = ", ".join(data["hobbies"])
 
@@ -240,6 +245,13 @@ class ProfileWidget(QWidget):
         info[2] = info[2].split(", ")
         info[3] = info[3].split(", ")
         return info
+
+    def update_database_profile(self, username):
+        info = self.get_updated_info()
+        self.intScript.updateProfile(username=username, body={"detail" : "name", "value" : info[0]})
+        self.intScript.updateProfile(username=username, body={"detail" : "age", "value" : info[1]})
+        self.intScript.updateProfile(username=username, body={"detail" : "sports", "value" : info[2]})
+        self.intScript.updateProfile(username=username, body={"detail" : "hobbies", "value" : info[3]})
 
 
 
