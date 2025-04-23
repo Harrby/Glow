@@ -200,11 +200,11 @@ class ProfileWidget(QWidget):
         :return:
         """
         #data = inter.getProfileDate(username,)
-        data = {"name" : self.intScript.getAccount(username=username, detail="name"),
-                "age" : str(self.intScript.getAccount(username=username, detail="age")),
-                "sports" : self.intScript.getAccount(username=username, detail="activities"),
-                "hobbies" : self.intScript.getAccount(username=username, detail="hobbies"),
-                "sex" : self.intScript.getAccount(username=username, detail="sex")}
+        data = {"name" : self.intScript.getAccount(username=username, detail="name")["name"],
+                "age" : str(self.intScript.getAccount(username=username, detail="age")["age"]),
+                "sports" : self.intScript.getAccount(username=username, detail="activities")["activities"],
+                "hobbies" : self.intScript.getAccount(username=username, detail="hobbies")["hobbies"],
+                "sex" : self.intScript.getAccount(username=username, detail="sex")["sex"]}
         sports = ", ".join(data["sports"])
         hobbies = ", ".join(data["hobbies"])
 
