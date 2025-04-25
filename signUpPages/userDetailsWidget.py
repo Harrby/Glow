@@ -8,7 +8,7 @@ class DetailsWidget(QtWidgets.QWidget):
     :author: James / Modified by [Your Name]
     :created: 06-04-25 (modified)
     :contributors:
-        - Add your name here when you edit or maintain this class."""
+        - Seb."""
     page_clicked = QtCore.Signal()
 
     def __init__(self):
@@ -120,10 +120,6 @@ class DetailsWidget(QtWidgets.QWidget):
 
         self.setLayout(main_layout)
 
-    def mousePressEvent(self, event):
-        if event.button() == QtCore.Qt.LeftButton:
-            self.page_clicked.emit()
-
     def paintEvent(self, event):
         if not self.background_pixmap.isNull():
             painter = QtGui.QPainter(self)
@@ -161,14 +157,11 @@ class DetailsWidget(QtWidgets.QWidget):
         username = self.username_input.text()
         password = self.password_input.text()
         # Handle the username and password as needed.
-        QtWidgets.QMessageBox.information(
-            self, 
-            "Information", 
-            f"Username: {username}\nPassword: {password}"
-        )
+        self.page_clicked.emit()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     window = DetailsWidget()
+    window.page_clicked.connect(lambda: print("Next page!"))
     window.show()
     sys.exit(app.exec())

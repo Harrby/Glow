@@ -2,25 +2,40 @@ import sys
 import os
 from PySide6 import QtGui, QtCore, QtWidgets
 
+
 class SignUpIntro(QtWidgets.QWidget):
     """A Sign up introduction page
     :author: James
     :created: 06-04-25
     :contributors:
-        - Add your name here when you edit or maintain this class."""
+        - Seb.
+
+    sign up pages
+    intro widget ->
+    speech widget ->
+    about widget ->
+    sex widget ->
+    age widget ->
+    choose icon ->
+    userDetailsWidget ->
+    endWidget
+    """
+    # Signal emitted when the user clicks "next"
     page_clicked = QtCore.Signal()
 
     def __init__(self):
         super().__init__()
-        
+
         self.setMinimumSize(800, 600)
         self.setWindowState(QtCore.Qt.WindowMaximized)
 
+        # Load custom font
         font_path = os.path.join("resources", "fonts/quicksand", "Quicksand-Bold.ttf")
         QtGui.QFontDatabase.addApplicationFont(font_path)
+
         # Dynamic image paths
         base_dir = os.path.dirname(__file__)
-        background_path = os.path.join("resources", "images", "welcomeImage.png")
+        background_path = os.path.join(base_dir, "..", "resources", "images", "welcomeImage.png")
 
         # Load background
         self.background_pixmap = QtGui.QPixmap(background_path)
@@ -28,7 +43,7 @@ class SignUpIntro(QtWidgets.QWidget):
             print(f"Warning: Background image not found at {background_path}")
 
         # Labels
-        self.main_label_hey = QtWidgets.QLabel(f"Hey! Welcome to", self)
+        self.main_label_hey = QtWidgets.QLabel("Hey! Welcome to", self)
         self.main_label_hey.setAlignment(QtCore.Qt.AlignCenter)
         self.main_label_hey.setTextFormat(QtCore.Qt.RichText)
 
@@ -36,6 +51,7 @@ class SignUpIntro(QtWidgets.QWidget):
         self.main_label_glow.setAlignment(QtCore.Qt.AlignCenter)
         self.main_label_glow.setTextFormat(QtCore.Qt.RichText)
 
+        # "Next" button
         self.button = QtWidgets.QPushButton("Let's get started!", self)
         self.button.clicked.connect(self.on_button_click)
         self.button.setStyleSheet("""
@@ -47,8 +63,11 @@ class SignUpIntro(QtWidgets.QWidget):
                 font-size: 48px;
             }
         """)
+
+        # Opacity animations
         self.add_opacity_effects()
 
+        # Layout
         top_line_layout = QtWidgets.QVBoxLayout()
         top_line_layout.setAlignment(QtCore.Qt.AlignCenter)
         top_line_layout.addWidget(self.main_label_hey)
@@ -57,18 +76,17 @@ class SignUpIntro(QtWidgets.QWidget):
         top_line_layout.addSpacing(10)
         top_line_layout.addWidget(self.button)
 
-        # Main vertical layout
         main_layout = QtWidgets.QHBoxLayout()
         main_layout.setAlignment(QtCore.Qt.AlignCenter)
         main_layout.addLayout(top_line_layout)
         self.setLayout(main_layout)
 
-        # Start animations
+        # Start the fade‐in animations
         QtCore.QTimer.singleShot(0, self.fade_animation_hey.start)
         QtCore.QTimer.singleShot(500, self.fade_animation_welcome.start)
 
     def add_opacity_effects(self):
-        # Opacity effects and animations
+        # Fade‐in for "Hey! Welcome to"
         self.opacity_effect_hey = QtWidgets.QGraphicsOpacityEffect(self.main_label_hey)
         self.opacity_effect_hey.setOpacity(0.0)
         self.main_label_hey.setGraphicsEffect(self.opacity_effect_hey)
@@ -78,6 +96,7 @@ class SignUpIntro(QtWidgets.QWidget):
         self.fade_animation_hey.setEndValue(1.0)
         self.fade_animation_hey.setEasingCurve(QtCore.QEasingCurve.InOutQuad)
 
+        # Fade‐in for "Glow"
         self.opacity_effect_welcome = QtWidgets.QGraphicsOpacityEffect(self.main_label_glow)
         self.opacity_effect_welcome.setOpacity(0.0)
         self.main_label_glow.setGraphicsEffect(self.opacity_effect_welcome)
@@ -87,45 +106,51 @@ class SignUpIntro(QtWidgets.QWidget):
         self.fade_animation_welcome.setEndValue(1.0)
         self.fade_animation_welcome.setEasingCurve(QtCore.QEasingCurve.InOutQuad)
 
+    def on_button_click(self):
+        """Emit the page_clicked signal to navigate to the next page."""
+        self.page_clicked.emit()
+
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
-            self.page_clicked.emit()  # Emit signal with username
+            self.page_clicked.emit()
 
     def paintEvent(self, event):
         if not self.background_pixmap.isNull():
             painter = QtGui.QPainter(self)
-            scaled_pixmap = self.background_pixmap.scaled(self.size(), QtCore.Qt.KeepAspectRatioByExpanding, QtCore.Qt.SmoothTransformation)
-            center_x = (self.width() - scaled_pixmap.width()) // 2
-            center_y = (self.height() - scaled_pixmap.height()) // 2
-            painter.drawPixmap(center_x, center_y, scaled_pixmap)
+            scaled = self.background_pixmap.scaled(
+                self.size(),
+                QtCore.Qt.KeepAspectRatioByExpanding,
+                QtCore.Qt.SmoothTransformation
+            )
+            x = (self.width() - scaled.width()) // 2
+            y = (self.height() - scaled.height()) // 2
+            painter.drawPixmap(x, y, scaled)
             painter.end()
 
     def resizeEvent(self, event):
-        font_size_1 =  max(30, min(int(self.width() * 0.025), 60))
-        font_size_2 = max(45, (int(self.width() * 0.07)))
+        # Responsive font sizing
+        w = self.width()
+        font_size_1 = max(30, min(int(w * 0.025), 60))
+        font_size_2 = max(45, min(int(w * 0.07), 100))
 
-        font1 = QtGui.QFont("Quicksand", font_size_1)
-        font1.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        f1 = QtGui.QFont("Quicksand", font_size_1)
+        f1.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.main_label_hey.setFont(f1)
 
-        font2 = QtGui.QFont("Quicksand", font_size_2)
-        font2.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        f2 = QtGui.QFont("Quicksand", font_size_2)
+        f2.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.main_label_glow.setFont(f2)
 
-        self.main_label_hey.setFont(font1)
-        self.main_label_glow.setFont(font2)
+        btn_size = max(20, min(int(w * 0.05), 48))
+        btn_font = QtGui.QFont("Quicksand", btn_size)
+        btn_font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.button.setFont(btn_font)
 
-        button_font_size = max(20, min(int(self.width() * 0.05), 48))
-        button_font = QtGui.QFont("Quicksand", button_font_size)
-        button_font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.button.setFont(button_font)
         super().resizeEvent(event)
 
-    
-    def on_button_click(self):
-        QtWidgets.QMessageBox.information(self, "Button Clicked", "You clicked the button!")
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     intro = SignUpIntro()
     intro.show()
     sys.exit(app.exec())
-

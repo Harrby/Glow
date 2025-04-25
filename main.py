@@ -18,6 +18,7 @@ from LogWidget import Log
 from exerciseInsightsWidget import ExerciseInsightsWidget
 from screenTimeWidget import ScreenTimeWidget
 from sleepTrackingWidget import SleepTrackingWidget
+from signUpContainer import SignUpPages
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -38,9 +39,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.stack = QStackedWidget()
 
         # Initially added widgets
+        self.sign_up_pages = SignUpPages()
+        self.sign_up_pages.login_page.connect(self.show_login_page)
+        self.stack.addWidget(self.sign_up_pages)
+
         self.login_page = LoginWidget(self.context)
         self.login_page.login_successful.connect(self.show_welcome)
-        self.stack.addWidget(self.login_page)  # index 0
+        self.stack.addWidget(self.login_page)
 
         self.welcome_page = WelcomeWidget()
         self.welcome_page.page_clicked.connect(self.show_opening_widget)
@@ -105,6 +110,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Auto-hide after 3 seconds
         QtCore.QTimer.singleShot(3000, hint.deleteLater)
+
+    def show_login_page(self):
+        self.login_page.login_successful.connect(self.show_welcome)
+        self.stack.addWidget(self.login_page)
+        self.stack.setCurrentWidget(self.login_page)
 
     def show_welcome(self, username):
         self.welcome_page.set_name(username)

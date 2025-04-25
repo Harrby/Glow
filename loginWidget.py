@@ -33,7 +33,7 @@ class LoginWidget(QtWidgets.QWidget):
             init_ui(): Initializes the layout and UI components.
             verify_login(): Verifies user credentials and emits a success signal if valid.
 
-        Author: Seb
+        Author: Seb & Sam
         Created: 2025-03-27
     """
 
