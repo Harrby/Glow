@@ -39,12 +39,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.stack = QStackedWidget()
 
         # Initially added widgets
-        self.sign_up_pages = SignUpPages()
-        self.sign_up_pages.login_page.connect(self.show_login_page)
-        self.stack.addWidget(self.sign_up_pages)
+
 
         self.login_page = LoginWidget(self.context)
         self.login_page.login_successful.connect(self.show_welcome)
+        self.login_page.sign_up.connect(self.show_sign_up_pages)
         self.stack.addWidget(self.login_page)
 
         self.welcome_page = WelcomeWidget()
@@ -113,6 +112,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def show_login_page(self):
         self.login_page.login_successful.connect(self.show_welcome)
+        self.login_page.sign_up.connect(self.show_sign_up_pages)
         self.stack.addWidget(self.login_page)
         self.stack.setCurrentWidget(self.login_page)
 
@@ -134,13 +134,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.logQuiz_widget = LogQuizWidget()
         self.stack.addWidget(self.logQuiz_widget)
         self.stack.setCurrentWidget(self.logQuiz_widget)
-
         self.logQuiz_widget.logQuizNext.connect(self.show_dashboard_widget)
 
-    def show_signup_screen(self):
-        self.signup_screen = SignupScreen()
-        self.stack.addWidget(self.signup_screen)
-        self.stack.setCurrentWidget(self.signup_screen)
+    def show_sign_up_pages(self):
+        self.sign_up_pages = SignUpPages()
+        self.sign_up_pages.login_page.connect(self.show_login_page)
+        self.stack.addWidget(self.sign_up_pages)
+        self.stack.setCurrentWidget(self.sign_up_pages)
 
     def show_profile_widget(self):
         self.profile_widget = ProfileWidget(self.context)
