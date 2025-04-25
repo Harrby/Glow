@@ -3,6 +3,7 @@ import os
 from PySide6 import QtGui, QtCore, QtWidgets
 from PySide6.QtWidgets import QLineEdit, QHBoxLayout, QFrame, QVBoxLayout
 
+
 class AfterGoal(QtWidgets.QWidget):
     """A page that confirms a goal has been set and provides encouraging feedback.
     :author: James

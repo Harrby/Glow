@@ -18,6 +18,7 @@ from LogWidget import Log
 from exerciseInsightsWidget import ExerciseInsightsWidget
 from screenTimeWidget import ScreenTimeWidget
 from sleepTrackingWidget import SleepTrackingWidget
+from intermediaryScript import intermediaryScript
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -25,6 +26,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
 
         self.context = AppContext()
+        self.intermediary_script = intermediaryScript()
 
         # key esc toggles full screen
         QtGui.QShortcut(QtGui.QKeySequence("Escape"), self, activated=self.toggle_fullscreen)

@@ -8,58 +8,7 @@ from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 
 
-@dataclass
-class MonthData:
-    """
-        a data class (makes syntax cleaner / and less code to write)
 
-        attributes:
-            month (int): int 1-12 declares which month this is
-            year (int): any year, but probably going to be 2025 onwards
-            days (list[int]): the month data used to create a calender frame e.g [[-1], [-1], 1, 2, ..., 31, [-1]]
-            moods (list[str]): list of file path extensions of each mood in the month, e.g ["happy", "sad", ...]
-                (doesnt need to be passed to instantiate however / has a default arg of [])
-                1 mood per day, if no mood then replace with a NONE e.g ["happy", "sad", None, "happy", None etc]
-            diary_entries (list[str]): list of diary entries e.g ["today I went gym", "chill day, didn't do much" etc]
-            screen_time (list[float]): list of hours of screen time. e.g. [2.2, 1.9, 2.0, etc.]
-            exercise (list[int]): list of minutes of exercise. e.g. [50, 0, 30, etc.]
-            alcohol (list[float]): list of units of alcohol. e.g. [2.5, 0, 0, 5, etc.]
-            sleep (list[float]) list of hours of sleep. e.g. [8, 8.5, 6, 9, etc.]
-
-        Author: Harry
-        Created: 02-04-2025
-
-
-    """
-    month: int
-    year: int
-    days: list
-    moods: list = field(default_factory=list)
-    diary_entries: list = field(default_factory=list)
-    screen_time: list = field(default_factory=list)
-    exercise: list = field(default_factory=list)
-    alcohol: list = field(default_factory=list)
-    sleep: list = field(default_factory=list)
-
-    def get_days_data(self, day_index: int) -> tuple:
-        """
-        gets all data for a given day.
-
-        :param day_index: e.g IMPORTANT: if want 3rd day, day index is 2.
-        :return: mood, diary entry, screen time, exercise, alcohol, sleep.
-        """
-        try:
-            return (
-                self.moods[day_index],
-                self.diary_entries[day_index],
-                self.screen_time[day_index],
-                self.exercise[day_index],
-                self.alcohol[day_index],
-                self.sleep[day_index]
-            )
-        except IndexError:
-            # If any list is out of range for day_index, return None
-            return None, None, None, None, None, None
 
 
 class CalenderContainer(QtWidgets.QWidget):
