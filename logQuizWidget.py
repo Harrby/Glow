@@ -6,6 +6,8 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, Signal
 
+from FUCKTHISWIDGET import CustomWindowWidget
+
 
 class QuestionBox(QWidget):
     def __init__(self):
@@ -50,41 +52,11 @@ class QuestionBox(QWidget):
 
 
 class QuestionWidget(QWidget):
-    def __init__(self, question_text, headerColour):
+    def __init__(self, question_text):
         super().__init__()
 
         main_layout = QVBoxLayout()
-        main_layout.setSpacing(0)  # So header and box touch seamlessly
         main_layout.setContentsMargins(0, 0, 0, 0)
-
-        # Header label styled as the top bar
-        header_label = QLabel("A quick question...")
-        header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        header_label.setStyleSheet(f"""
-            background-color: #{headerColour};
-            color: #4B4A63;
-            font-size: 45px;
-            font-weight: bold;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            margin: 0;
-        """)
-
-        header_label.setFixedHeight(90)
-        main_layout.addWidget(header_label)
-
-        # Container for the rest of the widget (the "box")
-        box_container = QWidget()
-        box_container_layout = QVBoxLayout()
-        box_container_layout.setSpacing(10)
-        box_container_layout.setContentsMargins(15, 15, 15, 15)
-        box_container.setLayout(box_container_layout)
-        box_container.setStyleSheet("""
-            background-color: #ECEAD7;
-            border: 2px solid #4E4C39;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-        """)
 
         # Question label within the box
         question_label = QLabel(question_text)
@@ -96,13 +68,13 @@ class QuestionWidget(QWidget):
             border-color: transparent;
         """)
         question_label.setWordWrap(True)
-        box_container_layout.addWidget(question_label)
 
         # Add the QuestionBox (with input field)
         self.question_box = QuestionBox()  # Store the instance for later access
-        box_container_layout.addWidget(self.question_box)
 
-        main_layout.addWidget(box_container)
+        main_layout.addWidget(question_label)
+        main_layout.addWidget(self.question_box)
+
         main_layout.setContentsMargins(15, 15, 15, 15)
         self.setLayout(main_layout)
 
@@ -150,17 +122,18 @@ class LogQuizWidget(QWidget):
             "How many hours of sleep did you get last night?"
         ]
         headerColours = [
-            "8FC19C",  # Greenish
-            "FFB699",  # Orange
-            "6EDDFF",  # Dark teal
-            "A4A2DA",  # Purple
+            "#8FC19C",  # Greenish
+            "#FFB699",  # Orange
+            "#6EDDFF",  # Dark teal
+            "#A4A2DA",  # Purple
         ]
 
         # Add each QuestionWidget to the grid and store it for later retrieval
         for i, question in enumerate(questions):
             row = i // 2
             col = i % 2
-            widget = QuestionWidget(question, headerColours[i])
+            widget1 = QuestionWidget(question)
+            widget = CustomWindowWidget("A quick question...", widget1, headerColours[i])
             widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
             grid.addWidget(widget, row, col)
             self.question_widgets.append(widget)
