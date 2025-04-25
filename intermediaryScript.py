@@ -77,6 +77,30 @@ class intermediaryScript():
             print(f"Error: {str(e)}")
 
 ##WORKS
+    def deleteAllMoods(self, username: str):
+        url = f"{BASE_URL}/moods/{username}/deleteAll"
+        try:
+            response = httpx.delete(url)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
+##WORKS
+    def deleteUser(self, username: str):
+        url = f"{BASE_URL}/accounts/{username}/delete"
+        try:
+            response = httpx.delete(url)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
+##WORKS
     def hasLoggedIn(self, username: str, date: str):
         url = f"{BASE_URL}/moods/{username}/hasLoggedIn/{date}"
         try:
@@ -161,6 +185,18 @@ class intermediaryScript():
             print(f"Error: {str(e)}")
 
 ##WORKS
+    def getMoodEntryByYear(self, username: str, year: str):
+        url = f"{BASE_URL}/moods/{username}/getMoodEntryByYear/{year}"
+        try:
+            response = httpx.get(url)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
+##WORKS
     def addExerciseEntry(self, username: str, body: dict):
         url = f"{BASE_URL}/exercise/{username}/insert"
         try:
@@ -220,29 +256,6 @@ class intermediaryScript():
         except Exception as e:
             print(f"Error: {str(e)}")
 
-##WORKS
-    def deleteAllMoods(self, username: str):
-        url = f"{BASE_URL}/moods/{username}/deleteAll"
-        try:
-            response = httpx.delete(url)
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
-        except Exception as e:
-            print(f"Error: {str(e)}")
-
-##WORKS
-    def deleteUser(self, username: str):
-        url = f"{BASE_URL}/accounts/{username}/delete"
-        try:
-            response = httpx.delete(url)
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as e:
-            print(f"HTTP error: {e.response.status_code}, {e.response.text}")
-        except Exception as e:
-            print(f"Error: {str(e)}")
 
 #keyworder = "sick"
 #hobby = "starving"
@@ -261,7 +274,7 @@ class intermediaryScript():
 
 
 #testywesty = intermediaryScript()
-#output = testywesty.addCustomExercise("TestDummy01", exercise)
+#output = testywesty.getUserID("TestDummy01")
 #print(output)
 
 ##VALIDATE DATE FUNCTION HAS LOGGED IN!!
