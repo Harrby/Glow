@@ -8,9 +8,8 @@ class EndWidget(QtWidgets.QWidget):
     :author: James
     :created: 06-04-25
     :contributors:
-        - Add your name here when you edit or maintain this class."""
-    page_clicked = QtCore.Signal()
-
+        - Seb."""
+    login = QtCore.Signal()
     def __init__(self):
         super().__init__()
         
@@ -36,7 +35,7 @@ class EndWidget(QtWidgets.QWidget):
         self.subtitle_label.setTextFormat(QtCore.Qt.RichText)
 
         self.button = QtWidgets.QPushButton("Lets Glow", self)
-        self.button.clicked.connect(self.on_button_click)
+        self.button.clicked.connect(self.loginClick)
         self.button.setStyleSheet("""
             QPushButton {
                 background-color: rgba(252, 236, 174, 0.99);
@@ -65,9 +64,6 @@ class EndWidget(QtWidgets.QWidget):
         main_layout.addLayout(top_line_layout)
         self.setLayout(main_layout)
 
-    def mousePressEvent(self, event):
-        if event.button() == QtCore.Qt.LeftButton:
-            self.page_clicked.emit()  
 
     def paintEvent(self, event):
         if not self.background_pixmap.isNull():
@@ -99,11 +95,14 @@ class EndWidget(QtWidgets.QWidget):
 
         super().resizeEvent(event)
 
-    def on_button_click(self):
-        QtWidgets.QMessageBox.information(self, "Button Clicked", "You clicked the button!")
+    def loginClick(self):
+        print("END??")
+        self.login.emit()
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     intro = EndWidget()
+    intro.login.connect(lambda: print("Next page!"))
     intro.show()
     sys.exit(app.exec())

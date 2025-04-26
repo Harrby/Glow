@@ -8,7 +8,7 @@ class AboutWidget(QtWidgets.QWidget):
     :author: James
     :created: 06-04-25
     :contributors:
-        - Add your name here when you edit or maintain this class."""
+        - Seb."""
     
     page_clicked = QtCore.Signal()
 
@@ -87,10 +87,6 @@ class AboutWidget(QtWidgets.QWidget):
         main_layout.addLayout(top_line_layout)
         self.setLayout(main_layout)
 
-    def mousePressEvent(self, event):
-        if event.button() == QtCore.Qt.LeftButton:
-            self.page_clicked.emit()  
-
     def paintEvent(self, event):
         if not self.background_pixmap.isNull():
             painter = QtGui.QPainter(self)
@@ -124,11 +120,12 @@ class AboutWidget(QtWidgets.QWidget):
 
     
     def on_button_click(self):
-        QtWidgets.QMessageBox.information(self, "Button Clicked", "You clicked the button!")
+        self.page_clicked.emit()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     intro = AboutWidget()
+    intro.page_clicked.connect(lambda: print("Next page!"))
     intro.show()
     sys.exit(app.exec())
 

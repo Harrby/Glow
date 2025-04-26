@@ -67,12 +67,12 @@ class OpeningWidget(QtWidgets.QFrame):
             (self.excited_button, "Exciting Stuff", "What are you looking forward to?", True),
             (self.happy_button,   "Brilliant","Everything feels great!", False),
             (self.proud_button,   "Woo-hoo!","I am so proud!", False),
-            (self.content_button, "Nothing special?","How about trying [database activity from original sign-up section] to really boost your mood today?", False),
-            (self.unsure_button,  "Not sure?","Try taking this short quiz", False),
+            (self.content_button, "Nothing special?","How about trying an activity to really boost your mood today?", False),
+            (self.unsure_button,  "This is a safe space to reflect on your day", ", express your feelings, and record today’s events. It’ll get stored for reflection in the diary section to help categorise how you’re feeling", False),
             (self.sick_button,    "I'm sorry you aren't feeling well.", "What's up?", False),
-            (self.stressed_button,"Breath, you've got this.","Tell me what is going on here", False),
-            (self.angry_button,   "It's okay to feel angry, take a deep breath", "Tell me some more about what you're feeling below", False),
-            (self.sad_button,     "Hey, I'm here for you","It’s normal to feel down. Don’t forget, you’ve got [excited database] (if logged) coming up in [n] days! ", False),
+            (self.stressed_button,"It’s completely normal to feel overwhelmed.","If anything else is bothering you, tell us what’s going on here:", False),
+            (self.angry_button,   "It's okay to feel angry", "Tell us some more about what you’re feeling...", False),
+            (self.sad_button,     "This is a safe space to reflect on your day, express your feelings, and record today’s events. ","It’s normal to feel down. Don’t forget, you’ve got things coming up soon! ", False),
             (self.tired_button,   "ZZZzzzzz....","Blah! Blah! Blah!", False)
         ]
 

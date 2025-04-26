@@ -66,10 +66,6 @@ class SetGoal(QtWidgets.QWidget):
         main_layout.addWidget(center_widget)
         self.setLayout(main_layout)
 
-    def mousePressEvent(self, event):
-        if event.button() == QtCore.Qt.LeftButton:
-            self.page_clicked.emit()  
-
     def resizeEvent(self, event):
         # Dynamic font sizes
         font_size_label = max(20, int(self.width() * 0.03))
@@ -96,10 +92,11 @@ class SetGoal(QtWidgets.QWidget):
         super().resizeEvent(event)
 
     def on_button_click(self):
-        QtWidgets.QMessageBox.information(self, "Button Clicked", "You clicked the button!")
+        self.page_clicked.emit()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     intro = SetGoal()
+    intro.page_clicked.connect(lambda: print("Next page!"))
     intro.show()
     sys.exit(app.exec())
