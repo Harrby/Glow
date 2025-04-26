@@ -54,7 +54,7 @@ class CustomWindowWidget(QWidget):
         w, h = self.width(), self.height()
         margin = 10
         radius = 15
-        bar_height = 120
+        bar_height = 100
 
         bg_color   = QColor("#E6DDD0")
         bar_color  = QColor(self.colour)

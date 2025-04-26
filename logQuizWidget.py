@@ -26,7 +26,7 @@ class QuestionBox(QWidget):
         self.input_field.setStyleSheet("""
             QLineEdit {
                 padding: 8px;
-                font-size: 72px;
+                font-size: 48px;
                 border: 1px solid #dddddd;
                 border-radius: 4px;
                 background-color: #E4E4E4;
@@ -63,7 +63,7 @@ class QuestionWidget(QWidget):
         question_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         question_label.setStyleSheet("""
             color: #4B4A63;
-            font-size: 54px;
+            font-size: 24px;
             font-weight: 600;
             border-color: transparent;
         """)
@@ -75,7 +75,7 @@ class QuestionWidget(QWidget):
         main_layout.addWidget(question_label)
         main_layout.addWidget(self.question_box)
 
-        main_layout.setContentsMargins(15, 15, 15, 15)
+        main_layout.setContentsMargins(35, 35, 35, 35)
         self.setLayout(main_layout)
 
         # Set an expanding size policy so that the widget grows with the window
