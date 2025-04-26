@@ -3,7 +3,7 @@ import sys
 import os
 import hashlib
 import pymongo
-
+from globalState import AppContext
 
 def encrypt(password):
     # Example placeholder; replace with real hashing if needed
@@ -40,7 +40,7 @@ class LoginWidget(QtWidgets.QWidget):
     login_successful = QtCore.Signal(str)
     sign_up = QtCore.Signal()
 
-    def __init__(self, context):
+    def __init__(self, context: AppContext):
         super().__init__()
 
         self.client = pymongo.MongoClient(
@@ -152,6 +152,8 @@ class LoginWidget(QtWidgets.QWidget):
             self.error_label.setText("Login successful!")
             self.error_label.setStyleSheet("color: #00e676;")
             self.context.username = username
+            self.context.retrieve_profile_data_from_db()
+            self.context.retrieve_all_mood_data_from_db()
             self.login_successful.emit(username)
         else:
             self.error_label.setText("Username or password incorrect")

@@ -179,8 +179,9 @@ class LogQuizWidget(QWidget):
 
     def on_next_clicked(self):
         """Collect all answers and emit them through the custom signal."""
-        answers = [widget.getAnswer() for widget in self.question_widgets]
-        print("Collected answers:", answers)
+        if self.question_widgets != [] and hasattr(CustomWindowWidget, "getAnswer"):
+            answers = [widget.getAnswer() for widget in self.question_widgets]
+            print("Collected answers:", answers)
         self.logQuizNext.emit()
 
     def resizeEvent(self, event):

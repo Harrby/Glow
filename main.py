@@ -13,7 +13,7 @@ from welcomeWidget import WelcomeWidget
 from quizWidget import QuizContainer
 from dashboardWidget import DashboardWidget
 from profileWidget import ProfileWidget
-#from calenderWidget import CalenderContainer
+from calenderWidget import CalenderContainer
 from LogWidget import Log
 from exerciseInsightsWidget import ExerciseInsightsWidget
 from screenTimeWidget import ScreenTimeWidget
@@ -52,16 +52,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.opening_widget.start_quiz.connect(self.show_quizWidget)
         self.stack.addWidget(self.opening_widget)
 
-        """self.calender_container = CalenderContainer()
+        self.calender_container = CalenderContainer(self.context)
         self.stack.addWidget(self.calender_container)
-        self.calender_container.request_exit.connect(self.show_dashboard_widget)"""
+        self.calender_container.request_exit.connect(self.show_dashboard_widget)
 
         self.dashboard_widget = DashboardWidget()
         self.dashboard_widget.alcohol_widget.connect(self.show_alcohol_log_widget)
         self.dashboard_widget.screenTime_widget.connect(self.show_screen_time_widget)
         self.dashboard_widget.sleep_widget.connect(self.show_sleep_tracking_widget)
         self.dashboard_widget.exercise_widget.connect(self.show_exercise_insights_widget)
-        #self.dashboard_widget.calender_widget.connect(self.show_calender_container)
+        self.dashboard_widget.calender_widget.connect(self.show_calender_container)
         self.dashboard_widget.opening_widget.connect(self.show_opening_widget)
         self.dashboard_widget.logo_widget.connect(self.show_profile_widget)
         self.stack.addWidget(self.dashboard_widget)
@@ -110,6 +110,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def show_welcome(self, username):
         self.welcome_page.set_name(username)
+        self.calender_container.set_up_calender()
         self.stack.setCurrentWidget(self.welcome_page)
 
     def show_opening_widget(self):
@@ -149,9 +150,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.stack.setCurrentWidget(self.dashboard_widget)
 
-        """def show_calender_container(self):
+    def show_calender_container(self):
         self.stack.setCurrentWidget(self.calender_container)
-        """
+
     def show_alcohol_log_widget(self):
         self.stack.setCurrentWidget(self.alcohol_log_widget)
 

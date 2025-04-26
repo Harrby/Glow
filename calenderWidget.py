@@ -6,9 +6,7 @@ from buttons.imageButton import ImageButton
 import calendar
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
-
-
-
+from globalState import AppContext, MonthData
 
 
 class CalenderContainer(QtWidgets.QWidget):
@@ -35,10 +33,14 @@ class CalenderContainer(QtWidgets.QWidget):
 
     request_exit = QtCore.Signal()
 
-    def __init__(self):
+    def __init__(self, app_context: AppContext):
         super().__init__()
 
+        self.app_context = app_context
+
         self.global_month_index = 2
+
+        self.calender_frame_widgets = []
 
         self.setStyleSheet("""QLabel{color: white;}""")
 
@@ -89,27 +91,18 @@ class CalenderContainer(QtWidgets.QWidget):
         left_v_layout.addStretch(1)
         left_v_layout.setContentsMargins(40, 0, 40, 0)
 
-        self.months = [
+        """self.months = [
 
-        ]
+        ]"""
         # pre load 2 years, unlikely to go further. But they'll be automatically generated if they want to go further
-        for j in range(2025, 2027):
+        """for j in range(2025, 2027):
             for i in range(1, 13):
                 # instantiate MonthData dataclass
-                self.months.append(MonthData(i, j, self.generate_month_data(j, i)))
-
-        self.calender_frame_widgets = []
-        for month in self.months:
-            new_frame = CalenderFrame(month)
-            new_frame.RequestCalenderZoomInWidget.connect(self.on_calender_zoom_in_widget_request)
-            self.calender_frame_widgets.append(new_frame)
+                self.months.append(MonthData(i, j, self.generate_month_data(j, i)))"""
 
         self.v_layout = QtWidgets.QVBoxLayout()
-        for calender_frame_widget in self.calender_frame_widgets:
-            calender_frame_widget.hide()
-            self.v_layout.addWidget(calender_frame_widget)
 
-        self.v_layout.addSpacing(35)
+        # self.v_layout.addSpacing(35) ## add spacing at end NEED TO DO!
 
         main_layout = QtWidgets.QVBoxLayout()
         main_layout.addLayout(h_title_layout)
@@ -120,10 +113,34 @@ class CalenderContainer(QtWidgets.QWidget):
         self.main_h_layout.addLayout(main_layout)
         self.main_h_layout.addLayout(right_v_layout)
 
+
+        self.setLayout(self.main_h_layout)
+
+    def set_up_calender(self):
+        self.create_calender_frame_widgets()
         self.set_month_and_year(2, 2025)
         self.show_calender_frame_at_index(self.global_month_index)
 
-        self.setLayout(self.main_h_layout)
+    def create_calender_frame_widgets(self):
+        # 1) Remove any existing frames
+        for i in reversed(range(self.v_layout.count())):
+            w = self.v_layout.itemAt(i).widget()
+            if w is not None:
+                w.setParent(None)
+        self.calender_frame_widgets.clear()
+
+        # 2) Create & add new frames
+        for month in self.app_context.mood_data:
+            print("Here")
+            print(month.month)
+            print(month)
+            frame = CalenderFrame(month)
+            frame.RequestCalenderZoomInWidget.connect(
+                self.on_calender_zoom_in_widget_request
+            )
+            frame.hide()  # start hidden
+            self.v_layout.addWidget(frame)  # add to the very same layout
+            self.calender_frame_widgets.append(frame)
 
     def set_example_data(self):
         example_mood_data = ["happy", None, "tired", "proud", "sick", "sick", "stressed", "angry", "angry", "sad", None,
@@ -213,15 +230,15 @@ class CalenderContainer(QtWidgets.QWidget):
     def get_month_and_year_from_index(self, index: int, start_year: int = None, start_month: int = None) -> tuple:
         """
 
-        :param index: (int) global index from pos 0 of self.months list
-        :param start_year: (int) year to begin counting from  {default=year at beginning of self.months}
-        :param start_month: (int) month to begin counting on  {default=month at beginning of self.months}
+        :param index: (int) global index from pos 0 of self.app_context.mood_data list
+        :param start_year: (int) year to begin counting from  {default=year at beginning of self.app_context.mood_data}
+        :param start_month: (int) month to begin counting on  {default=month at beginning of self.app_context.mood_data}
         :return: tuple(month, year): tuple(int, int) the month and year at the given index.
         """
         if start_year is None:
-            start_year = self.months[0].year
+            start_year = self.app_context.mood_data[0].year
         if start_month is None:
-            start_month = self.months[0].month
+            start_month = self.app_context.mood_data[0].month
         total_months = (start_year * 12 + start_month - 1) + index
         year = total_months // 12
         month = total_months % 12 + 1
@@ -231,14 +248,14 @@ class CalenderContainer(QtWidgets.QWidget):
         """
             :param month: (int) target month
             :param year: (int) target year
-            :param start_year: (int) year to begin counting from {default = year at beginning of self.months}
-            :param start_month: (int) month to begin counting on {default = month at beginning of self.months}
-            :return: (int) global index from pos 0 of self.months list
+            :param start_year: (int) year to begin counting from {default = year at beginning of self.app_context.mood_data}
+            :param start_month: (int) month to begin counting on {default = month at beginning of self.app_context.mood_data}
+            :return: (int) global index from pos 0 of self.app_context.mood_data list
             """
         if start_year is None:
-            start_year = self.months[0].year
+            start_year = self.app_context.mood_data[0].year
         if start_month is None:
-            start_month = self.months[0].month
+            start_month = self.app_context.mood_data[0].month
 
         start_total_months = start_year * 12 + start_month - 1
         target_total_months = year * 12 + month - 1
@@ -264,7 +281,7 @@ class CalenderContainer(QtWidgets.QWidget):
         :param year:  (int) e.g. 2025
         """
         self.global_month_index = month
-        self.month_label.setText(calendar.month_name[self.months[month].month])
+        self.month_label.setText(calendar.month_name[self.app_context.mood_data[month].month])
         self.year_label.setText(str(year))
 
     def set_month_mood_data(self, global_month_index: int, mood_data: list) -> None:
@@ -272,17 +289,17 @@ class CalenderContainer(QtWidgets.QWidget):
 
         takes in a list of mood data and the month index, and sets the mood data for that month. (will set the pictures too)
 
-        :param global_month_index: index of month from pos 0 in self.months array
+        :param global_month_index: index of month from pos 0 in self.app_context.mood_data array
         :param mood_data: moods (list[str]): list of file path extensions of each mood in the month, e.g ["happy", "sad", ...]
                 (doesnt need to be passed to instantiate however / has a default arg of [])
                 1 mood per day, if no mood then replace with a NONE e.g ["happy", "sad", None, "happy", None etc]
         """
-        current_month = self.months[global_month_index]
+        current_month = self.app_context.mood_data[global_month_index]
         current_month.moods = mood_data
         current_month_frame_widget = self.calender_frame_widgets[global_month_index]
         calender_entries = list(filter(lambda x: x.number != -1, current_month_frame_widget.calender_entries))
         for i, calender_entry in enumerate(calender_entries):
-            print(mood_data[i])
+            #print(mood_data[i])
             mood = mood_data[i]
             if mood is not None:
                 calender_entry.set_mood_pixmap(mood)
@@ -290,10 +307,10 @@ class CalenderContainer(QtWidgets.QWidget):
     def set_month_data(self, global_month_index: int, mood_data: list, diary_entries: list, screen_time: list, exercise: list, alcohol: list, sleep: list):
         """
 
-        updates the local monthData object in self.months and sets the mood data in children classes, such as caledner
+        updates the local monthData object in self.app_context.mood_data and sets the mood data in children classes, such as caledner
         frame etc, so it can be displayed for the user.
 
-        :param global_month_index: (int) index in self.months list (e.g. Jan 2025 would be index = 0)
+        :param global_month_index: (int) index in self.app_context.mood_data list (e.g. Jan 2025 would be index = 0)
         :param mood_data: (list[str])
         :param diary_entries: (list[str])
         :param screen_time: (list[float])
@@ -303,7 +320,7 @@ class CalenderContainer(QtWidgets.QWidget):
         :return:
         """
         self.set_month_mood_data(global_month_index, mood_data)
-        current_month = self.months[global_month_index]
+        current_month = self.app_context.mood_data[global_month_index]
         current_month.diary_entries = diary_entries
         current_month.screen_time = screen_time
         current_month.exercise = exercise
@@ -315,22 +332,23 @@ class CalenderContainer(QtWidgets.QWidget):
         Advances to the next month (if one doesnt exist it creates one)
         """
         self.global_month_index += 1
-        if self.global_month_index < len(self.months):
+        #print(self.app_context.mood_data)
+        if self.global_month_index < len(self.app_context.mood_data):
             self.show_calender_frame_at_index(self.global_month_index)
-            self.set_month_and_year(self.global_month_index, self.months[self.global_month_index].year)
+            self.set_month_and_year(self.global_month_index, self.app_context.mood_data[self.global_month_index].year)
         else:
             self.create_new_month()
             self.show_calender_frame_at_index(self.global_month_index)
-            self.set_month_and_year(self.global_month_index, self.months[self.global_month_index].year)
+            self.set_month_and_year(self.global_month_index, self.app_context.mood_data[self.global_month_index].year)
 
     def create_new_month(self) -> None:
         """
         generates new month data, and uses this to instantiate another CalenderFrame
         """
         month, year = self.get_month_and_year_from_index(self.global_month_index)
-        self.months.append(MonthData(month, year, self.generate_month_data(year, month)))
+        self.app_context.mood_data.append(MonthData(month, year, self.generate_month_data(year, month)))
         self.calender_frame_widgets.append(CalenderFrame(
-            self.months[self.global_month_index]
+            self.app_context.mood_data[self.global_month_index]
         ))
         self.v_layout.insertWidget(self.v_layout.count() - 1, self.calender_frame_widgets[self.global_month_index])
 
@@ -341,13 +359,14 @@ class CalenderContainer(QtWidgets.QWidget):
         if self.global_month_index > 0:
             self.global_month_index -= 1
             self.show_calender_frame_at_index(self.global_month_index)
-            self.set_month_and_year(self.global_month_index, self.months[self.global_month_index].year)
+            self.set_month_and_year(self.global_month_index, self.app_context.mood_data[self.global_month_index].year)
 
     def on_zoom_in_widget_close_request(self):
         self.setLayout(self.main_h_layout)
 
     @QtCore.Slot(int, int, int)
     def on_calender_zoom_in_widget_request(self, year: int, month: int, day: int) -> None:
+        print("reached here")
         """
         When user clicks on a calender sub frame widget e.g. a day, say jan 1st 2025, then this slot wil be called.
         Which will create a new calender zoom in widget.
@@ -360,11 +379,12 @@ class CalenderContainer(QtWidgets.QWidget):
         day_index = day - 1  # as index starts from 0 not 1
 
         month_index = self.get_index_from_month_and_year(month, year)
-        current_month_data = self.months[month_index]
+        current_month_data = self.app_context.mood_data[month_index]
 
-        args = current_month_data.get_days_data(day_index)
+        args = current_month_data.get_days_data(day_index, include_date=False)
 
-        new_calender_zoom_in_widget = CalenderZoomInContainer(day, month, year, *args)
+        print("args are: ", args)
+        new_calender_zoom_in_widget = CalenderZoomInContainer(day, month, year, **args)
         new_calender_zoom_in_widget.RequestExit.connect(self.on_zoom_in_widget_close_request)
         new_calender_zoom_in_widget.RequestNextDayData.connect(self.return_request_next_day_data)
         new_calender_zoom_in_widget.RequestPrevDayData.connect(self.return_request_prev_day_data)
@@ -391,15 +411,17 @@ class CalenderContainer(QtWidgets.QWidget):
 
         month_index = self.get_index_from_month_and_year(month, year)
         day += 1
-        current_month_data = self.months[month_index]
+        current_month_data = self.app_context.mood_data[month_index]
         if day >= len(list(filter(lambda x: x != -1, current_month_data.days))) + 1:
             day = 1
             month_index += 1
-            current_month_data = self.months[month_index]
+            current_month_data = self.app_context.mood_data[month_index]
         self.global_month_index = month_index
         self.show_calender_frame_at_index(month_index)
         month, year = self.get_month_and_year_from_index(month_index)
-        sender.receive_new_day_data(day, month, year, *current_month_data.get_days_data(day-1))
+        args = current_month_data.get_days_data(day-1, include_date=False)
+
+        sender.receive_new_day_data(day, month, year, **args)
 
     def return_request_prev_day_data(self, sender, day, month, year):
         """
@@ -416,17 +438,17 @@ class CalenderContainer(QtWidgets.QWidget):
 
         month_index = self.get_index_from_month_and_year(month, year)
         day -= 1
-        current_month_data = self.months[month_index]
+        current_month_data = self.app_context.mood_data[month_index]
         if day <= 0:
             month_index -= 1
-            current_month_data = self.months[month_index]
+            current_month_data = self.app_context.mood_data[month_index]
             day = len(list(filter(lambda x: x != -1, current_month_data.days)))
         self.global_month_index = month_index
         self.show_calender_frame_at_index(month_index)
         month, year = self.get_month_and_year_from_index(self.global_month_index)
 
-        args = current_month_data.get_days_data(day-1)
-        sender.receive_new_day_data(day, month, year, *args)
+        args = current_month_data.get_days_data(day-1, include_date=False)
+        sender.receive_new_day_data(day, month, year, **args)
 
 
 class CalenderFrame(QtWidgets.QFrame):
@@ -477,13 +499,27 @@ class CalenderFrame(QtWidgets.QFrame):
         for i, widget in enumerate(self.day_calender_widgets):
             grid_layout.addWidget(widget, 0, i)
 
+        j=0
         for i, day in enumerate(month.days):
-            new_calender_entry = CalenderEntry(day)
-            new_calender_entry.CalenderEntryWasClicked.connect(self.on_calender_entry_click)
-            self.calender_entries.append(new_calender_entry)
+            new_calendar_entry = CalenderEntry(day)
+            mood_list = getattr(month, 'mood_data', [])
+            if day != -1:
+
+                # only if we have an entry at this index and it’s not None
+                if j < len(mood_list) and mood_list[j] is not None:
+                    mood_value = self.month.mood_data[j].mood
+                    if mood_value is not None:
+                        new_calendar_entry.set_mood_pixmap(mood_value)
+                j += 1
+
+            new_calendar_entry.CalenderEntryWasClicked.connect(
+                self.on_calender_entry_click
+            )
+            self.calender_entries.append(new_calendar_entry)
+
             row = 1 + (i // 7)
             col = i % 7
-            grid_layout.addWidget(new_calender_entry, row, col)
+            grid_layout.addWidget(new_calendar_entry, row, col)
 
         self.setLayout(grid_layout)
 
@@ -494,6 +530,7 @@ class CalenderFrame(QtWidgets.QFrame):
         :param day: (int)
         :return:
         """
+        print("got to on_calender_entry_click")
         self.RequestCalenderZoomInWidget.emit(self.month.year, self.month.month, day)
 
 
@@ -552,16 +589,19 @@ class CalenderEntry(QtWidgets.QFrame):
         """)
         # 66, 65, 96
 
-    def set_mood_pixmap(self, mood: str) -> None:
+    def set_mood_pixmap(self, mood: str | None) -> None:
         """
         sets the image in a calender entry to the given mood.
 
         :param mood: string e.g 'happy'
         :return:
         """
+        if mood is None:
+            return
         self.mood_pixmap = QtGui.QPixmap(f"resources/images/{mood}.png")
         scaled_pixmap = self.mood_pixmap.scaled(40, 40, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         self.mood_label.setPixmap(scaled_pixmap)
+        #("set mood pixmap")
 
     def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
         """
@@ -597,6 +637,7 @@ class CalenderEntry(QtWidgets.QFrame):
         super().mousePressEvent(event)
         if event.button() == QtCore.Qt.LeftButton:
             if self.number != -1:
+                print("got here lad")
                 self.CalenderEntryWasClicked.emit(self.number)
 
 
@@ -678,17 +719,17 @@ class CalenderZoomInContainer(QtWidgets.QFrame):
     RequestPrevDayData = QtCore.Signal(object, int, int, int)
     RequestExit = QtCore.Signal()
 
-    def __init__(self, day: int, month: int, year: int, mood: str, diary_entry: str, screen_time: float, exercise: int,
-                 alcohol: float, sleep: float):
+    def __init__(self, day: int, month: int, year: int, mood: str, sleep: float,  screen: float, exercise: int,
+                 alcohol: float,  diary: str,):
         super().__init__()
 
         # setting variables
         self.day = day
         self.month = month
         self.year = year
-        self.diary_entry = diary_entry
+        self.diary_entry = diary
         self.mood = mood
-        self.screen_time = screen_time
+        self.screen_time = screen
         self.exercise = exercise
         self.alcohol = alcohol
         self.sleep = sleep
@@ -776,21 +817,21 @@ class CalenderZoomInContainer(QtWidgets.QFrame):
     def left_button_clicked(self):
         self.RequestPrevDayData.emit(self, self.day, self.month, self.year)
 
-    def receive_new_day_data(self, day: int, month: int, year: int,  mood: str,diary_entry: str, screen_time: float,
-                             exercise: int, alcohol: float, sleep: float):
+    def receive_new_day_data(self, day: int, month: int, year: int,  mood: str, sleep: float,  screen: float,
+                             exercise: int, alcohol: float,  diary: str):
         self.day = day
         self.month = month
         self.year = year
-        self.diary_entry = diary_entry
+        self.diary_entry = diary
         self.mood = mood
-        self.screen_time = screen_time
+        self.screen_time = screen
         self.exercise = exercise
         self.alcohol = alcohol
         self.sleep = sleep
 
         self.set_date_text()
 
-        self.main_widget.receive_new_day_data( mood, diary_entry, screen_time, exercise, alcohol, sleep)
+        self.main_widget.receive_new_day_data(mood, diary, screen, exercise, alcohol, sleep)
         self.main_widget.set_widgets()
 
 
@@ -1000,7 +1041,7 @@ class DiaryEntryWidget(QtWidgets.QFrame):
         if self.entry_text == "":
             self.entry_text = "No diary entry for this day."
 
-        print(self.entry_text)
+        #print(self.entry_text)
         self.diary_text_label = ClickableLabel(self.entry_text)
         self.diary_text_label.doubleClicked.connect(self.enable_editing)
         self.diary_text_label.setFont(font_content)
@@ -1227,7 +1268,7 @@ class DiaryStatContainer(QtWidgets.QFrame):
         self.content_label.show()
 
     def check_legal_input(self, new_input: str) -> bool:
-        print("checked if legal input")
+        #print("checked if legal input")
         self.title_to_check_dict = {"Mood": self.valid_mood_input, "Screen time": self.valid_screen_time,
                                    "Exercise": self.valid_exercise_input, "Alcohol": self.valid_alcohol_input,
                                    "Sleep": self.valid_sleep_input }

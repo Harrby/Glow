@@ -3,6 +3,8 @@ from typing import TypedDict, Optional, Any
 from dataclasses import dataclass, field, asdict
 import calendar
 from intermediaryScript import intermediaryScript
+from collections import defaultdict
+from datetime import datetime
 
 
 @dataclass
@@ -45,9 +47,12 @@ class MoodData:
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self) -> dict:
+    def to_dict(self, include_date: bool = True) -> dict:
         """Return a dictionary representation of the dataclass."""
-        return asdict(self)
+        data = asdict(self)
+        if not include_date:
+            data.pop('date', None)
+        return data
 
 
 @dataclass
@@ -82,19 +87,21 @@ class MonthData:
             days.append(-1)
         self.days = days
 
-    def get_days_data(self, day_index: int) -> dict:
+    def get_days_data(self, day_index: int, include_date: bool = True) -> dict:
         """
         gets all data for a given day.
 
         :param day_index: e.g. IMPORTANT: if want 3rd day, day index is 2.
+        :param include_date
         :return: dict of mood, diary entry, screen time, exercise, alcohol, sleep.
         """
         try:
-            return self.mood_data[day_index].to_dict()
+            return self.mood_data[day_index].to_dict(include_date)
 
         except IndexError:
-            # If any list is out of range for day_index, return {}
-            return {}
+            # If any list is out of range for day_index, return empty mood data
+
+            return MoodData.to_dict(include_date)
 
 
 class AppContext(QObject):
@@ -154,7 +161,55 @@ class AppContext(QObject):
         self._profile_data = self._intermediary_script.getAccount(username=self._username, detail=None)
 
     def retrieve_all_mood_data_from_db(self):
-        ...
+        for year in (2025, 2026, 2027):
+            new = self._intermediary_script.getMoodEntryByYear(self._username, year)
+            print("YEAR ", year)
+            print(new)
+            self.update_mood_entries(new)
+
+
+    def update_mood_entries(self, raw_entries: list[dict]):
+        # 1) group incoming entries by year/month
+        by_month = defaultdict(list)
+        for e in raw_entries:
+            dt = datetime.strptime(e['date'], '%Y-%m-%d')
+            by_month[(dt.year, dt.month)].append((dt.day, e))
+
+        # 2) map existing months
+        existing = {(m.year, m.month): m for m in self._mood_data}
+
+        for (yr, mon), entries in by_month.items():
+            # either grab or create the MonthData
+            if (yr, mon) in existing:
+                md = existing[(yr, mon)]
+            else:
+                md = MonthData(month=mon, year=yr, days=[])
+                md.generate_month_data(yr, mon)
+                self._mood_data.append(md)
+
+            # figure out how many real days are in this month
+            _, num_days = calendar.monthrange(yr, mon)
+
+            # ensure mood_data is exactly one placeholder per real day
+            if len(md.mood_data) != num_days:
+                md.mood_data = [MoodData() for _ in range(num_days)]
+
+            # 3) inject each entry at index = day-1
+            for day, entry in entries:
+                if 1 <= day <= num_days:
+                    idx = day - 1
+                    md.mood_data[idx] = MoodData(
+                        mood=entry['mood'],
+                        sleep=entry['sleep'],
+                        screen=entry['screen'],
+                        exercise=entry['exercise'],
+                        alcohol=entry['alcohol'],
+                        date=entry['date'],
+                        diary=entry.get('diary')
+                    )
+
+        # 4) keep them sorted
+        self._mood_data.sort(key=lambda m: (m.year, m.month))
 
 
 
