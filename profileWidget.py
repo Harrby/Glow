@@ -18,7 +18,7 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QCheckBox
 )
-from calenderWidget import ClickableLabel
+#from calenderWidget import ClickableLabel
 import intermediaryScript as inter
 
 

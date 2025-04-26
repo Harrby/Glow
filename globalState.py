@@ -2,6 +2,7 @@ from PySide6.QtCore import QObject, Signal
 from typing import TypedDict, Optional, Any
 from dataclasses import dataclass, field, asdict
 import calendar
+from intermediaryScript import intermediaryScript
 
 
 @dataclass
@@ -112,6 +113,8 @@ class AppContext(QObject):
 
         self._mood_data: list[MonthData] = []
 
+        self._intermediary_script = intermediaryScript()
+
     @property
     def username(self) -> str:
         return self._username
@@ -146,5 +149,13 @@ class AppContext(QObject):
         self._profile_data[key] = value
         # notify any listeners
         self.ProfileDataChanged.emit(self._profile_data)
+
+    def retrieve_profile_data_from_db(self):
+        self._profile_data = self._intermediary_script.getAccount(username=self._username, detail=None)
+
+    def retrieve_all_mood_data_from_db(self):
+        ...
+
+
 
 
