@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QApplication, QStackedWidget
 from globalState import AppContext
 
 from logQuizWidget import LogQuizWidget
+from signUpContainer import SignUpPages
 from signupPage import SignupScreen
 from activitiesWidget import ActivitiesWidget
 from loginWidget import LoginWidget
@@ -42,7 +43,13 @@ class MainWindow(QtWidgets.QMainWindow):
         # Initially added widgets
         self.login_page = LoginWidget(self.context)
         self.login_page.login_successful.connect(self.show_welcome)
+        self.login_page.sign_up.connect(self.show_sign_up_pages)
         self.stack.addWidget(self.login_page)  # index 0
+
+        # Initially added widgets
+        self.sign_up_pages = SignUpPages()
+        self.sign_up_pages.login_page.connect(self.show_login_page)
+        self.stack.addWidget(self.sign_up_pages)
 
         self.welcome_page = WelcomeWidget()
         self.welcome_page.page_clicked.connect(self.show_opening_widget)
@@ -107,6 +114,18 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Auto-hide after 3 seconds
         QtCore.QTimer.singleShot(3000, hint.deleteLater)
+
+    def show_login_page(self):
+        self.login_page.login_successful.connect(self.show_welcome)
+        self.login_page.sign_up.connect(self.show_sign_up_pages)
+        self.stack.addWidget(self.login_page)
+        self.stack.setCurrentWidget(self.login_page)
+
+    def show_sign_up_pages(self):
+        self.sign_up_pages = SignUpPages()
+        self.sign_up_pages.login_page.connect(self.show_login_page)
+        self.stack.addWidget(self.sign_up_pages)
+        self.stack.setCurrentWidget(self.sign_up_pages)
 
     def show_welcome(self, username):
         self.welcome_page.set_name(username)
