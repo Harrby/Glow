@@ -7,7 +7,7 @@ import calendar
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 from globalState import AppContext, MonthData
-
+from typing import Any
 
 class CalenderContainer(QtWidgets.QWidget):
     """
@@ -381,6 +381,7 @@ class CalenderContainer(QtWidgets.QWidget):
 
         print("args are: ", args)
         new_calender_zoom_in_widget = CalenderZoomInContainer(day, month, year, **args)
+        new_calender_zoom_in_widget.UserEditedValue.connect(self.app_context.update_mood_data_value)
         new_calender_zoom_in_widget.RequestExit.connect(self.on_zoom_in_widget_close_request)
         new_calender_zoom_in_widget.RequestNextDayData.connect(self.return_request_next_day_data)
         new_calender_zoom_in_widget.RequestPrevDayData.connect(self.return_request_prev_day_data)
@@ -714,6 +715,7 @@ class CalenderZoomInContainer(QtWidgets.QFrame):
     RequestNextDayData = QtCore.Signal(object, int, int, int)  # sends a request for getting next days data
     RequestPrevDayData = QtCore.Signal(object, int, int, int)
     RequestExit = QtCore.Signal()
+    UserEditedValue = QtCore.Signal(int, int, int, str, Any)
 
     def __init__(self, day: int, month: int, year: int, mood: str, sleep: float,  screen: float, exercise: int,
                  alcohol: float,  diary: str,):
@@ -766,7 +768,7 @@ class CalenderZoomInContainer(QtWidgets.QFrame):
         title_hor_layout.addStretch(3)
 
         self.main_widget = CalenderZoomInWidget(self.diary_entry, self.mood, self.screen_time, self.exercise, self.alcohol, self.sleep)
-
+        self.main_widget.UserEditedValue.connect(self.user_edited_value)
 
         scroll_area = QtWidgets.QScrollArea()
         scroll_area.setStyleSheet("""
@@ -830,6 +832,9 @@ class CalenderZoomInContainer(QtWidgets.QFrame):
         self.main_widget.receive_new_day_data(mood, diary, screen, exercise, alcohol, sleep)
         self.main_widget.set_widgets()
 
+    def user_edited_value(self, key, value):
+        self.UserEditedValue.emit(self.day, self.month, self.year, key, value)
+
 
 class CalenderZoomInWidget(QtWidgets.QFrame):
 
@@ -861,6 +866,7 @@ class CalenderZoomInWidget(QtWidgets.QFrame):
     Author: Harry
     Created: 04-04-2025
     """
+    UserEditedValue = QtCore.Signal(str, str)
 
     def __init__(self, diary_entry: str, mood: str, screen_time: float,
                              exercise: int, alcohol: float, sleep: float):
@@ -897,6 +903,7 @@ class CalenderZoomInWidget(QtWidgets.QFrame):
         # this seems a bit hacky
 
         self.diary_entry_widget = DiaryEntryWidget("")
+        self.diary_entry_widget.UserEditedText.connect(lambda x: self.user_edited_value("diary", x))
         # self.diary_entry_widget.UserEditedText.connect()
 
         self.mood_stat_container = DiaryStatContainer("Mood")
@@ -904,6 +911,12 @@ class CalenderZoomInWidget(QtWidgets.QFrame):
         self.exercise_stat_container = DiaryStatContainer("Exercise")
         self.alcohol_stat_container = DiaryStatContainer("Alcohol")
         self.sleep_stat_container = DiaryStatContainer("Sleep")
+
+        self.mood_stat_container.UserEditedValue.connect(lambda x: self.user_edited_value("mood", x))
+        self.screen_time_stat_container.UserEditedValue.connect(lambda x: self.user_edited_value("screen", x))
+        self.exercise_stat_container.UserEditedValue.connect(lambda x: self.user_edited_value( "exercise", x))
+        self.alcohol_stat_container.UserEditedValue.connect(lambda x: self.user_edited_value( "alcohol", x))
+        self.sleep_stat_container.UserEditedValue.connect(lambda x: self.user_edited_value( "sleep", x))
 
         self.set_stat_labels()
 
@@ -950,6 +963,10 @@ class CalenderZoomInWidget(QtWidgets.QFrame):
         super().paintEvent(event)
         painter = QtGui.QPainter(self)
         painter.drawPixmap(self.rect(), self.pixmap)
+
+    def user_edited_value(self, key: str, value: str):
+        self.UserEditedValue.emit(key, value)
+
 
     def receive_new_day_data(self,  mood: str, diary_entry: str, screen_time: float,
                              exercise: int, alcohol: float, sleep: float):
@@ -1265,12 +1282,9 @@ class DiaryStatContainer(QtWidgets.QFrame):
 
     def check_legal_input(self, new_input: str) -> bool:
         #print("checked if legal input")
-        self.title_to_check_dict = {"Mood": self.valid_mood_input, "Screen time": self.valid_screen_time,
-                                   "Exercise": self.valid_exercise_input, "Alcohol": self.valid_alcohol_input,
-                                   "Sleep": self.valid_sleep_input }
         try:
             return self.title_to_check_dict[self.title_text](new_input)
-        except :
+        except:
             return False
 
     @staticmethod

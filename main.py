@@ -66,17 +66,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.dashboard_widget.logo_widget.connect(self.show_profile_widget)
         self.stack.addWidget(self.dashboard_widget)
 
-        self.alcohol_log_widget = Log(page="alcohol", name="Name")
-        self.stack.addWidget(self.alcohol_log_widget)
-
-        self.exercise_insights_widget = ExerciseInsightsWidget()
-        self.stack.addWidget(self.exercise_insights_widget)
-
-        self.screen_time_widget = ScreenTimeWidget()
-        self.stack.addWidget(self.screen_time_widget)
-
-        self.sleep_tracking_widget = SleepTrackingWidget()
-        self.stack.addWidget(self.sleep_tracking_widget)
+        self.alcohol_log_widget: Log
+        self.exercise_insights_widget: Log
+        self.screen_time_widget: Log
+        self.sleep_tracking_widget: Log
 
         # Set initial index for the stacked widget
         self.stack.setCurrentIndex(0)
@@ -111,7 +104,26 @@ class MainWindow(QtWidgets.QMainWindow):
     def show_welcome(self, username):
         self.welcome_page.set_name(username)
         self.calender_container.set_up_calender()
+        self.set_up_log_widgets()
         self.stack.setCurrentWidget(self.welcome_page)
+
+    def set_up_log_widgets(self):
+        name = self.context.profile_data["username"]
+        self.alcohol_log_widget = Log(page="alcohol", name=name)
+        self.alcohol_log_widget.RequestExit.connect(self.show_dashboard_widget)
+        self.stack.addWidget(self.alcohol_log_widget)
+
+        self.exercise_insights_widget = Log(page="exercise", name=name)
+        self.exercise_insights_widget.RequestExit.connect(self.show_dashboard_widget)
+        self.stack.addWidget(self.exercise_insights_widget)
+
+        self.screen_time_widget = Log(page="screen time", name=name)
+        self.screen_time_widget.RequestExit.connect(self.show_dashboard_widget)
+        self.stack.addWidget(self.screen_time_widget)
+
+        self.sleep_tracking_widget = Log(page="sleep", name=name)
+        self.sleep_tracking_widget.RequestExit.connect(self.show_dashboard_widget)
+        self.stack.addWidget(self.sleep_tracking_widget)
 
     def show_opening_widget(self):
         self.stack.setCurrentWidget(self.opening_widget)
@@ -147,6 +159,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.stack.setCurrentWidget(self.activities_widget)
 
     def show_dashboard_widget(self):
+        print("showed dashboard")
 
         self.stack.setCurrentWidget(self.dashboard_widget)
 

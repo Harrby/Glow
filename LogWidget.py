@@ -25,6 +25,7 @@ class Log(QtWidgets.QWidget):
         self.suggestions_widget = SuggestionsWidget(page=page) 
         self.activity_breakdown_widget = ActivityBreakdown(page=page)
 
+        self.log_widget.RequestExit.connect(self.RequestExit)
         self.log_widget.RequestWeeklyAnalytics.connect(self.show_weekly_analytics)
         self.log_widget.RequestTips.connect(self.show_tips)
         self.log_widget.RequestSuggestions.connect(self.show_suggestions)

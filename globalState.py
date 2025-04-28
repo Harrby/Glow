@@ -108,6 +108,16 @@ class AppContext(QObject):
     username_changed = Signal(str)  # Define a Signal (PySide6 uses Signal instead of pyqtSignal)
     ProfileDataChanged = Signal(dict)
 
+    TYPE_CASTERS: dict[str, type] = {
+        "mood": int,
+        "sleep": float,
+        "screen": float,
+        "exercise": int,
+        "alcohol": float,
+        "date": str,
+        "diary": str,
+    }
+
     def __init__(self):
         super().__init__()
         self._username: str = ""  # Initially no user
@@ -217,6 +227,73 @@ class AppContext(QObject):
     def change_profile_data_on_db(self, new_profile_data: dict):
         ...
 
+    def update_mood_data_value(
+        self,
+        day: int,
+        month: int,
+        year: int,
+        key: str,
+        value: Any
+    ) -> None:
+        """
+        Update the local MoodData for a specific day (1-based), month and year,
+        then persist the change via intermediaryScript.
 
+        :param day:    1-based day of month
+        :param month:  month as 1–12
+        :param year:   full year, e.g. 2025
+        :param key:    one of 'mood','sleep','screen','exercise','alcohol','diary'
+        :param value:  new value for that key
+        """
+        # --- 1) find or create the MonthData ---
+        md = next(
+            (m for m in self._mood_data if m.year == year and m.month == month),
+            None
+        )
+        if md is None:
+            md = MonthData(month=month, year=year, days=[])
+            md.generate_month_data(year, month)
+            # create placeholder MoodData for each real day
+            num_days = calendar.monthrange(year, month)[1]
+            md.mood_data = [MoodData() for _ in range(num_days)]
+            self._mood_data.append(md)
+
+        # --- 2) ensure we have one MoodData per real day ---
+        num_days = calendar.monthrange(year, month)[1]
+        if len(md.mood_data) != num_days:
+            md.mood_data = [MoodData() for _ in range(num_days)]
+
+        # --- 3) update that day’s MoodData locally ---
+        idx = day - 1
+        if not (0 <= idx < num_days):
+            raise IndexError(f"Day {day} is out of range for {month}/{year}")
+
+        day_data = md.mood_data[idx]
+
+        if not hasattr(day_data, key):
+            raise KeyError(f"Unknown mood key: {key!r}")
+
+        # set the field
+        setattr(day_data, key, value)
+
+        # ensure we have a proper ISO date on it
+        iso_date = f"{year}-{month:02d}-{day:02d}"
+        if day_data.date != iso_date:
+            day_data.date = iso_date
+
+        caster = self.TYPE_CASTERS.get(key, str)
+        raw_detail = getattr(day_data, key)
+        try:
+            detail = caster(raw_detail) if raw_detail is not None else None
+        except (ValueError, TypeError):
+            detail = raw_detail  # fallback if cast fails
+
+        #entry_dict = day_data.to_dict(include_date=True)
+        self._intermediary_script.updateFactor(
+            username=self._username,
+            body={"factor": key,
+                  "value": detail},
+            date=iso_date
+        )
 
 

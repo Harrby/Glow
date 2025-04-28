@@ -25,6 +25,7 @@ import intermediaryScript as inter
 class ProfileWidget(QWidget):
 
     dashboard_widget = QtCore.Signal()
+    UpdateDBProfile = QtCore.Signal(int, str)
 
     def __init__(self, context):
         super().__init__()
@@ -32,6 +33,8 @@ class ProfileWidget(QWidget):
         self.db_details= ["name", "age", "sports", "hobbies", "sex"]
 
         self.intScript = inter.intermediaryScript()
+
+        self.UpdateDBProfile.connect(self.update_db_profile)
 
         self.context = context
         self.context.username_changed.connect(self.update_ui)
@@ -141,6 +144,7 @@ class ProfileWidget(QWidget):
             text_edit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
             text_edit.hide()
             text_edit.requestSave.connect(lambda x=i: self.save_edit_text(x))
+            text_edit.setStyleSheet(input_style)
 
             self.input_lines.append([info, text_edit])
 
@@ -213,12 +217,12 @@ class ProfileWidget(QWidget):
         new_text = text_edit.toPlainText()
         label.setText(new_text)
 
-        self.context.profile_data()
-
-        self.update_db_profile(index, new_text)
-
+        self.context.profile_data[self.db_details[index]] = new_text
         text_edit.hide()
         label.show()
+
+        self.UpdateDBProfile.emit(index, new_text)
+        #self.update_db_profile(index, new_text)
 
     def get_profile_data(self):
         """
