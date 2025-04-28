@@ -18,7 +18,7 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QCheckBox
 )
-#from calenderWidget import ClickableLabel
+from calenderWidget import ClickableLabel, EditableTextEdit
 import intermediaryScript as inter
 
 
@@ -28,6 +28,8 @@ class ProfileWidget(QWidget):
 
     def __init__(self, context):
         super().__init__()
+
+        self.db_details= ["name", "age", "sports", "hobbies", "sex"]
 
         self.intScript = inter.intermediaryScript()
 
@@ -82,7 +84,7 @@ class ProfileWidget(QWidget):
         username_label.setStyleSheet("color: black;")
         top_bar_layout.addWidget(username_label, alignment=Qt.AlignVCenter)
 
-        self.close_button.clicked.connect(self.update_database_profile)
+        self.close_button.clicked.connect(self.dashboard_widget)
         top_bar_layout.addWidget(self.close_button, alignment=Qt.AlignRight)
         container_layout.addStretch()
         container_layout.addLayout(top_bar_layout)
@@ -113,40 +115,44 @@ class ProfileWidget(QWidget):
                     }"""
 
         # placeholder username variable for function to work
-        name, age, sports, hobbies, sex = self.get_profile_data(self.username)
+        name, age, sports, hobbies, sex = self.get_profile_data()
         user_info = [["Name: ", name], ["Age: ", age], ["Sports: ", sports], ["Hobbies: ", hobbies], ["Sex: ", sex]]
-        self.checkboxes = []
         self.input_lines = []
 
-        for field in user_info:
+        for i, field in enumerate(user_info):
             field_layout = QHBoxLayout()
 
             # change to a clickable label
 
-            info = QLineEdit()
+            info = ClickableLabel()
+            info.doubleClicked.connect(lambda x=i: self.enable_editing(x))
             info.setFont(quicksand_medium_content)
             info.setMinimumHeight(50)
             info.setMaximumWidth(1000)
             info.setText(field[1])
-            info.setEnabled(False)
+            info.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            # info.setEnabled(False)
             info.setStyleSheet(input_style)
-            self.input_lines.append(info)
+
+            text_edit = EditableTextEdit()
+            text_edit.setFont(quicksand_medium_content)
+            text_edit.setMaximumWidth(1000)
+            text_edit.setMinimumHeight(50)
+            text_edit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            text_edit.hide()
+            text_edit.requestSave.connect(lambda x=i: self.save_edit_text(x))
+
+            self.input_lines.append([info, text_edit])
 
             lbl = QLabel(field[0])
             lbl.setFont(quicksand_medium_content)
             lbl.setStyleSheet(label_style)
             field_layout.addWidget(lbl)
             field_layout.addWidget(info)
-
-            if user_info.index(field) != 4:
-                chckbox = QCheckBox(font=quicksand_medium_content)
-                chckbox.setStyleSheet(checkbox_style)
-                self.checkboxes.append(chckbox)
-                chckbox.toggled.connect(self.toggle_info_fields)
-
-                field_layout.addWidget(chckbox)
+            field_layout.addWidget(text_edit)
 
             container_layout.addLayout(field_layout)
+        print("input lines are", self.input_lines)
         container_layout.addStretch()
 
         # Add the container frame to the main layout.
@@ -191,41 +197,37 @@ class ProfileWidget(QWidget):
 
         super().paintEvent(event)
 
-    def get_profile_data(self, username):
+    def enable_editing(self, index: int):
+        label = self.input_lines[index][0]
+        text_edit = self.input_lines[index][1]
+
+        text_edit.setPlainText(label.text())
+        label.hide()
+        text_edit.show()
+        text_edit.setFocus()
+
+    def save_edit_text(self, index: int):
+        label = self.input_lines[index][0]
+        text_edit = self.input_lines[index][1]
+
+        new_text = text_edit.toPlainText()
+        label.setText(new_text)
+
+        self.context.profile_data()
+
+        self.update_db_profile(index, new_text)
+
+        text_edit.hide()
+        label.show()
+
+    def get_profile_data(self):
         """
         :param username:
             This will fetch the name, age, sports, hobbies and sex of the current user.
         :return:
         """
-        #data = inter.getProfileDate(username,)
-        data = {"name" : self.intScript.getAccount(username=username, detail="name")["name"],
-                "age" : str(self.intScript.getAccount(username=username, detail="age")["age"]),
-                "sports" : self.intScript.getAccount(username=username, detail="exercises")["exercises"],
-                "hobbies" : self.intScript.getAccount(username=username, detail="hobbies")["hobbies"],
-                "sex" : self.intScript.getAccount(username=username, detail="sex")["sex"]}
-        sports = ", ".join(data["sports"])
-        hobbies = ", ".join(data["hobbies"])
-
-        user_info_texts = [
-            data["name"],
-            data["age"],
-            sports,
-            hobbies,
-            data["sex"]
-        ]
-        return user_info_texts[0], user_info_texts[1], user_info_texts[2], user_info_texts[3], user_info_texts[4]
-
-    def toggle_info_fields(self):
-        """
-            Allows the user to change their profile information if the associated edit checkbox is checked.
-        :param i:
-        :return:
-        """
-        for i in range(len(self.checkboxes)):
-            if self.checkboxes[i].isChecked():
-                self.input_lines[i].setEnabled(True)
-            else:
-                self.input_lines[i].setEnabled(False)
+        data = self.context.profile_data
+        return data["name"], data["age"], ", ".join(data["exercises"]), ", ".join(data["hobbies"]), data["sex"]
 
     def get_updated_info(self):
         """
@@ -238,18 +240,21 @@ class ProfileWidget(QWidget):
         :return:
         """
         info = []
-        for field in self.input_lines[:4]:
+        for field in self.input_lines[0][:4]:
             info.append(field.text())
         info[2] = info[2].split(", ")
         info[3] = info[3].split(", ")
         return info
 
+    def update_db_profile(self, index, new_text: str):
+        self.intScript.updateProfile(username=self.username, body={"detail": self.db_details[index], "value": new_text})
+
     def update_database_profile(self):
         info = self.get_updated_info()
-        self.intScript.updateProfile(username=self.username, body={"detail" : "name", "value" : info[0]})
-        self.intScript.updateProfile(username=self.username, body={"detail" : "age", "value" : info[1]})
-        self.intScript.updateProfile(username=self.username, body={"detail" : "sports", "value" : info[2]})
-        self.intScript.updateProfile(username=self.username, body={"detail" : "hobbies", "value" : info[3]})
+        self.intScript.updateProfile(username=self.username, body={"detail": "name", "value" : info[0]})
+        self.intScript.updateProfile(username=self.username, body={"detail": "age", "value" : info[1]})
+        self.intScript.updateProfile(username=self.username, body={"detail": "sports", "value" : info[2]})
+        self.intScript.updateProfile(username=self.username, body={"detail": "hobbies", "value" : info[3]})
         self.dashboard_widget.emit()
 
 

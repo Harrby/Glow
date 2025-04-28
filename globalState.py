@@ -122,6 +122,8 @@ class AppContext(QObject):
 
         self._intermediary_script = intermediaryScript()
 
+        self.ProfileDataChanged.connect(self.change_profile_data_on_db)
+
     @property
     def username(self) -> str:
         return self._username
@@ -163,10 +165,11 @@ class AppContext(QObject):
     def retrieve_all_mood_data_from_db(self):
         for year in (2025, 2026, 2027):
             new = self._intermediary_script.getMoodEntryByYear(self._username, year)
-            print("YEAR ", year)
-            print(new)
             self.update_mood_entries(new)
 
+    def retrieve_new_year_mood_data_from_db(self, year: int):
+        new = self._intermediary_script.getMoodEntryByYear(self._username, year)
+        self.update_mood_entries(new)
 
     def update_mood_entries(self, raw_entries: list[dict]):
         # 1) group incoming entries by year/month
@@ -210,6 +213,9 @@ class AppContext(QObject):
 
         # 4) keep them sorted
         self._mood_data.sort(key=lambda m: (m.year, m.month))
+
+    def change_profile_data_on_db(self, new_profile_data: dict):
+        ...
 
 
 

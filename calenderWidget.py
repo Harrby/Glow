@@ -113,7 +113,6 @@ class CalenderContainer(QtWidgets.QWidget):
         self.main_h_layout.addLayout(main_layout)
         self.main_h_layout.addLayout(right_v_layout)
 
-
         self.setLayout(self.main_h_layout)
 
     def set_up_calender(self):
@@ -131,9 +130,6 @@ class CalenderContainer(QtWidgets.QWidget):
 
         # 2) Create & add new frames
         for month in self.app_context.mood_data:
-            print("Here")
-            print(month.month)
-            print(month)
             frame = CalenderFrame(month)
             frame.RequestCalenderZoomInWidget.connect(
                 self.on_calender_zoom_in_widget_request
@@ -1122,7 +1118,7 @@ class ClickableLabel(QtWidgets.QLabel):
 class EditableTextEdit(QtWidgets.QTextEdit):
     requestSave = QtCore.Signal()
 
-    def __init__(self, text: str, parent=None):
+    def __init__(self, text: str = "", parent=None):
         super().__init__(text, parent)
 
         self.setStyleSheet("""
