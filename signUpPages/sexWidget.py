@@ -30,6 +30,7 @@ class SexWidget(QtWidgets.QWidget):
                 border: 1px solid #ccc;
                 border-radius: 10px;
                 padding: 8px;
+                color: black;
                 font-family: Quicksand;
                 font-size: 32px;
                 min-width: 200px;

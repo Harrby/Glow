@@ -54,7 +54,7 @@ class AgeWidget(QtWidgets.QWidget):
             QLineEdit {
                 background-color: rgba(255, 227, 155, 1);
                 font-size: 40px;
-                color: rgba(237, 216, 112, 1);
+                color: black;
                 border-radius: 20px;
             }
         """)

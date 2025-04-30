@@ -10,9 +10,9 @@ class MeasurementCardWidget(QtWidgets.QFrame):
 
         self.setStyleSheet("QFrame { border: none; background-color: transparent; }")
 
-        # Background image
+        # # Background image
         self.background = QtWidgets.QLabel(self)
-        self.background.setPixmap(QtGui.QPixmap(self.get_background_image_path()))
+        # self.background.setPixmap(QtGui.QPixmap(self.get_background_image_path()))
         self.background.setScaledContents(True)
         
         # Main number display label

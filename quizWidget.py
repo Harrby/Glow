@@ -115,7 +115,7 @@ class QuizContainer(QtWidgets.QFrame):
 
         # 4) Put the panel in front, with padding around it
         outer_layout = QtWidgets.QVBoxLayout(self)
-        outer_layout.setContentsMargins(250, 250, 250, 250)  # adjust padding here
+        outer_layout.setContentsMargins(250, 100, 250, 100)  # adjust padding here
         outer_layout.addWidget(self.panel)
 
     # (You can still connect QuizContainer.main_dashboard externally.)

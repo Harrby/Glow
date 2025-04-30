@@ -79,7 +79,7 @@ class CustomWindowWidget(QWidget):
 
         # title text, centered
         painter.setPen(text_color)
-        font = QFont("Segoe UI", 48, QFont.Bold)
+        font = QFont("Segoe UI", 36, QFont.Bold)
         painter.setFont(font)
         painter.drawText(bar_rect, Qt.AlignCenter, self.title)
 

@@ -4,6 +4,7 @@ from buttons.imageButton import ImageButton
 from buttons.textButton import TextButton
 from MeasurementCardWidget import MeasurementCardWidget
 from resources.extra_classes.ScalablePixmapLabel import ScalablePixmapLabel
+from GlowWindowWidget import CustomWindowWidget
 
 class Log(QtWidgets.QWidget):
     """
@@ -96,6 +97,7 @@ class LogWidget(QtWidgets.QFrame):
             "button_colors": ["rgba(164, 162, 218, 1)", "rgba(118, 116, 161, 1)", "rgba(75, 74, 99, 1)"],
         },
         "alcohol": {
+            "bg_color": "#FFB699",
             "background_image": "resources/images/alcohol_images/alcoholBackground.png",
             "button_texts": ["Weekly analytics", "Alcohol intake tips", "Suggestions"],
             "button_colors": ["#FFB699", "#D06F48", "#9C3F1A"],
@@ -164,6 +166,11 @@ class LogWidget(QtWidgets.QFrame):
             self.RequestTips.emit()
 
     def setup_layout(self):
+
+        config = self.PAGE_CONFIGS.get(self.page, self.PAGE_CONFIGS["sleep"])
+        bg_color = str(self.PAGE_CONFIGS.get(self.page, {}).get("bg_color"))
+        print(bg_color)
+
         # Title + Close
         title_layout = QtWidgets.QHBoxLayout()
         title_layout.addStretch(1)
@@ -181,10 +188,15 @@ class LogWidget(QtWidgets.QFrame):
         buttons_layout.setContentsMargins(100, 0, 100, 100)
 
         # Card
-        card = MeasurementCardWidget(number=5, class_name=self.page)
+        card = CustomWindowWidget("", MeasurementCardWidget(number=5, class_name=self.page), colour=bg_color)
+
+        card_container = QtWidgets.QVBoxLayout()
+        card_container.setContentsMargins(0, 0, 80, 200)
+        card_container.addWidget(card)
+
         main_layout = QtWidgets.QHBoxLayout()
-        main_layout.addLayout(buttons_layout, 5),
-        main_layout.addWidget(card, 4),
+        main_layout.addLayout(buttons_layout, 5)
+        main_layout.addLayout(card_container, 4)
         main_layout.setAlignment(QtCore.Qt.AlignCenter)
 
         # final
