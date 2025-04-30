@@ -1,6 +1,6 @@
 from PySide6 import QtGui, QtCore, QtWidgets
 import sys
-from FUCKTHISWIDGET import CustomWindowWidget
+from GlowWindowWidget import CustomWindowWidget
 
 class QuizContainer(QtWidgets.QFrame):
     """

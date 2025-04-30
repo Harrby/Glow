@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, Signal
 
-from FUCKTHISWIDGET import CustomWindowWidget
+from GlowWindowWidget import CustomWindowWidget
 
 
 class QuestionBox(QWidget):

@@ -14,6 +14,9 @@ from welcomeWidget import WelcomeWidget
 from quizWidget import QuizContainer
 from dashboardWidget import DashboardWidget
 from profileWidget import ProfileWidget
+from analysisWidget import AnalysisContainer
+from Suggestions import Suggestions
+from achievementsWidget import Achievements
 from calenderWidget import CalenderContainer
 from LogWidget import Log
 from exerciseInsightsWidget import ExerciseInsightsWidget
@@ -59,18 +62,36 @@ class MainWindow(QtWidgets.QMainWindow):
         self.opening_widget.start_quiz.connect(self.show_quizWidget)
         self.stack.addWidget(self.opening_widget)
 
+        self.analysis_widget = AnalysisContainer()
+        self.stack.addWidget(self.analysis_widget)
+        self.analysis_widget.RequestExit.connect(self.show_dashboard_widget)
+
         self.calender_container = CalenderContainer(self.context)
         self.stack.addWidget(self.calender_container)
         self.calender_container.request_exit.connect(self.show_dashboard_widget)
 
-        self.dashboard_widget = DashboardWidget()
+        self.achievements_container = Achievements()
+        self.stack.addWidget(self.achievements_container)
+        self.achievements_container.RequestExit.connect(self.show_dashboard_widget)
+
+        self.suggestions_container = Suggestions()
+        self.stack.addWidget(self.suggestions_container)
+        self.suggestions_container.RequestExit.connect(self.show_dashboard_widget)
+
+        self.dashboard_widget: DashboardWidget = DashboardWidget()
+
         self.dashboard_widget.alcohol_widget.connect(self.show_alcohol_log_widget)
         self.dashboard_widget.screenTime_widget.connect(self.show_screen_time_widget)
         self.dashboard_widget.sleep_widget.connect(self.show_sleep_tracking_widget)
         self.dashboard_widget.exercise_widget.connect(self.show_exercise_insights_widget)
-        self.dashboard_widget.calender_widget.connect(self.show_calender_container)
-        self.dashboard_widget.opening_widget.connect(self.show_opening_widget)
-        self.dashboard_widget.logo_widget.connect(self.show_profile_widget)
+
+        self.dashboard_widget.analysisWidgetClicked.connect(self.show_analysis_widget)
+        self.dashboard_widget.calenderWidgetClicked.connect(self.show_calender_container)
+        self.dashboard_widget.achievementsWidgetClicked.connect(self.show_achievements_widget)
+        self.dashboard_widget.logoWidgetClicked.connect(self.show_profile_widget)
+        self.dashboard_widget.openingWidgetClicked.connect(self.show_opening_widget)
+        self.dashboard_widget.suggestionsWidgetClicked.connect(self.show_suggestions_widget)
+
         self.stack.addWidget(self.dashboard_widget)
 
         self.alcohol_log_widget: Log
@@ -130,18 +151,22 @@ class MainWindow(QtWidgets.QMainWindow):
         name = self.context.profile_data["username"]
         self.alcohol_log_widget = Log(page="alcohol", name=name)
         self.alcohol_log_widget.RequestExit.connect(self.show_dashboard_widget)
+        self.alcohol_log_widget.RequestSuggestions.connect(self.show_suggestions_widget)
         self.stack.addWidget(self.alcohol_log_widget)
 
         self.exercise_insights_widget = Log(page="exercise", name=name)
         self.exercise_insights_widget.RequestExit.connect(self.show_dashboard_widget)
+        self.exercise_insights_widget.RequestSuggestions.connect(self.show_suggestions_widget)
         self.stack.addWidget(self.exercise_insights_widget)
 
         self.screen_time_widget = Log(page="screen time", name=name)
         self.screen_time_widget.RequestExit.connect(self.show_dashboard_widget)
+        self.screen_time_widget.RequestSuggestions.connect(self.show_suggestions_widget)
         self.stack.addWidget(self.screen_time_widget)
 
         self.sleep_tracking_widget = Log(page="sleep", name=name)
         self.sleep_tracking_widget.RequestExit.connect(self.show_dashboard_widget)
+        self.sleep_tracking_widget.RequestSuggestions.connect(self.show_suggestions_widget)
         self.stack.addWidget(self.sleep_tracking_widget)
 
     def show_opening_widget(self):
@@ -182,8 +207,18 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.stack.setCurrentWidget(self.dashboard_widget)
 
+    def show_analysis_widget(self):
+        print("set anlysius widget")
+        self.stack.setCurrentWidget(self.analysis_widget)
+
     def show_calender_container(self):
         self.stack.setCurrentWidget(self.calender_container)
+
+    def show_achievements_widget(self):
+        self.stack.setCurrentWidget(self.achievements_container)
+
+    def show_suggestions_widget(self):
+        self.stack.setCurrentWidget(self.suggestions_container)
 
     def show_alcohol_log_widget(self):
         self.stack.setCurrentWidget(self.alcohol_log_widget)

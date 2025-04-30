@@ -13,6 +13,7 @@ class Log(QtWidgets.QWidget):
 
     """
     RequestExit = QtCore.Signal()
+    RequestSuggestions = QtCore.Signal()
 
     def __init__(self, page="alcohol", name="Name"): 
         super().__init__()
@@ -54,7 +55,8 @@ class Log(QtWidgets.QWidget):
         self.stacked_layout.setCurrentWidget(self.tips_widget)
 
     def show_suggestions(self) -> None:
-        self.stacked_layout.setCurrentWidget(self.suggestions_widget)
+        self.RequestSuggestions.emit()
+        #self.stacked_layout.setCurrentWidget(self.suggestions_widget)
 
     def show_activity_breakdown(self) -> None:
         self.stacked_layout.setCurrentWidget(self.activity_breakdown_widget)
@@ -213,12 +215,21 @@ class WeeklyAnalyticsWidget(QtWidgets.QFrame):
         "alcohol": {"bg_color": QtGui.QColor(235,149,115,255)},  
     }
 
+    PIXMAPS = {
+        "sleep":   "resources/images/sleep_images/analytics.png",
+        "exercise": "resources/images/exercise_images/analytics.png",
+        "screen time": "resources/images/screen_images/analytics.png",
+        "alcohol": "resources/images/alcohol_images/alcohol_analytics",
+    }
+
     def __init__(self, page="sleep"):  
         super().__init__()
         self.page = page
         cfg = self.PAGE_CONFIGS.get(page, {})
 
         # set background color
+        self.pixmap = QtGui.QPixmap(self.PIXMAPS[page])
+
         bg = cfg.get("bg_color")
         if bg:
             pal = self.palette()
@@ -231,22 +242,21 @@ class WeeklyAnalyticsWidget(QtWidgets.QFrame):
         self.close_button.clicked.connect(self.RequestExit)
 
         # Title label
-        self.title_label = QtWidgets.QLabel("Weekly Analytics")
-        font = QtGui.QFont("Quicksand Medium", 24)
-        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
-        self.title_label.setFont(font)
-        self.title_label.setAlignment(QtCore.Qt.AlignCenter)
 
         # layout
         v = QtWidgets.QVBoxLayout(self)
         v.setContentsMargins(20, 20, 20, 20)
         v.addWidget(self.close_button, alignment=QtCore.Qt.AlignRight)
-        v.addWidget(self.title_label)
         v.addStretch(1)
         self.setLayout(v)
 
-    def paintEvent(self, event):
-        super().paintEvent(event)
+    def paintEvent(self, event) -> None:
+        """
+        Draws the background image to the correct size on resize.
+        :param event:
+        """
+        painter = QtGui.QPainter(self)
+        painter.drawPixmap(self.rect(), self.pixmap)
 
 #Button 2 clicked
 class TipsWidget(QtWidgets.QFrame):
@@ -377,7 +387,7 @@ class ActivityBreakdown(QtWidgets.QFrame):
 
         # First scalable image
         pixmap1 = QtGui.QPixmap("resources/images/exercise_images/week_pie.png")
-        image1_label = ScalablePixmapLabel(pixmap1, scale_ratio=0.45, parent=self)
+        image1_label = ScalablePixmapLabel(pixmap1, scale_ratio=0.55, parent=self)
 
         # Second scalable image
         pixmap2 = QtGui.QPixmap("resources/images/exercise_images/month_pie.png")
@@ -422,12 +432,20 @@ class SuggestionsWidget(QtWidgets.QFrame):
     """
     RequestExit = QtCore.Signal()
 
+    PAGE_CONFIGS = {
+        "sleep": {"bg_color": QtGui.QColor(133, 200, 220, 255)},
+        "exercise": {"bg_color": QtGui.QColor(173, 226, 187, 255)},
+        "screen time": {"bg_color": QtGui.QColor(172, 176, 255, 255)},
+        "alcohol": {"bg_color": QtGui.QColor(235, 149, 115, 255)},
+    }
+
     def __init__(self, page="sleep"):  
         super().__init__()
         self.page = page
 
         background_img = QtGui.QPixmap("resources/images/alcohol_images/subWidgetBackground.png")
         self.pixmap = background_img
+
 
         self.close_button = ImageButton(50, 50, "resources/images/alcohol_images/close.png", False)
         self.close_button.setFixedSize(50, 50)

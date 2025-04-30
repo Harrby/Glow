@@ -1,8 +1,9 @@
 import sys
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtWidgets import QSizePolicy
-from PySide6.QtGui import QFont, QIcon
+from PySide6.QtGui import QFont, QIcon, QPixmap
 from buttons.hoverButton import HoverButton
+from buttons.imageButton import ImageButton
 
 
 class DashboardWidget(QtWidgets.QWidget):
@@ -33,26 +34,37 @@ class DashboardWidget(QtWidgets.QWidget):
 
         Author: James
         Created: 2025-03-27
+
+        contributers:
+            Harry 2025-04-30
     """
 
     alcohol_widget = QtCore.Signal()
     sleep_widget = QtCore.Signal()
     screenTime_widget = QtCore.Signal()
     exercise_widget = QtCore.Signal()
-    calender_widget = QtCore.Signal()
-    logo_widget = QtCore.Signal()
-    opening_widget = QtCore.Signal()
+
+    analysisWidgetClicked = QtCore.Signal()
+    calenderWidgetClicked = QtCore.Signal()
+    achievementsWidgetClicked = QtCore.Signal()
+    logoWidgetClicked = QtCore.Signal()
+    openingWidgetClicked = QtCore.Signal()
+    suggestionsWidgetClicked = QtCore.Signal()
 
     def __init__(self):
         super().__init__()
         self.setMinimumSize(800, 600)
-        self.setStyleSheet("background-color: #4B4A63;")
+        """self.setStyleSheet(".DashboardWidget"
+                           "{background-color: #4B4A63;}")"""
+
+        self.setAttribute(QtCore.Qt.WA_StyledBackground, True)
+        self.setStyleSheet(".DashboardWidget{background-color: #4B4A63;}")
 
         # Replace QPushButton with HoverButton for the main buttons
         self.screenTimeButton = HoverButton("Screen Time", self)
-        self.alcoholLogButton = HoverButton("Alcohol log", self)
-        self.exerciseButton = HoverButton("Exercise", self)
-        self.sleepButton = HoverButton("Sleep", self)
+        self.alcoholLogButton = HoverButton("Alcohol Log", self)
+        self.exerciseButton = HoverButton("Exercise Insights", self)
+        self.sleepButton = HoverButton("Sleep Tracking", self)
 
         self.screenTimeButton.clicked.connect(self.screenTime_widget.emit)
         self.alcoholLogButton.clicked.connect(self.alcohol_widget.emit)
@@ -61,33 +73,37 @@ class DashboardWidget(QtWidgets.QWidget):
 
         self.main_button_features(self.screenTimeButton, "#ACB0FF")
         self.main_button_features(self.alcoholLogButton, "#EB9573")
-        self.main_button_features(self.exerciseButton, "#C7ECD1")
-        self.main_button_features(self.sleepButton, "#D2D697")
+        self.main_button_features(self.exerciseButton, "#ADE2BB")
+        self.main_button_features(self.sleepButton, "#85C8DC")
 
         size_policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         for button in [self.screenTimeButton, self.alcoholLogButton, self.exerciseButton, self.sleepButton]:
             button.setSizePolicy(size_policy)
 
         # For icon buttons, you can also use HoverButton
-        self.exitButton = HoverButton("", self)
-        self.exitButton.setIcon(QIcon("resources/images/exit.png"))
 
-        self.calenderButton = HoverButton("", self)
-        self.calenderButton.setIcon(QIcon("resources/images/calender.png"))
-        self.calenderButton.clicked.connect(self.calender_widget.emit)
+        self.analysisButton = ImageButton(158, 150, "resources/images/dashboard/analysis.png", True)
+        self.analysisButton.clicked.connect(self.analysisWidgetClicked)
 
-        self.logoButton = HoverButton("", self)
-        self.logoButton.setIcon(QIcon("resources/images/glowlogo.png"))
-        self.logoButton.clicked.connect(self.logo_widget.emit)
+        self.calenderButton = ImageButton(158, 150, "resources/images/dashboard/calender.png", True)
+        self.calenderButton.clicked.connect(self.calenderWidgetClicked)
 
-        self.editMood = HoverButton("", self)
-        self.editMood.setIcon(QIcon("resources/images/miniLogos.png"))
-        self.editMood.clicked.connect(self.opening_widget.emit)
+        self.achievementsButton = ImageButton(158, 150, "resources/images/dashboard/acheivements.png", True)
+        self.achievementsButton.clicked.connect(self.achievementsWidgetClicked)
 
-        for button in [self.exitButton, self.calenderButton, self.logoButton, self.editMood]:
+        self.settingsButton = ImageButton(158, 150, "resources/images/dashboard/settings.png", True)
+        self.settingsButton.clicked.connect(self.logoWidgetClicked)
+
+        self.moodsButton = ImageButton(158, 150, "resources/images/dashboard/buttons.png", True)
+        self.moodsButton.clicked.connect(self.openingWidgetClicked)
+
+        self.suggestionsButton = ImageButton(158, 150, "resources/images/dashboard/suggestions.png", True)
+        self.suggestionsButton.clicked.connect(self.suggestionsWidgetClicked)
+
+        """for button in [self.exitButton, self.calenderButton, self.logoButton, self.editMood]:
             button.setFixedSize(140, 140)  
             button.setStyleSheet("border-radius: 40px; background-color: #B9B9B9;")
-            button.setIconSize(QtCore.QSize(100, 100))  
+            button.setIconSize(QtCore.QSize(100, 100))  """
 
         main_layout = QtWidgets.QHBoxLayout(self)
         grid_layout = QtWidgets.QGridLayout()
@@ -95,27 +111,33 @@ class DashboardWidget(QtWidgets.QWidget):
 
         upper_side_widget = QtWidgets.QWidget()
         upper_side_layout = QtWidgets.QVBoxLayout(upper_side_widget)  
-        upper_side_widget.setFixedWidth(150)
-        upper_side_layout.addWidget(self.exitButton) 
-        upper_side_layout.addWidget(self.calenderButton) 
+        upper_side_widget.setFixedWidth(180)
+        upper_side_layout.addWidget(self.analysisButton)
+        upper_side_layout.addWidget(self.calenderButton)
+        upper_side_layout.addWidget(self.achievementsButton)
 
         lower_side_widget = QtWidgets.QWidget()
         lower_side_layout = QtWidgets.QVBoxLayout(lower_side_widget) 
-        lower_side_widget.setFixedWidth(150)
-        lower_side_layout.addWidget(self.logoButton) 
-        lower_side_layout.addWidget(self.editMood)  
+        lower_side_widget.setFixedWidth(180)
+        lower_side_layout.addWidget(self.settingsButton)
+        lower_side_layout.addWidget(self.moodsButton)
+        lower_side_layout.addWidget(self.suggestionsButton)
 
         upper_side_layout.setSpacing(10) 
-        lower_side_layout.setSpacing(10)   
+        lower_side_layout.setSpacing(10)
+
+        border_label =QtWidgets.QLabel()
+        border_label.setPixmap(QPixmap("resources/images/dashboard/border.png"))
         
         side_layout.addWidget(upper_side_widget)
+        side_layout.addWidget(border_label)
         side_layout.addWidget(lower_side_widget)
   
         grid_layout.addWidget(self.screenTimeButton, 0, 0)
         grid_layout.addWidget(self.alcoholLogButton, 0, 1)
         grid_layout.addWidget(self.exerciseButton, 1, 0)
         grid_layout.addWidget(self.sleepButton, 1, 1)
-        grid_layout.setSpacing(10)
+        grid_layout.setSpacing(30)
         grid_layout.setContentsMargins(20, 20, 20, 20)
 
         grid_widget = QtWidgets.QWidget()
@@ -142,13 +164,13 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     window = DashboardWidget()
 
-    window.screenTime_widget.connect(lambda: print("screenTime_widget signal"))
+    """window.screenTime_widget.connect(lambda: print("screenTime_widget signal"))
     window.sleep_widget.connect(lambda: print("sleep_widget signal"))
     window.alcohol_widget.connect(lambda: print("alcohol_widget signal"))
     window.exercise_widget.connect(lambda: print("exercise_widget signal"))
     window.calender_widget.connect(lambda: print("calender_widget signal"))
     window.opening_widget.connect(lambda: print("opening_widget signal"))
-    window.logo_widget.connect(lambda: print("logo_widget signal"))
+    window.logo_widget.connect(lambda: print("logo_widget signal"))"""
 
     window.show()
     sys.exit(app.exec())
